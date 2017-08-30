@@ -105,6 +105,10 @@ import org.springframework.util.StringValueResolver;
  * @see #createBean
  * @see AbstractAutowireCapableBeanFactory#createBean
  * @see DefaultListableBeanFactory#getBeanDefinition
+ * BeanFactory的抽象实现
+ * 提供对单例的缓存，可以判断是单例还是原型，管理，别名，bean definition的合并，bean的销毁等。
+ * 继承了FactoryBeanRegistrySupport
+ * 实现了ConfigurableBeanFactory
  */
 public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
 
