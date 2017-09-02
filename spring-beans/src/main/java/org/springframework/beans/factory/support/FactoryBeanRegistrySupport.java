@@ -119,7 +119,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 					else {
 						if (object != null && shouldPostProcess) {
 							try {
-								//执行后处理
+								//执行ObjectFactory的后处理器
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							}
 							catch (Throwable ex) {

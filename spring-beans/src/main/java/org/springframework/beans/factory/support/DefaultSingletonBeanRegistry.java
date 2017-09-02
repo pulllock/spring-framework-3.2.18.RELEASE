@@ -296,7 +296,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					//获取单例对象后的检查
 					afterSingletonCreation(beanName);
 				}
-				//将新创建的单例注册到缓存中
+				//将新创建的单例注册到缓存中，并删除加载bean过程中所记录的各种辅助状态
 				addSingleton(beanName, singletonObject);
 			}
 			//单例对象缓存中存在或者新的创建了，返回
@@ -396,6 +396,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void beforeSingletonCreation(String beanName) {
 		//创建过程中不需要检查的缓存中不存在，并且正在创建的缓存添加成功，才可以继续执行，否则抛异常
+		//记录bean正在加载的状态
 		if (!this.inCreationCheckExclusions.containsKey(beanName) &&
 				this.singletonsCurrentlyInCreation.put(beanName, Boolean.TRUE) != null) {
 			throw new BeanCurrentlyInCreationException(beanName);
