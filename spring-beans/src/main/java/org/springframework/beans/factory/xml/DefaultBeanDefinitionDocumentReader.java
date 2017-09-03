@@ -97,7 +97,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
 		logger.debug("Loading bean definitions");
+		//获取root
 		Element root = doc.getDocumentElement();
+		//使用root继续进行BeanDefinition的注册
 		doRegisterBeanDefinitions(root);
 	}
 
@@ -123,8 +125,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	/**
 	 * Register each bean definition within the given root {@code <beans/>} element.
+	 * 使用给定的root元素，进行BeanDefinition的注册
 	 */
 	protected void doRegisterBeanDefinitions(Element root) {
+		//先处理profile属性
 		String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 		if (StringUtils.hasText(profileSpec)) {
 			String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
@@ -140,11 +144,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// the new (child) delegate with a reference to the parent for fallback purposes,
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
+		// BeanDefinition解析器代理
 		BeanDefinitionParserDelegate parent = this.delegate;
 		this.delegate = createDelegate(this.readerContext, root, parent);
 
+		//允许解析xml之前进行处理
 		preProcessXml(root);
+		//解析BeanDefinition
 		parseBeanDefinitions(root, this.delegate);
+		//允许解析xml之后进行处理
 		postProcessXml(root);
 
 		this.delegate = parent;
@@ -172,8 +180,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * Parse the elements at the root level in the document:
 	 * "import", "alias", "bean".
 	 * @param root the DOM root element of the document
+	 * 解析顶级的元素，import，alias，bean
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
+		//如果是默认的命名空间
 		if (delegate.isDefaultNamespace(root)) {
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
@@ -181,15 +191,17 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						//子元素是默认的标签
 						parseDefaultElement(ele, delegate);
 					}
 					else {
+						//子元素是自定义的标签
 						delegate.parseCustomElement(ele);
 					}
 				}
 			}
 		}
-		else {
+		else {//解析自定义的标签
 			delegate.parseCustomElement(root);
 		}
 	}
