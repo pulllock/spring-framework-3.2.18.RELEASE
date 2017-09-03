@@ -41,6 +41,7 @@ import org.springframework.core.io.Resource;
  * @see #getConfigResources
  * @see #getConfigLocations
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
+ * 使用XmlBeanDefinitionReader加载解析xml配置文件
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
@@ -75,21 +76,26 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 * @see #initBeanDefinitionReader
 	 * @see #loadBeanDefinitions
+	 * 使用XmlBeanDefinitionReader来加载Bean定义
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		//创建一个XmlBeanDefinitionReader
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
-		// resource loading environment.
+		// resource loading environment
+		// 配置XmlBeanDefinitionReader.
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
+		// 允许子类提供自定义初始化XmlBeanDefinitionReader
 		initBeanDefinitionReader(beanDefinitionReader);
+		// 使用XmlBeanDefinitionReader进行bean Definition的加载
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -116,14 +122,19 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getConfigLocations
 	 * @see #getResources
 	 * @see #getResourcePatternResolver
+	 * 使用给定的XmlBeanDefinitionReader 加载bean定义
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		//获取xml资源，getConfigResources方法由具体的子类实现
 		Resource[] configResources = getConfigResources();
 		if (configResources != null) {
+			//使用XmlBeanDefinitionReader在指定的资源中加载bean definition
 			reader.loadBeanDefinitions(configResources);
 		}
+		//资源位置
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
+			//从指定的配置文件位置加载bean definition
 			reader.loadBeanDefinitions(configLocations);
 		}
 	}
