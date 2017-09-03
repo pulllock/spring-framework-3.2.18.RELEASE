@@ -37,6 +37,7 @@ import org.springframework.core.env.Environment;
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 03.11.2003
+ * 提供了可配置的应用上下文
  */
 public interface ConfigurableApplicationContext extends ApplicationContext, Lifecycle, Closeable {
 
@@ -46,6 +47,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @see org.springframework.context.support.AbstractXmlApplicationContext#setConfigLocation
 	 * @see org.springframework.web.context.ContextLoader#CONFIG_LOCATION_PARAM
 	 * @see org.springframework.web.servlet.FrameworkServlet#setContextConfigLocation
+	 * 配置文件位置的分隔符
 	 */
 	String CONFIG_LOCATION_DELIMITERS = ",; \t\n";
 
@@ -54,6 +56,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * If none is supplied, default conversion rules apply.
 	 * @see org.springframework.core.convert.ConversionService
 	 * @since 3.0
+	 * 转换服务的名字
 	 */
 	String CONVERSION_SERVICE_BEAN_NAME = "conversionService";
 
@@ -63,24 +66,28 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * to allow the LoadTimeWeaver to process all actual bean classes.
 	 * @since 2.5
 	 * @see org.springframework.instrument.classloading.LoadTimeWeaver
+	 * LoadTimeWeaver的名字
 	 */
 	String LOAD_TIME_WEAVER_BEAN_NAME = "loadTimeWeaver";
 
 	/**
 	 * Name of the {@link Environment} bean in the factory.
 	 * @since 3.1
+	 * Environment的名字
 	 */
 	String ENVIRONMENT_BEAN_NAME = "environment";
 
 	/**
 	 * Name of the System properties bean in the factory.
 	 * @see java.lang.System#getProperties()
+	 * 系统属性的名字
 	 */
 	String SYSTEM_PROPERTIES_BEAN_NAME = "systemProperties";
 
 	/**
 	 * Name of the System environment bean in the factory.
 	 * @see java.lang.System#getenv()
+	 * 系统环境的名字
 	 */
 	String SYSTEM_ENVIRONMENT_BEAN_NAME = "systemEnvironment";
 
@@ -88,6 +95,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	/**
 	 * Set the unique id of this application context.
 	 * @since 3.0
+	 * 设置应用上下文的id
 	 */
 	void setId(String id);
 
@@ -98,12 +106,14 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * for example in case of WebApplicationContext setup.
 	 * @param parent the parent context
 	 * @see org.springframework.web.context.ConfigurableWebApplicationContext
+	 * 设置父上下文
 	 */
 	void setParent(ApplicationContext parent);
 
 	/**
 	 * Return the Environment for this application context in configurable form.
 	 * @since 3.1
+	 * 获取应用上下文的环境
 	 */
 	ConfigurableEnvironment getEnvironment();
 
@@ -119,6 +129,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * bean factory of this application context on refresh, before any of the
 	 * bean definitions get evaluated. To be invoked during context configuration.
 	 * @param postProcessor the factory processor to register
+	 * 添加一个新的BeanFactoryPostProcessor
 	 */
 	void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor);
 
@@ -131,6 +142,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @param listener the ApplicationListener to register
 	 * @see org.springframework.context.event.ContextRefreshedEvent
 	 * @see org.springframework.context.event.ContextClosedEvent
+	 * 添加一个新的ApplicationListener
 	 */
 	void addApplicationListener(ApplicationListener<?> listener);
 
@@ -143,6 +155,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @throws BeansException if the bean factory could not be initialized
 	 * @throws IllegalStateException if already initialized and multiple refresh
 	 * attempts are not supported
+	 * 加载和刷新配置
 	 */
 	void refresh() throws BeansException, IllegalStateException;
 
@@ -153,6 +166,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * (at max) will be registered for each context instance.
 	 * @see java.lang.Runtime#addShutdownHook
 	 * @see #close()
+	 * 注册一个关闭的钩子
 	 */
 	void registerShutdownHook();
 
@@ -163,6 +177,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * parent contexts have their own, independent lifecycle.
 	 * <p>This method can be called multiple times without side effects: Subsequent
 	 * {@code close} calls on an already closed context will be ignored.
+	 * 关闭应用上下文
 	 */
 	void close();
 
@@ -173,6 +188,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @see #refresh()
 	 * @see #close()
 	 * @see #getBeanFactory()
+	 * 是否当前应用上下文还活跃
 	 */
 	boolean isActive();
 
@@ -194,6 +210,7 @@ public interface ConfigurableApplicationContext extends ApplicationContext, Life
 	 * @see #refresh()
 	 * @see #close()
 	 * @see #addBeanFactoryPostProcessor
+	 * 获取BeanFactory
 	 */
 	ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException;
 
