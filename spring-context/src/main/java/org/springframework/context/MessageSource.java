@@ -34,6 +34,7 @@ import java.util.Locale;
  * @author Juergen Hoeller
  * @see org.springframework.context.support.ResourceBundleMessageSource
  * @see org.springframework.context.support.ReloadableResourceBundleMessageSource
+ * 访问国际化信息的接口
  */
 public interface MessageSource {
 
