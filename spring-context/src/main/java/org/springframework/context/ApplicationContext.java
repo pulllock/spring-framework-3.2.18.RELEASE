@@ -53,6 +53,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  * @see ConfigurableApplicationContext
  * @see org.springframework.beans.factory.BeanFactory
  * @see org.springframework.core.io.ResourceLoader
+ * 包含BeanFactory的所有功能，增加了支持不同信息源，可以访问资源，支持应用事件机制等
  */
 public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory,
 		MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
@@ -60,24 +61,28 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	/**
 	 * Return the unique id of this application context.
 	 * @return the unique id of the context, or {@code null} if none
+	 * 返回应用上下文的id
 	 */
 	String getId();
 
 	/**
 	 * Return a name for the deployed application that this context belongs to.
 	 * @return a name for the deployed application, or the empty String by default
+	 * 获取应用名字
 	 */
 	String getApplicationName();
 
 	/**
 	 * Return a friendly name for this context.
 	 * @return a display name for this context (never {@code null})
+	 * 返回上下文的一个展示用名字
 	 */
 	String getDisplayName();
 
 	/**
 	 * Return the timestamp when this context was first loaded.
 	 * @return the timestamp (ms) when this context was first loaded
+	 * 返回上下文启动的时间
 	 */
 	long getStartupDate();
 
@@ -85,6 +90,7 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	 * Return the parent context, or {@code null} if there is no parent
 	 * and this is the root of the context hierarchy.
 	 * @return the parent context, or {@code null} if there is no parent
+	 * 获取父上下文
 	 */
 	ApplicationContext getParent();
 
@@ -104,6 +110,7 @@ public interface ApplicationContext extends EnvironmentCapable, ListableBeanFact
 	 * bean factory yet (usually if {@code refresh()} has never been called)
 	 * @see ConfigurableApplicationContext#refresh()
 	 * @see ConfigurableApplicationContext#getBeanFactory()
+	 * 暴露AutowireCapableBeanFactory
 	 */
 	AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException;
 
