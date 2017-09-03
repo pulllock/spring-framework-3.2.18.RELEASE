@@ -61,14 +61,19 @@ import org.springframework.context.ApplicationContextException;
  * @see ClassPathXmlApplicationContext
  * @see FileSystemXmlApplicationContext
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
+ * 主要和上下文的刷新和创建有关
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
+	//是否允许同名bean定义覆盖
 	private Boolean allowBeanDefinitionOverriding;
 
+	//是否允许循环依赖
 	private Boolean allowCircularReferences;
 
-	/** Bean factory for this context */
+	/** Bean factory for this context
+	 * 当前上下文的BeanFactory
+	 * */
 	private DefaultListableBeanFactory beanFactory;
 
 	/** Synchronization monitor for the internal BeanFactory */
