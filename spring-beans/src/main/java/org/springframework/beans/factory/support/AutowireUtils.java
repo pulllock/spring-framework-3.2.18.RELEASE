@@ -55,6 +55,7 @@ abstract class AutowireUtils {
 	 * with decreasing number of arguments, then non-public constructors, again with
 	 * decreasing number of arguments.
 	 * @param constructors the constructor array to sort
+	 * 排序给定的构造器，public的优先，然后是非publi，参数数量降序
 	 */
 	public static void sortConstructors(Constructor<?>[] constructors) {
 		Arrays.sort(constructors, new Comparator<Constructor<?>>() {
