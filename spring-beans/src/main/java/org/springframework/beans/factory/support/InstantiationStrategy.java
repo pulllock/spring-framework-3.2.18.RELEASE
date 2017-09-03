@@ -30,6 +30,7 @@ import org.springframework.beans.factory.BeanFactory;
  *
  * @author Rod Johnson
  * @since 1.1
+ * 实例化bean的策略
  */
 public interface InstantiationStrategy {
 
@@ -42,6 +43,7 @@ public interface InstantiationStrategy {
 	 * @param owner owning BeanFactory
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation failed
+	 * 实例化
 	 */
 	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner)
 			throws BeansException;
