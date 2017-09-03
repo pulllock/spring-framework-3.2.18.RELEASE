@@ -66,6 +66,7 @@ public interface ApplicationEventMulticaster {
 	/**
 	 * Multicast the given application event to appropriate listeners.
 	 * @param event the event to multicast
+	 * 广播事件
 	 */
 	void multicastEvent(ApplicationEvent event);
 
