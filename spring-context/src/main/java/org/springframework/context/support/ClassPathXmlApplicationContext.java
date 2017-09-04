@@ -47,9 +47,12 @@ import org.springframework.util.Assert;
  * @see #getResource
  * @see #getResourceByPath
  * @see GenericApplicationContext
+ * xml应用上下文，从类路径加载上下文配置文件
+ * 配置文件位置可以通过getConfigLocations来覆盖
  */
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
 
+	//资源文件
 	private Resource[] configResources;
 
 
@@ -129,6 +132,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 	 * @param parent the parent context
 	 * @throws BeansException if context creation failed
 	 * @see #refresh()
+	 * 创建一个新的ClassPathXmlApplicationContext，指定配置文件位置，指定是否自动刷新上下文，加载所有的Bean定义，创建所有的单例
 	 */
 	public ClassPathXmlApplicationContext(String[] configLocations, boolean refresh, ApplicationContext parent)
 			throws BeansException {
