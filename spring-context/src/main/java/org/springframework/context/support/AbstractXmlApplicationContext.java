@@ -146,6 +146,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * this to provide pre-built Resource objects rather than location Strings.
 	 * @return an array of Resource objects, or {@code null} if none
 	 * @see #getConfigLocations()
+	 * 返回资源文件，默认返回null，子类可以覆盖
 	 */
 	protected Resource[] getConfigResources() {
 		return null;
