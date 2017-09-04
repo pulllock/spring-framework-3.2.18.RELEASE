@@ -75,20 +75,29 @@ import org.springframework.web.context.ServletContextAware;
  * @see org.springframework.web.context.ConfigurableWebApplicationContext#setConfigLocations
  * @see org.springframework.ui.context.ThemeSource
  * @see XmlWebApplicationContext
+ * 适用于web环境的应用上下文
  */
 public abstract class AbstractRefreshableWebApplicationContext extends AbstractRefreshableConfigApplicationContext
 		implements ConfigurableWebApplicationContext, ThemeSource {
 
-	/** Servlet context that this context runs in */
+	/** Servlet context that this context runs in
+	 * Servlet上下文
+	 * */
 	private ServletContext servletContext;
 
-	/** Servlet config that this context runs in, if any */
+	/** Servlet config that this context runs in, if any
+	 * Servlet配置
+	 * */
 	private ServletConfig servletConfig;
 
-	/** Namespace of this context, or {@code null} if root */
+	/** Namespace of this context, or {@code null} if root
+	 * 上下文的命名空间
+	 * */
 	private String namespace;
 
-	/** the ThemeSource for this ApplicationContext */
+	/** the ThemeSource for this ApplicationContext
+	 * 主题资源
+	 * */
 	private ThemeSource themeSource;
 
 
@@ -158,6 +167,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 
 	/**
 	 * Register request/session scopes, a {@link ServletContextAwareProcessor}, etc.
+	 * 注册request和session作用域
 	 */
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
