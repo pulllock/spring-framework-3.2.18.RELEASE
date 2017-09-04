@@ -77,6 +77,7 @@ import org.springframework.web.context.ContextLoader;
  * @author Juergen Hoeller
  * @since 3.0
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
+ * 可以使用注解
  */
 public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWebApplicationContext {
 
@@ -182,6 +183,7 @@ public class AnnotationConfigWebApplicationContext extends AbstractRefreshableWe
 	 * @see #setConfigLocations(String[])
 	 * @see AnnotatedBeanDefinitionReader
 	 * @see ClassPathBeanDefinitionScanner
+	 * 使用AnnotatedBeanDefinitionReader来加载bean定义
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {

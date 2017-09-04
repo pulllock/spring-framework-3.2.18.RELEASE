@@ -40,6 +40,7 @@ import org.springframework.context.ApplicationContext;
  * @author Juergen Hoeller
  * @since January 19, 2001
  * @see ServletContextAware#setServletContext
+ * web应用上下文
  */
 public interface WebApplicationContext extends ApplicationContext {
 
