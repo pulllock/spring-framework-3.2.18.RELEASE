@@ -37,6 +37,7 @@ import org.springframework.util.StringUtils;
  * @since 10.03.2004
  * @see FileSystemResourceLoader
  * @see org.springframework.context.support.ClassPathXmlApplicationContext
+ * ResourceLoader的默认实现
  */
 public class DefaultResourceLoader implements ResourceLoader {
 
@@ -86,16 +87,19 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
+		//class path
 		if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
+				//尝试以URL来解析
 				// Try to parse the location as a URL...
 				URL url = new URL(location);
 				return new UrlResource(url);
 			}
 			catch (MalformedURLException ex) {
+				//路径
 				// No URL -> resolve as resource path.
 				return getResourceByPath(location);
 			}
