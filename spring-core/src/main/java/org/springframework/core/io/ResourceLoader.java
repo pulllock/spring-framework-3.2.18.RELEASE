@@ -37,10 +37,13 @@ import org.springframework.util.ResourceUtils;
  * @see org.springframework.core.io.support.ResourcePatternResolver
  * @see org.springframework.context.ApplicationContext
  * @see org.springframework.context.ResourceLoaderAware
+ * 资源加载器接口
  */
 public interface ResourceLoader {
 
-	/** Pseudo URL prefix for loading from the class path: "classpath:" */
+	/** Pseudo URL prefix for loading from the class path: "classpath:"
+	 * 类路径前缀
+	 * */
 	String CLASSPATH_URL_PREFIX = ResourceUtils.CLASSPATH_URL_PREFIX;
 
 
@@ -62,6 +65,7 @@ public interface ResourceLoader {
 	 * @see #CLASSPATH_URL_PREFIX
 	 * @see org.springframework.core.io.Resource#exists
 	 * @see org.springframework.core.io.Resource#getInputStream
+	 * 根据位置获取资源
 	 */
 	Resource getResource(String location);
 
@@ -73,6 +77,7 @@ public interface ResourceLoader {
 	 * @return the ClassLoader (only {@code null} if even the system
 	 * ClassLoader isn't accessible)
 	 * @see org.springframework.util.ClassUtils#getDefaultClassLoader()
+	 * 获取类加载器
 	 */
 	ClassLoader getClassLoader();
 
