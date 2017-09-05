@@ -474,12 +474,16 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
+		//如果containingBean不为空，也就是当前标签是一个子标签
 		if (containingBean == null) {
+			//检查beanName是否在当前层级元素中被使用
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		//进一步解析其他属性，将所有属性统一封装起来
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
+			//如果没有beanName，Spring根据命名规则会生成一个beanName
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
