@@ -230,8 +230,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	/**
 	 * Parse an "import" element and load the bean definitions
 	 * from the given resource into the bean factory.
+	 * 解析import元素，加载import里面配置文件中的BeanDefinition
 	 */
 	protected void importBeanDefinitionResource(Element ele) {
+		// resource属性
 		String location = ele.getAttribute(RESOURCE_ATTRIBUTE);
 		if (!StringUtils.hasText(location)) {
 			getReaderContext().error("Resource location must not be empty", ele);
@@ -239,11 +241,13 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 
 		// Resolve system properties: e.g. "${user.dir}"
+		// 将resource中指定的值的占位符解析
 		location = getEnvironment().resolveRequiredPlaceholders(location);
 
 		Set<Resource> actualResources = new LinkedHashSet<Resource>(4);
 
 		// Discover whether the location is an absolute or relative URI
+		// 给定的地址是绝对地址还是相对地址
 		boolean absoluteLocation = false;
 		try {
 			absoluteLocation = ResourcePatternUtils.isUrl(location) || ResourceUtils.toURI(location).isAbsolute();
@@ -254,8 +258,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 
 		// Absolute or relative?
+		// 绝对地址
 		if (absoluteLocation) {
 			try {
+				// 加载BeanDefinition
 				int importCount = getReaderContext().getReader().loadBeanDefinitions(location, actualResources);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Imported " + importCount + " bean definitions from URL location [" + location + "]");
@@ -268,6 +274,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		else {
 			// No URL -> considering resource location as relative to the current file.
+			// 相对地址
 			try {
 				int importCount;
 				Resource relativeResource = getReaderContext().getResource().createRelative(location);
@@ -293,6 +300,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 		Resource[] actResArray = actualResources.toArray(new Resource[actualResources.size()]);
+		// 发送import已经处理完的事件
 		getReaderContext().fireImportProcessed(location, actResArray, extractSource(ele));
 	}
 
