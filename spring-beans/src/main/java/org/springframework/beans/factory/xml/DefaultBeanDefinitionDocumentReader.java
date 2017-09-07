@@ -306,9 +306,12 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	/**
 	 * Process the given alias element, registering the alias with the registry.
+	 * 处理ailas标签
 	 */
 	protected void processAliasRegistration(Element ele) {
+		// name属性
 		String name = ele.getAttribute(NAME_ATTRIBUTE);
+		// alias属性
 		String alias = ele.getAttribute(ALIAS_ATTRIBUTE);
 		boolean valid = true;
 		if (!StringUtils.hasText(name)) {
@@ -321,12 +324,14 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		if (valid) {
 			try {
+				// 注册alias
 				getReaderContext().getRegistry().registerAlias(name, alias);
 			}
 			catch (Exception ex) {
 				getReaderContext().error("Failed to register alias '" + alias +
 						"' for bean with name '" + name + "'", ele, ex);
 			}
+			// 发送alias注册事件
 			getReaderContext().fireAliasRegistered(name, alias, extractSource(ele));
 		}
 	}
