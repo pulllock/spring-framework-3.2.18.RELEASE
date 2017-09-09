@@ -86,6 +86,7 @@ public abstract class AopConfigUtils {
 		return registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry, null);
 	}
 
+	// 注册或升级AutoProxyCreator，定义beanName为internalAutoProxyCreator的BeanDefinition
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry, Object source) {
 		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
 	}
@@ -93,6 +94,7 @@ public abstract class AopConfigUtils {
 	public static void forceAutoProxyCreatorToUseClassProxying(BeanDefinitionRegistry registry) {
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			BeanDefinition definition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
+			// 设置proxyTargetClass属性为true
 			definition.getPropertyValues().add("proxyTargetClass", Boolean.TRUE);
 		}
 	}
@@ -100,22 +102,31 @@ public abstract class AopConfigUtils {
 	static void forceAutoProxyCreatorToExposeProxy(BeanDefinitionRegistry registry) {
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
 			BeanDefinition definition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
+			// 设置exposeProxy属性为true
 			definition.getPropertyValues().add("exposeProxy", Boolean.TRUE);
 		}
 	}
 
 
+	// 注册或升级AutoProxyCreator，定义beanName为internalAutoProxyCreator的BeanDefinition
 	private static BeanDefinition registerOrEscalateApcAsRequired(Class cls, BeanDefinitionRegistry registry, Object source) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
+		// 如果已经包含了internalAutoProxyCreator
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
+			// 获取已经注册的internalAutoProxyCreator
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
+			// 已经注册的internalAutoProxyCreator与我们现在要注册的不一致，需要根据优先级来判断 到底使用哪个
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
+				// 找到已经注册的internalAutoProxyCreator的优先级
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
+				// 找到我们现在的要注册优先级
 				int requiredPriority = findPriorityForClass(cls);
+				// 已经注册的没有我们现在要注册的优先级大，使用我们的现在要注册的
 				if (currentPriority < requiredPriority) {
 					apcDefinition.setBeanClassName(cls.getName());
 				}
 			}
+			// 已经存在internalAutoProxyCreator，并且与我们现在要创建的一致，就不需要再创建
 			return null;
 		}
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);

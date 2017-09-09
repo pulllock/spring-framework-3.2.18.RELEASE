@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
  * @author Rod Johnson
  * @see MethodBeforeAdvice
  * @see ThrowsAdvice
+ * 在连接点执行后，在执行横切逻辑
  */
 public interface AfterReturningAdvice extends AfterAdvice {
 

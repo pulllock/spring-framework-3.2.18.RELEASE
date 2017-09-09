@@ -31,6 +31,7 @@ import org.aopalliance.aop.Advice;
  * implemented using interception.
  *
  * @author Rod Johnson
+ * 切面
  */
 public interface Advisor {
 
@@ -42,6 +43,7 @@ public interface Advisor {
 	 * @see BeforeAdvice
 	 * @see ThrowsAdvice
 	 * @see AfterReturningAdvice
+	 * Advice
 	 */
 	Advice getAdvice();
 
