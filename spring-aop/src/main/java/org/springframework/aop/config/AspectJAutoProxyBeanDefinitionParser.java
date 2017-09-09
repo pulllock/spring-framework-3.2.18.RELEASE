@@ -34,11 +34,14 @@ import org.springframework.beans.factory.xml.ParserContext;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
+ * aspectj-autoproxy标签解析器
  */
 class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 注册AnnotationAwareAspectJAutoProxyCreator
 		AopNamespaceUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(parserContext, element);
+		// 对注解中子类的处理
 		extendBeanDefinition(element, parserContext);
 		return null;
 	}

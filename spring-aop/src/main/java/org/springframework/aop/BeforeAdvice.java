@@ -26,6 +26,7 @@ import org.aopalliance.aop.Advice;
  *
  * @author Rod Johnson
  * @see AfterAdvice
+ * 在连接点前执行的横切逻辑
  */
 public interface BeforeAdvice extends Advice {
 

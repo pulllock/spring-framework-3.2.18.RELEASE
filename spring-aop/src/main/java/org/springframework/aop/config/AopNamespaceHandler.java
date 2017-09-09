@@ -51,6 +51,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  * @author Adrian Colyer
  * @author Juergen Hoeller
  * @since 2.0
+ * aop标签的解析器
  */
 public class AopNamespaceHandler extends NamespaceHandlerSupport {
 
@@ -61,11 +62,15 @@ public class AopNamespaceHandler extends NamespaceHandlerSupport {
 	 */
 	public void init() {
 		// In 2.0 XSD as well as in 2.1 XSD.
+		// config标签
 		registerBeanDefinitionParser("config", new ConfigBeanDefinitionParser());
+		// aspectj-autoproxy标签
 		registerBeanDefinitionParser("aspectj-autoproxy", new AspectJAutoProxyBeanDefinitionParser());
+		// scoped-proxy标签
 		registerBeanDefinitionDecorator("scoped-proxy", new ScopedProxyBeanDefinitionDecorator());
 
 		// Only in 2.0 XSD: moved to context namespace as of 2.1
+		// spring-configured标签
 		registerBeanDefinitionParser("spring-configured", new SpringConfiguredBeanDefinitionParser());
 	}
 
