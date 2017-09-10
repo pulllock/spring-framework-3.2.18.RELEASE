@@ -71,9 +71,11 @@ public abstract class DataSourceUtils {
 	 * @throws org.springframework.jdbc.CannotGetJdbcConnectionException
 	 * if the attempt to get a Connection failed
 	 * @see #releaseConnection
+	 * 获取数据库连接
 	 */
 	public static Connection getConnection(DataSource dataSource) throws CannotGetJdbcConnectionException {
 		try {
+			// 获取数据库连接
 			return doGetConnection(dataSource);
 		}
 		catch (SQLException ex) {
