@@ -182,6 +182,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	private String contextInitializerClasses;
 
 	/** Should we publish the context as a ServletContext attribute? */
+	// 是否将webApplicationContext设置到ServletContext的属性
 	private boolean publishContext = true;
 
 	/** Should we publish a ServletRequestHandledEvent at the end of each request? */
@@ -459,7 +460,9 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// 初始化WebApplicationContext
 			this.webApplicationContext = initWebApplicationContext();
+			// 初始化FrameworkServlet
 			initFrameworkServlet();
 		}
 		catch (ServletException ex) {
@@ -488,10 +491,16 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	 * @see #setContextConfigLocation
 	 */
 	protected WebApplicationContext initWebApplicationContext() {
+		// 获取Spring的根容器rootContext
+		// 默认情况下Spring会将自己的容器设置成ServletContext的属性
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
 
+		// 构造方法中已经注入了webApplicationContext
+		// 这时候只需要进行一些设置
+		// 这种方法主要用于Servlet3.0之后，3.0之后可以在程序中使用ServletContext.addServlet方式注册Servlet
+		// 这时就可以在新建FrameworkServlet和其子类的时候通过构造方法传递webApplicationContext
 		if (this.webApplicationContext != null) {
 			// A context instance was injected at construction time -> use it
 			wac = this.webApplicationContext;
@@ -514,10 +523,13 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			// has been registered in the servlet context. If one exists, it is assumed
 			// that the parent context (if any) has already been set and that the
 			// user has performed any initialization such as setting the context id
+			// 当webApplication已经存在ServletContext中时，
+			// 通过配置在Servlet中的contextAttribute参数获取
 			wac = findWebApplicationContext();
 		}
 		if (wac == null) {
 			// No context instance is defined for this servlet -> create a local one
+			// 前面两种方法无效，就创建一个
 			wac = createWebApplicationContext(rootContext);
 		}
 
@@ -528,8 +540,10 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			onRefresh(wac);
 		}
 
+		// 需要将webApplicationContext设置到ServletContext属性
 		if (this.publishContext) {
 			// Publish the context as a servlet context attribute.
+			// 将ApplicationContext保存到ServletContext中
 			String attrName = getServletContextAttributeName();
 			getServletContext().setAttribute(attrName, wac);
 			if (this.logger.isDebugEnabled()) {
@@ -580,23 +594,28 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext
 	 */
 	protected WebApplicationContext createWebApplicationContext(ApplicationContext parent) {
+		// 获取创建类型
 		Class<?> contextClass = getContextClass();
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug("Servlet with name '" + getServletName() +
 					"' will try to create custom WebApplicationContext context of class '" +
 					contextClass.getName() + "'" + ", using parent context [" + parent + "]");
 		}
+		// 检查创建类型
 		if (!ConfigurableWebApplicationContext.class.isAssignableFrom(contextClass)) {
 			throw new ApplicationContextException(
 					"Fatal initialization error in servlet with name '" + getServletName() +
 					"': custom WebApplicationContext class [" + contextClass.getName() +
 					"] is not of type ConfigurableWebApplicationContext");
 		}
+		// 创建
 		ConfigurableWebApplicationContext wac =
 				(ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 
 		wac.setEnvironment(getEnvironment());
 		wac.setParent(parent);
+		// 将设置的contextConfigLocation参数传给wac
+		// 默认传入WEB-INFO/[ServletName]-Servlet.xml
 		wac.setConfigLocation(getContextConfigLocation());
 
 		configureAndRefreshWebApplicationContext(wac);
@@ -636,6 +655,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		wac.setServletContext(getServletContext());
 		wac.setServletConfig(getServletConfig());
 		wac.setNamespace(getNamespace());
+		// 添加监听ContextRefreshedEvent的监听器
 		wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
 
 		// The wac environment's #initPropertySources will be called in any case when the context
