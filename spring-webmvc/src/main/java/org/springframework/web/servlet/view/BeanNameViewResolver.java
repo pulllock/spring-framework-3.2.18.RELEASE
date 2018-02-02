@@ -50,6 +50,7 @@ import org.springframework.web.servlet.ViewResolver;
  * @see XmlViewResolver
  * @see ResourceBundleViewResolver
  * @see UrlBasedViewResolver
+ * 根据viewName从ApplicationContext容器中查找相应的bean做View
  */
 public class BeanNameViewResolver extends WebApplicationObjectSupport implements ViewResolver, Ordered {
 
