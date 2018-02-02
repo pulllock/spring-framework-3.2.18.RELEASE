@@ -835,14 +835,17 @@ public abstract class FrameworkServlet extends HttpServletBean {
 
 	/**
 	 * Override the parent class implementation in order to intercept PATCH requests.
+	 * FrameworkServlet重写了service方法
 	 */
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// 增加了对PATCH类型请求的处理
 		if (RequestMethod.PATCH.name().equalsIgnoreCase(request.getMethod())) {
 			processRequest(request, response);
 		}
+		// 其他类型请求交给父类进行处理
 		else {
 			super.service(request, response);
 		}
@@ -956,18 +959,38 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
+		/**
+		 *
+		 * 获取LocaleContextHolder中原来保存的LocaleContext
+		 * LocaleContext中保存着Locale本地化信息
+		 */
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
+		// 获取当前请求的LocaleContext
 		LocaleContext localeContext = buildLocaleContext(request);
 
+		/**
+		 * 获取RequestContextHolder中原来保存的RequestAttributes
+		 * RequestAttributes是Spring的接口，可以get，set，remove attribute
+		 * 根据scope参数判断操作request还是session
+		 */
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+		/**
+		 *
+		 * 获取当前请求的ServletRequestAttributes
+		 * ServletRequestAttributes里面还封装了request，response，session
+		 */
+
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
+		// 拿到异步处理管理器并设置拦截器
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 		asyncManager.registerCallableInterceptor(FrameworkServlet.class.getName(), new RequestBindingInterceptor());
 
+		// 将当前请求的LocalContext和ServletRequestAttributes设置到LocaleContextHolder和RequestContextHolder
 		initContextHolders(request, localeContext, requestAttributes);
 
 		try {
+			// 实际处理请求入口
 			doService(request, response);
 		}
 		catch (ServletException ex) {
@@ -984,6 +1007,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		}
 
 		finally {
+			// 恢复原来的LocaleContext和ServletRequestAttributes
 			resetContextHolders(request, previousLocaleContext, previousAttributes);
 			if (requestAttributes != null) {
 				requestAttributes.requestCompleted();
@@ -1003,6 +1027,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 				}
 			}
 
+			// 发布ServletRequestHandledEvent消息
 			publishRequestHandledEvent(request, startTime, failureCause);
 		}
 	}
