@@ -32,6 +32,7 @@ import java.util.Locale;
  * @see org.springframework.web.servlet.view.InternalResourceViewResolver
  * @see org.springframework.web.servlet.view.ResourceBundleViewResolver
  * @see org.springframework.web.servlet.view.XmlViewResolver
+ * 用来将String类型的视图名（逻辑视图）和Locale解析为View类型的视图
  */
 public interface ViewResolver {
 

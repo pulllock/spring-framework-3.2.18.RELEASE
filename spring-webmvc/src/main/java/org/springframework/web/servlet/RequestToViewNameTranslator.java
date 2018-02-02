@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
+ * 从request中获取viewName
  */
 public interface RequestToViewNameTranslator {
 
