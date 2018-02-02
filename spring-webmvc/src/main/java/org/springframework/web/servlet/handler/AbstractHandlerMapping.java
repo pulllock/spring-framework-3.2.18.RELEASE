@@ -53,6 +53,10 @@ import org.springframework.web.util.UrlPathHelper;
  * @see org.springframework.util.AntPathMatcher
  * @see #setInterceptors
  * @see org.springframework.web.servlet.HandlerInterceptor
+ * HandlerMapping的抽象实现
+ * HandlerMapping的作用是根据request查找Handler和Interceptors
+ *
+ * 继承了WebApplicationObjectSupport，初始化的时候会自动调用模板方法initApplicationContext
  */
 public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 		implements HandlerMapping, Ordered {
@@ -65,10 +69,29 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
 	private PathMatcher pathMatcher = new AntPathMatcher();
 
+	/**
+	 * 用于配置Spring MVC的拦截器，有两种设置方式：
+	 * 1. 注册HandlerMapping时通过属性设置
+	 * 2. 通过子类的extendInterceptors钩子方法进行设置
+	 * interceptors不会直接使用，而是通过initInterceptors方法
+	 * 按照类型分配到mappedInterceptors和adaptedInterceptors
+	 * 中进行使用，interceptors只用于配置
+	 */
 	private final List<Object> interceptors = new ArrayList<Object>();
 
+	/**
+	 * 这种类型的Interceptor不需要进行匹配，在getHandler中会全部
+	 * 添加到返回值HandlerExecutionChain里面
+	 */
 	private final List<HandlerInterceptor> adaptedInterceptors = new ArrayList<HandlerInterceptor>();
 
+	/**
+	 * 使用时需要与请求的url进行匹配，只有匹配成功后才会添加到
+	 * getHandler的返回值HandlerExecutionChain里，有两种获
+	 * 取途径：
+	 * 1. 从interceptors中获取
+	 * 2. 注册到Spring容器中通过detectMappedInterceptors方法获取
+	 */
 	private final List<MappedInterceptor> mappedInterceptors = new ArrayList<MappedInterceptor>();
 
 
@@ -191,8 +214,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	@Override
 	protected void initApplicationContext() throws BeansException {
+		// 模板方法，给子类提供一个添加或者修改interceptors的入口
 		extendInterceptors(this.interceptors);
+		// 将Spring MVC容器以及父容器中的所有的MappedInterceptor类型的bean添加到mappedInterceptors中去
 		detectMappedInterceptors(this.mappedInterceptors);
+		// 初始化Interceptor
 		initInterceptors();
 	}
 
@@ -294,7 +320,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #getHandlerInternal
 	 */
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		// 获取Handler，这个是模板方法，留给子类实现
 		Object handler = getHandlerInternal(request);
+		// 没有获取到Handler使用默认的
 		if (handler == null) {
 			handler = getDefaultHandler();
 		}
@@ -302,10 +330,12 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			return null;
 		}
 		// Bean name or resolved handler?
+		// 如果找到的Handler是String类型，则以它作为名字去容器中查找对应的Bean
 		if (handler instanceof String) {
 			String handlerName = (String) handler;
 			handler = getApplicationContext().getBean(handlerName);
 		}
+		// 添加拦截器
 		return getHandlerExecutionChain(handler, request);
 	}
 
