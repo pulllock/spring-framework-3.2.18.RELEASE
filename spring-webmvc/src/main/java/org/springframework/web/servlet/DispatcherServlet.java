@@ -1120,6 +1120,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>Tries all handler mappings in order.
 	 * @param request current HTTP request
 	 * @return the HandlerExecutionChain, or {@code null} if no handler could be found
+	 * 查找Handler是按顺序遍历所有的HandlerMapping，找到一个HandlerMappering后立即停止查找并返回
 	 */
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		for (HandlerMapping hm : this.handlerMappings) {

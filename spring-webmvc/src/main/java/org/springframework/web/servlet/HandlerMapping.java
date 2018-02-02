@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
  * @see org.springframework.web.servlet.handler.AbstractHandlerMapping
  * @see org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping
  * @see org.springframework.web.servlet.handler.SimpleUrlHandlerMapping
+ * 作用是根据request找到相应的处理器Handler和Interceptors
  */
 public interface HandlerMapping {
 
