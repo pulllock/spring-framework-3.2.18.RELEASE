@@ -31,6 +31,8 @@ import org.springframework.web.servlet.handler.AbstractDetectingUrlHandlerMappin
  * @since 2.5.3
  * @see ControllerClassNameHandlerMapping
  * @see ControllerBeanNameHandlerMapping
+ * 将实现了Controller接口或者注释了@Controller的bean作为Handler
+ * 可以通过设置excludedClasses和excludedPackages将不包含的bean或者不包含的包下的所有的bean排除在外
  */
 public abstract class AbstractControllerUrlHandlerMapping extends AbstractDetectingUrlHandlerMapping  {
 
@@ -82,7 +84,9 @@ public abstract class AbstractControllerUrlHandlerMapping extends AbstractDetect
 	@Override
 	protected String[] determineUrlsForHandler(String beanName) {
 		Class<?> beanClass = getApplicationContext().getType(beanName);
+		// 调用isEligibleForMapping方法判断是不是支持的类型
 		if (isEligibleForMapping(beanName, beanClass)) {
+			// 模板方法，在子类实现
 			return buildUrlsForHandler(beanName, beanClass);
 		}
 		else {
@@ -106,6 +110,7 @@ public abstract class AbstractControllerUrlHandlerMapping extends AbstractDetect
 			}
 			return false;
 		}
+		// 排除在excludedClasses中配置的类
 		if (this.excludedClasses.contains(beanClass)) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Excluding controller bean '" + beanName + "' from class name mapping " +
@@ -114,6 +119,7 @@ public abstract class AbstractControllerUrlHandlerMapping extends AbstractDetect
 			return false;
 		}
 		String beanClassName = beanClass.getName();
+		// 排除在exclededPackages里配置的包下的类
 		for (String packageName : this.excludedPackages) {
 			if (beanClassName.startsWith(packageName)) {
 				if (logger.isDebugEnabled()) {
@@ -123,6 +129,7 @@ public abstract class AbstractControllerUrlHandlerMapping extends AbstractDetect
 				return false;
 			}
 		}
+		// 是否实现了Controller或者注释了@Controller
 		return isControllerType(beanClass);
 	}
 

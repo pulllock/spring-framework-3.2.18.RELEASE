@@ -51,6 +51,7 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	/**
 	 * Calls the {@link #detectHandlers()} method in addition to the
 	 * superclass's initialization.
+	 * 重写initApplicationContext
 	 */
 	@Override
 	public void initApplicationContext() throws ApplicationContextException {
@@ -70,15 +71,20 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking for URL mappings in application context: " + getApplicationContext());
 		}
+		// 根据detectHandlersInAncestorContexts参数从Spring MVC容器中或者父容器中
+		// 找到所有bean的beanName
 		String[] beanNames = (this.detectHandlersInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(getApplicationContext(), Object.class) :
 				getApplicationContext().getBeanNamesForType(Object.class));
 
 		// Take any bean name that we can determine URLs for.
 		for (String beanName : beanNames) {
+			// 解析对应的urls
+			// 模板方法，子类实现
 			String[] urls = determineUrlsForHandler(beanName);
 			if (!ObjectUtils.isEmpty(urls)) {
 				// URL paths found: Let's consider it a handler.
+				// 注册到AbstractUrlHandlerMapping中
 				registerHandler(urls, beanName);
 			}
 			else {

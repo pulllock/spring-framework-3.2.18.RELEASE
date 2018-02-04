@@ -52,13 +52,16 @@ import org.springframework.web.servlet.HandlerMapping;
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 3.1
+ * 将Method作为Handler来使用，比如常用的@RequestMapping
  */
 public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMapping implements InitializingBean {
 
 	private boolean detectHandlerMethodsInAncestorContexts = false;
 
+	// 保存着匹配条件和HandlerMethod对应关系
 	private final Map<T, HandlerMethod> handlerMethods = new LinkedHashMap<T, HandlerMethod>();
 
+	// 保存着url与匹配条件的对应关系
 	private final MultiValueMap<String, T> urlMap = new LinkedMultiValueMap<String, T>();
 
 
@@ -83,6 +86,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 	/**
 	 * Detects handler methods at initialization.
+	 * 实现了InitializingBean接口，自动调用该方法
 	 */
 	public void afterPropertiesSet() {
 		initHandlerMethods();
@@ -108,6 +112,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				detectHandlerMethods(beanName);
 			}
 		}
+		// 可以对Handler进行一些初始化，是一个模板方法
 		handlerMethodsInitialized(getHandlerMethods());
 	}
 
@@ -123,13 +128,17 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param handler the bean name of a handler or a handler instance
 	 */
 	protected void detectHandlerMethods(final Object handler) {
+		// 获取Handler的类型
 		Class<?> handlerType =
 				(handler instanceof String ? getApplicationContext().getType((String) handler) : handler.getClass());
 
 		// Avoid repeated calls to getMappingForMethod which would rebuild RequestMatchingInfo instances
+		// 保存Handler与匹配条件的对应关系
 		final Map<Method, T> mappings = new IdentityHashMap<Method, T>();
+		// 如果是cglib代理的子对象类型，则返回父类型，否则直接返回传入的类型
 		final Class<?> userType = ClassUtils.getUserClass(handlerType);
 
+		// 获取当前bean里所有符合Handler要求的method
 		Set<Method> methods = HandlerMethodSelector.selectMethods(userType, new MethodFilter() {
 			public boolean matches(Method method) {
 				T mapping = getMappingForMethod(method, userType);
@@ -143,6 +152,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			}
 		});
 
+		// 将符合要求的Method注册，保存到上面的两个Map中
 		for (Method method : methods) {
 			registerHandlerMethod(handler, method, mappings.get(method));
 		}
@@ -224,10 +234,12 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+		// 根据request获取lookupPath
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking up handler method for path " + lookupPath);
 		}
+		// 通过lookupPath和request找handlerMethod
 		HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 		if (logger.isDebugEnabled()) {
 			if (handlerMethod != null) {
@@ -237,6 +249,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.debug("Did not find handler method for [" + lookupPath + "]");
 			}
 		}
+		// 创建新的HandlerMethod并返回
 		return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 	}
 

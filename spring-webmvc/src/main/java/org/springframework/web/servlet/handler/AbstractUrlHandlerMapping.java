@@ -99,10 +99,12 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 	@Override
 	protected Object getHandlerInternal(HttpServletRequest request) throws Exception {
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
+		// 使用lookupPath从Map中查找Handler
 		Object handler = lookupHandler(lookupPath, request);
 		if (handler == null) {
 			// We need to care for the default handler directly, since we need to
 			// expose the PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE for it as well.
+			// 定义一个临时变量，保存找到的原始的Handler
 			Object rawHandler = null;
 			if ("/".equals(lookupPath)) {
 				rawHandler = getRootHandler();
@@ -112,11 +114,16 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 			}
 			if (rawHandler != null) {
 				// Bean name or resolved handler?
+				// String类型的就去容器中找具体的bean
 				if (rawHandler instanceof String) {
 					String handlerName = (String) rawHandler;
 					rawHandler = getApplicationContext().getBean(handlerName);
 				}
+				// 校验找到的Handler和request是否匹配，模板方法
 				validateHandler(rawHandler, request);
+				// 用于给查找到的Handler注册两个拦截器，拦截器的主要作用是将与当前url实际匹配
+				// 的Pattern、匹配条件和url模板参数等设置到request的属性里
+				// 可以在后面的处理过程中直接从request属性中获取，不需要重新查找一遍
 				handler = buildPathExposingHandler(rawHandler, lookupPath, lookupPath, null);
 			}
 		}
@@ -144,9 +151,11 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 	 */
 	protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 		// Direct match?
+		// 从Map中直接获取
 		Object handler = this.handlerMap.get(urlPath);
 		if (handler != null) {
 			// Bean name or resolved handler?
+			// String类型，从容器中获取
 			if (handler instanceof String) {
 				String handlerName = (String) handler;
 				handler = getApplicationContext().getBean(handlerName);
@@ -155,6 +164,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping {
 			return buildPathExposingHandler(handler, urlPath, urlPath, null);
 		}
 		// Pattern match?
+		// Pattern匹配，比如使用带*号的模式与url进行匹配
 		List<String> matchingPatterns = new ArrayList<String>();
 		for (String registeredPattern : this.handlerMap.keySet()) {
 			if (getPathMatcher().match(registeredPattern, urlPath)) {

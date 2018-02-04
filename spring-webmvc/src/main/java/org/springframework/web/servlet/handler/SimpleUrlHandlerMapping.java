@@ -97,10 +97,12 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 	/**
 	 * Calls the {@link #registerHandlers} method in addition to the
 	 * superclass's initialization.
+	 * 重写了initApplicationContext方法
 	 */
 	@Override
 	public void initApplicationContext() throws BeansException {
 		super.initApplicationContext();
+		// 将当前的urlMap注册到AbstractUrlHandlerMapping的Map中
 		registerHandlers(this.urlMap);
 	}
 
@@ -126,6 +128,7 @@ public class SimpleUrlHandlerMapping extends AbstractUrlHandlerMapping {
 				if (handler instanceof String) {
 					handler = ((String) handler).trim();
 				}
+				// 注册到AbstractUrlHandlerMapping中
 				registerHandler(url, handler);
 			}
 		}
