@@ -170,6 +170,7 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	 */
 	@Override
 	protected boolean isHandler(Class<?> beanType) {
+		// 是否有@Controller或者@RequestMapping注释
 		return ((AnnotationUtils.findAnnotation(beanType, Controller.class) != null) ||
 				(AnnotationUtils.findAnnotation(beanType, RequestMapping.class) != null));
 	}
