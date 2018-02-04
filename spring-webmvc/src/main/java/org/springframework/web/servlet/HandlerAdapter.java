@@ -44,6 +44,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author Juergen Hoeller
  * @see org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter
  * @see org.springframework.web.servlet.handler.SimpleServletHandlerAdapter
+ * HandlerMapping是通过request找到Handler
+ * HandlerAdapter具体使用Handler来干活的
  */
 public interface HandlerAdapter {
 
