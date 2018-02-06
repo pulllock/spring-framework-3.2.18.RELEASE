@@ -111,6 +111,8 @@ import org.springframework.web.util.WebUtils;
  * @since 3.1
  * @see HandlerMethodArgumentResolver
  * @see HandlerMethodReturnValueHandler
+ * 使用处理器处理请求，使用的处理器是HandlerMethod类型
+ * 处理请求的过程主要分为三步：绑定参数、执行请求、和处理返回值
  */
 public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		implements BeanFactoryAware, InitializingBean {
@@ -731,21 +733,34 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	/**
 	 * Invoke the {@link RequestMapping} handler method preparing a {@link ModelAndView}
 	 * if view resolution is required.
+	 * 具体执行请求的处理
 	 */
 	private ModelAndView invokeHandleMethod(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
+		// 使用request和response创建ServletWebRequest
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 
+		// 初始化WebDataBinderFactory
+		// WebDataBinder用于参数绑定，主要功能是实现参数跟String之间的类型转换
 		WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+		// 初始化ModelFactory
+		// ModelFactory是处理Model的，主要包含两个功能，1个是在处理器处理之前对Model进行初始化，
+		// 2，在处理完请求之后对Model参数进行更新
 		ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
+		// 初始化ServletInvocableHandlerMethod
 		ServletInvocableHandlerMethod requestMappingMethod = createRequestMappingMethod(handlerMethod, binderFactory);
 
+		// 用于保存Model和View，贯穿于整个处理过程
 		ModelAndViewContainer mavContainer = new ModelAndViewContainer();
+		// FlashMap中的数据设置到Model中
 		mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
+		// 使用modelFactory将SessionAttributes和注解了@ModelAttribute的方法的参数设置到Model
 		modelFactory.initModel(webRequest, mavContainer, requestMappingMethod);
+		// 设置ignoreDefaultModelOnRedirect
 		mavContainer.setIgnoreDefaultModelOnRedirect(this.ignoreDefaultModelOnRedirect);
 
+		// 对异步处理进行设置
 		AsyncWebRequest asyncWebRequest = WebAsyncUtils.createAsyncWebRequest(request, response);
 		asyncWebRequest.setTimeout(this.asyncRequestTimeout);
 
@@ -766,12 +781,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			requestMappingMethod = requestMappingMethod.wrapConcurrentResult(result);
 		}
 
+		// 执行请求
 		requestMappingMethod.invokeAndHandle(webRequest, mavContainer);
 
 		if (asyncManager.isConcurrentHandlingStarted()) {
 			return null;
 		}
 
+		// 处理完请求后的的后置处理
 		return getModelAndView(mavContainer, modelFactory, webRequest);
 	}
 
@@ -788,15 +805,20 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	private ModelFactory getModelFactory(HandlerMethod handlerMethod, WebDataBinderFactory binderFactory) {
+		// 获取SessionAttributesHandler
 		SessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
+		// 获取处理器类型
 		Class<?> handlerType = handlerMethod.getBeanType();
 		Set<Method> methods = this.modelAttributeCache.get(handlerType);
+		// 获取处理中注解了@ModelAttribute并且没有注解@RequestMapping的类型
+		// 第一次获取后添加到缓存，以后直接从缓存中获取
 		if (methods == null) {
 			methods = HandlerMethodSelector.selectMethods(handlerType, MODEL_ATTRIBUTE_METHODS);
 			this.modelAttributeCache.put(handlerType, methods);
 		}
 		List<InvocableHandlerMethod> attrMethods = new ArrayList<InvocableHandlerMethod>();
 		// Global methods first
+		// 先添加全局的@ModelAttribute方法，后添加当前处理器定义的@ModelAttribute方法
 		for (Entry<ControllerAdviceBean, Set<Method>> entry : this.modelAttributeAdviceCache.entrySet()) {
 			Object bean = entry.getKey().resolveBean();
 			for (Method method : entry.getValue()) {
@@ -807,6 +829,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			Object bean = handlerMethod.getBean();
 			attrMethods.add(createModelAttributeMethod(binderFactory, bean, method));
 		}
+		// 新建ModelFactory
 		return new ModelFactory(attrMethods, binderFactory, sessionAttrHandler);
 	}
 
@@ -820,23 +843,28 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
 		Class<?> handlerType = handlerMethod.getBeanType();
+		// 检查当前Handler中的InitBinder方法是否已经存在缓存中
 		Set<Method> methods = this.initBinderCache.get(handlerType);
+		// 如果没有则查找并设置到缓存中
 		if (methods == null) {
 			methods = HandlerMethodSelector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);
 		}
 		List<InvocableHandlerMethod> initBinderMethods = new ArrayList<InvocableHandlerMethod>();
 		// Global methods first
+		// 找到所有符合条件的全局InitBinder方法
 		for (Entry<ControllerAdviceBean, Set<Method>> entry : this.initBinderAdviceCache .entrySet()) {
 			Object bean = entry.getKey().resolveBean();
 			for (Method method : entry.getValue()) {
 				initBinderMethods.add(createInitBinderMethod(bean, method));
 			}
 		}
+		// 将当前Handler中的InitBinder方法添加到initBinderMethods
 		for (Method method : methods) {
 			Object bean = handlerMethod.getBean();
 			initBinderMethods.add(createInitBinderMethod(bean, method));
 		}
+		// 创建DataBinderFactory并返回
 		return createDataBinderFactory(initBinderMethods);
 	}
 
@@ -865,15 +893,18 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
 			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
 
+		// 更新Model
 		modelFactory.updateModel(webRequest, mavContainer);
 		if (mavContainer.isRequestHandled()) {
 			return null;
 		}
 		ModelMap model = mavContainer.getModel();
+		// 创建ModelAndView
 		ModelAndView mav = new ModelAndView(mavContainer.getViewName(), model);
 		if (!mavContainer.isViewReference()) {
 			mav.setView((View) mavContainer.getView());
 		}
+		// RedirectAttributes类型的model 设置到FlashMap中
 		if (model instanceof RedirectAttributes) {
 			Map<String, ?> flashAttributes = ((RedirectAttributes) model).getFlashAttributes();
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);

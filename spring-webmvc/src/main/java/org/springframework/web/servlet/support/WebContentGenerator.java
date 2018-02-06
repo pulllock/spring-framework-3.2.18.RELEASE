@@ -65,6 +65,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 
 	/** Set of supported HTTP methods */
+	// 保存所有支持的request类型
 	private Set<String>	supportedMethods;
 
 	private boolean requireSession = false;
@@ -267,6 +268,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 			throws ServletException {
 
 		// Check whether we should support the request method.
+		// 根据supportedMethods判断request的类型是否支持
 		String method = request.getMethod();
 		if (this.supportedMethods != null && !this.supportedMethods.contains(method)) {
 			throw new HttpRequestMethodNotSupportedException(
@@ -274,6 +276,7 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 		}
 
 		// Check whether a session is required.
+		// requireSession为true的时候检查session是否存在
 		if (this.requireSession) {
 			if (request.getSession(false) == null) {
 				throw new HttpSessionRequiredException("Pre-existing session required but none found");
@@ -282,6 +285,8 @@ public abstract class WebContentGenerator extends WebApplicationObjectSupport {
 
 		// Do declarative cache control.
 		// Revalidate if the controller supports last-modified.
+		// 给response设置缓存过期时间
+		// 如果有@SessionAttribute注解，则阻止使用缓存，否则什么也不做
 		applyCacheSeconds(response, cacheSeconds, lastModified);
 	}
 
