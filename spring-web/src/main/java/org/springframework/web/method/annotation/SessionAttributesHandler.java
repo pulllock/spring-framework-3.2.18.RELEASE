@@ -43,6 +43,7 @@ import org.springframework.web.context.request.WebRequest;
  *
  * @author Rossen Stoyanchev
  * @since 3.1
+ * 用来处理@SessionAttributes注解的参数
  */
 public class SessionAttributesHandler {
 
