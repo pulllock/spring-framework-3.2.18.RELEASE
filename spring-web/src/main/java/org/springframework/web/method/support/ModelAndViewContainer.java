@@ -41,21 +41,30 @@ import org.springframework.web.bind.support.SimpleSessionStatus;
  *
  * @author Rossen Stoyanchev
  * @since 3.1
+ * 承担着整个请求过程中数据的传递工作
+ * 保存Model和View等
  */
 public class ModelAndViewContainer {
 
+	// 如果为true则在处理器返回redirect视图时一定不使用defaultModel
 	private boolean ignoreDefaultModelOnRedirect = false;
 
+	// 视图，可以是实际视图，也可以是String类型的逻辑视图
 	private Object view;
 
+	// 默认使用的Model
 	private final ModelMap defaultModel = new BindingAwareModelMap();
 
+	// redirect类型的Model
 	private ModelMap redirectModel;
 
+	// 处理器返回redirect视图的标志
 	private boolean redirectModelScenario = false;
 
+	// 用于设置SessionAttribute使用完的标志
 	private final SessionStatus sessionStatus = new SimpleSessionStatus();
 
+	// 请求是否已经处理完成的标志
 	private boolean requestHandled = false;
 
 
