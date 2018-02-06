@@ -50,9 +50,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  *
  * @author Rossen Stoyanchev
  * @since 3.1
- * 用来维护Model
+ * 用来维护Model的：
  * 初始化Model
- * 处理器执行后将Model中相应的参数更新到SessionAttributes中
+ * 处理器执行后将Model中相应的参数更新到SessionAttribute中
  */
 public final class ModelFactory {
 
@@ -90,18 +90,18 @@ public final class ModelFactory {
 	 * @param mavContainer contains the model to be initialized
 	 * @param handlerMethod the method for which the model is initialized
 	 * @throws Exception may arise from {@code @ModelAttribute} methods
+	 * 初始化Model，主要是在处理器执行之前将相应数据设置到Model中
 	 */
 	public void initModel(NativeWebRequest request, ModelAndViewContainer mavContainer, HandlerMethod handlerMethod)
 			throws Exception {
-
-		// 从SessionAttributes中取出保存的参数，并合并到mavContainer中
+		// 从sessionAttributes中取出保存的参数，并合并到mavContainer中
 		Map<String, ?> attributesInSession = this.sessionAttributesHandler.retrieveAttributes(request);
 		mavContainer.mergeAttributes(attributesInSession);
 
-		// 执行注释了@ModelAttribute的方法，并将结果设置到Model
+		// 执行注解了@ModelAttribute的方法并将结果设置到Model
 		invokeModelAttributeMethods(request, mavContainer);
 
-		// 遍历注解了@ModelAttribute又在@SessionAttributes注解中的参数
+		// 遍历注解了@ModelAttribute又注解了@SessionAttributes的参数
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!mavContainer.containsAttribute(name)) {
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
@@ -116,6 +116,7 @@ public final class ModelFactory {
 	/**
 	 * Invoke model attribute methods to populate the model. Attributes are
 	 * added only if not already present in the model.
+	 * 执行注解了@ModelAttribute的方法，并将结果设置到Model
 	 */
 	private void invokeModelAttributeMethods(NativeWebRequest request, ModelAndViewContainer mavContainer)
 			throws Exception {
@@ -123,14 +124,14 @@ public final class ModelFactory {
 		for (InvocableHandlerMethod attrMethod : this.attributeMethods) {
 			// 获取注解了@ModelAttribute的方法
 			String modelName = attrMethod.getMethodAnnotation(ModelAttribute.class).value();
+			// 如果参数名已经存在过，跳过
 			if (mavContainer.containsAttribute(modelName)) {
 				continue;
 			}
 
 			// 执行@ModelAttribute注解的方法
 			Object returnValue = attrMethod.invokeForRequest(request, mavContainer);
-
-			// 不是Void类型的，就处理。void类型的说明这个方法是自己将参数设置到Model中
+			// 不是void类型的，需要处理，是void类型的说明这个方法是自己将参数设置到Model中，不需要处理
 			if (!attrMethod.isVoid()){
 				// 获取参数名
 				String returnValueName = getNameForReturnValue(returnValue, attrMethod.getReturnType());
@@ -172,12 +173,14 @@ public final class ModelFactory {
 	 */
 	public static String getNameForReturnValue(Object returnValue, MethodParameter returnType) {
 		ModelAttribute annot = returnType.getMethodAnnotation(ModelAttribute.class);
+		// 设置了value则直接将其作为参数名返回
 		if (annot != null && StringUtils.hasText(annot.value())) {
 			return annot.value();
 		}
 		else {
 			Method method = returnType.getMethod();
 			Class<?> resolvedType = GenericTypeResolver.resolveReturnType(method, returnType.getDeclaringClass());
+			// 根据方法，返回值类型和返回值获取参数名
 			return Conventions.getVariableNameForReturnType(method, resolvedType, returnValue);
 		}
 	}
