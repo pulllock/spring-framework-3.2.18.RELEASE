@@ -50,6 +50,9 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  *
  * @author Rossen Stoyanchev
  * @since 3.1
+ * 用来维护Model
+ * 初始化Model
+ * 处理器执行后将Model中相应的参数更新到SessionAttributes中
  */
 public final class ModelFactory {
 
@@ -91,11 +94,14 @@ public final class ModelFactory {
 	public void initModel(NativeWebRequest request, ModelAndViewContainer mavContainer, HandlerMethod handlerMethod)
 			throws Exception {
 
+		// 从SessionAttributes中取出保存的参数，并合并到mavContainer中
 		Map<String, ?> attributesInSession = this.sessionAttributesHandler.retrieveAttributes(request);
 		mavContainer.mergeAttributes(attributesInSession);
 
+		// 执行注释了@ModelAttribute的方法，并将结果设置到Model
 		invokeModelAttributeMethods(request, mavContainer);
 
+		// 遍历注解了@ModelAttribute又在@SessionAttributes注解中的参数
 		for (String name : findSessionAttributeArguments(handlerMethod)) {
 			if (!mavContainer.containsAttribute(name)) {
 				Object value = this.sessionAttributesHandler.retrieveAttribute(request, name);
@@ -115,14 +121,18 @@ public final class ModelFactory {
 			throws Exception {
 
 		for (InvocableHandlerMethod attrMethod : this.attributeMethods) {
+			// 获取注解了@ModelAttribute的方法
 			String modelName = attrMethod.getMethodAnnotation(ModelAttribute.class).value();
 			if (mavContainer.containsAttribute(modelName)) {
 				continue;
 			}
 
+			// 执行@ModelAttribute注解的方法
 			Object returnValue = attrMethod.invokeForRequest(request, mavContainer);
 
+			// 不是Void类型的，就处理。void类型的说明这个方法是自己将参数设置到Model中
 			if (!attrMethod.isVoid()){
+				// 获取参数名
 				String returnValueName = getNameForReturnValue(returnValue, attrMethod.getReturnType());
 				if (!mavContainer.containsAttribute(returnValueName)) {
 					mavContainer.addAttribute(returnValueName, returnValue);
