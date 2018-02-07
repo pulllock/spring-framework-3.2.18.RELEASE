@@ -41,6 +41,8 @@ import org.springframework.util.ClassUtils;
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 3.1
+ * 用于封装Handler和其中具体处理请求的Method
+ * 分别对应其中的bean和method属性
  */
 public class HandlerMethod {
 
@@ -49,12 +51,16 @@ public class HandlerMethod {
 
 	private final Object bean;
 
+	// 主要用于新建HandlerMethod时传入的Handler是String的情况，
+	// 需要beanFactory根据传入的String作为beanName获取到对应的Bean并设置为Handler
 	private final BeanFactory beanFactory;
 
 	private final Method method;
 
+	// 如果method是bridge method则设置为其所对应的原有方法，否则直接设置为method
 	private final Method bridgedMethod;
 
+	// 请求处理的方法参数
 	private final MethodParameter[] parameters;
 
 
