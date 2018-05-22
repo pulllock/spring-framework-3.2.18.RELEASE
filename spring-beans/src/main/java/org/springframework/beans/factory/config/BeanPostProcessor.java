@@ -38,6 +38,8 @@ import org.springframework.beans.BeansException;
  * @see DestructionAwareBeanPostProcessor
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
+ *
+ * 可以在bean生成前后做操作
  */
 public interface BeanPostProcessor {
 
@@ -52,6 +54,7 @@ public interface BeanPostProcessor {
 	 * {@code null}, no subsequent BeanPostProcessors will be invoked
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
+	 * bean初始化之前
 	 */
 	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
@@ -74,6 +77,7 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
+	 * bean初始化之后
 	 */
 	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 
