@@ -50,6 +50,7 @@ public interface Pointcut {
 
 	/**
 	 * Canonical Pointcut instance that always matches.
+	 * 磨人的Pointcut实例，该实例对于任何方法的匹配结果都是返回true
 	 */
 	Pointcut TRUE = TruePointcut.INSTANCE;
 
