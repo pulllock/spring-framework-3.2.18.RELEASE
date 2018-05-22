@@ -238,8 +238,10 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 * @return a fresh AOP proxy reflecting the current state of this factory
 	 */
 	public Object getObject() throws BeansException {
+		// 为代理对象配置Advisor链，初始化通知器链
 		initializeAdvisorChain();
 		if (isSingleton()) {
+			// 获取单例实例，这里返回的就是代理类，可能是cglib代理的，也可能是jdk代理的
 			return getSingletonInstance();
 		}
 		else {
@@ -413,6 +415,7 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 	 * from a BeanFactory will be refreshed each time a new prototype instance
 	 * is added. Interceptors added programmatically through the factory API
 	 * are unaffected by such changes.
+	 * 初始化过滤器链，就是循环在配置文件中配置的通知器Advisor，按照链表的方式连接起来
 	 */
 	private synchronized void initializeAdvisorChain() throws AopConfigException, BeansException {
 		if (this.advisorChainInitialized) {
