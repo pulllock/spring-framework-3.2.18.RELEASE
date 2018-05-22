@@ -44,6 +44,13 @@ import java.lang.reflect.Method;
  * @since 11.11.2003
  * @see Pointcut
  * @see ClassFilter
+ *
+ * 该接口定义了静态方法匹配器和动态方法匹配器。
+ * 静态方法匹配器：仅对方法签名（包括方法名和入参类型及顺序）进行匹配。
+ * 动态方法匹配器：在运行期检查方法入参的值。
+ * 静态方法匹配器仅会判别一次，动态方法匹配器因为每次调用方法的入参都可能不一样，所以每次都需要判断。
+ * 动态方法匹配不常用。
+ * 方法匹配器类型由isRuntime()返回值决定，返回false表示是静态方法匹配器；true是动态方法匹配器。
  */
 public interface MethodMatcher {
 
