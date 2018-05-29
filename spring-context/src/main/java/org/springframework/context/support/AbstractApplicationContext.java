@@ -498,7 +498,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				//注册Bean处理器，可以用来拦截Bean创建，这里只是注册，真正调用是在getBean的时候
+				//注册Bean后置处理器，可以用来拦截Bean创建，这里只是注册，真正调用是在getBean的时候
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
@@ -776,6 +776,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * 注册BeanPostProcessor，真正调用是在getBean的时候
 	 */
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+		// 从beanFactory中找到所有的后置处理器的名字
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when

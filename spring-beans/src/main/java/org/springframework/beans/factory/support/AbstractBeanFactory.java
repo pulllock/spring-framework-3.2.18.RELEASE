@@ -902,6 +902,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @see org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor
 	 */
 	protected boolean hasInstantiationAwareBeanPostProcessors() {
+		// 此状态在注册后置处理器的时候设置
 		return this.hasInstantiationAwareBeanPostProcessors;
 	}
 
