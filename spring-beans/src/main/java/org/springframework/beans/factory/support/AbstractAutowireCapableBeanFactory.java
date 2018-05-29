@@ -948,7 +948,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				//实例化前应用post processors
 				bean = applyBeanPostProcessorsBeforeInstantiation(mbd.getBeanClass(), beanName);
 				if (bean != null) {
-					//实例化后引用post processors
+					//初始化后引用post processors
 					bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 				}
 			}
@@ -973,15 +973,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName)
 			throws BeansException {
 
+		// 获取所有的后置处理器，并循环进行处理
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
+			// 只处理InstantiationAwareBeanPostProcessor类型的后置处理器
 			if (bp instanceof InstantiationAwareBeanPostProcessor) {
 				InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+				// 调用postProcessBeforeInstantiation方法
+				// AbstractAutoProxyCreator也实现了此方法，也会在此被调用
 				Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);
 				if (result != null) {
 					return result;
 				}
 			}
-		}
+	}
 		return null;
 	}
 
