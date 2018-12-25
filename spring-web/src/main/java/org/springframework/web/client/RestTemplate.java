@@ -103,6 +103,8 @@ import org.springframework.web.util.UriTemplate;
  * will be encoded twice (i.e. {@code http://example.com/hotel%20list} will become {@code
  * http://example.com/hotel%2520list}). If this behavior is undesirable, use the {@code URI}-argument methods, which
  * will not perform any URL encoding.
+ * 如果String类型的url没有编码，restTemplate将会进行编码；如果url已经编码了，restTemplate还会再次进行编码。
+ * 如果不想被编码，使用参数为URI类型的方法
  *
  * <p>Objects passed to and returned from these methods are converted to and from HTTP messages by
  * {@link HttpMessageConverter} instances. Converters for the main mime types are registered by default,
@@ -477,6 +479,12 @@ public class RestTemplate extends InterceptingHttpAccessor implements RestOperat
 
 	public <T> T execute(String url, HttpMethod method, RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor, Object... urlVariables) throws RestClientException {
+
+		/**
+		 * 填充模板变量到，就是将url中的占位符替换成指定的值，比如下面的{hotel}
+		 * http://example.com/hotels/{hotel}/rooms/{hotel}
+		 * 填充完后会将url进行编码
+ 		 */
 
 		URI expanded = new UriTemplate(url).expand(urlVariables);
 		return doExecute(expanded, method, requestCallback, responseExtractor);
