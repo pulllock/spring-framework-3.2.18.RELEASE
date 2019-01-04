@@ -35,8 +35,19 @@ import org.springframework.core.AttributeAccessor;
  * @see ConfigurableListableBeanFactory#getBeanDefinition
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ * BeanDefinition中保存了我们的Bean信息，比如：
+ * 这个Bean指向的是哪个类
+ * 是否是单例的
+ * 是否懒加载
+ * 这个Bean依赖了哪些Bean等等。
  */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
+
+	/**
+	 * 默认只提供singleton和prototype两种
+	 * 而request，session，globalSession，application，websocket等这几种
+	 * 都是基于web的扩展
+	 */
 
 	/**
 	 * Scope identifier for the standard singleton scope: "singleton".
@@ -86,6 +97,8 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
 	 * Set the name of the parent definition of this bean definition, if any.
+	 * 设置父Bean
+	 * 涉及到Bean的继承，继承父Bean的配置信息
 	 */
 	void setParentName(String parentName);
 
@@ -102,6 +115,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Override the bean class name of this bean definition.
 	 * <p>The class name can be modified during bean factory post-processing,
 	 * typically replacing the original class name with a parsed variant of it.
+	 * 设置Bean的类名称，将来要通过反射来生成实例
 	 */
 	void setBeanClassName(String beanClassName);
 
@@ -112,6 +126,8 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
 	 * Specify the factory bean to use, if any.
+	 * 如果该Bean采用工厂方法生成，指定工厂名称。
+	 * 有些实例不是用反射生成的，而是用工厂模式生成的、
 	 */
 	void setFactoryBeanName(String factoryBeanName);
 
@@ -128,6 +144,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @param factoryMethodName static factory method name,
 	 * or {@code null} if normal constructor creation should be used
 	 * @see #getBeanClassName()
+	 * 指定工厂类中年的 工厂方法名称
 	 */
 	void setFactoryMethodName(String factoryMethodName);
 
@@ -165,6 +182,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Set the names of the beans that this bean depends on being initialized.
 	 * The bean factory will guarantee that these beans get initialized first.
+	 * 设置该Bean依赖的所有的Bean
+	 * 这里的依赖不是指属性依赖如@Autowire标记的
+	 * 而是depends-on=""属性设置的值
 	 */
 	void setDependsOn(String[] dependsOn);
 
@@ -175,6 +195,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
 	 * Set whether this bean is a candidate for getting autowired into some other bean.
+	 * 设置该Bean是否可以注入到其他Bean中，只对根据类型注入有效
+	 *
+	 * 如果根据名称注入，这边设置了false，也是可以注入的
 	 */
 	void setAutowireCandidate(boolean autowireCandidate);
 
@@ -189,6 +212,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Set whether this bean is a primary autowire candidate.
 	 * <p>If this value is true for exactly one bean among multiple
 	 * matching candidates, it will serve as a tie-breaker.
+	 * 同一接口的多个不同实现，如果不指定名字的话，Spring会优先选择设置primary为true的Bean
 	 */
 	void setPrimary(boolean primary);
 
@@ -197,6 +221,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Return the constructor argument values for this bean.
 	 * <p>The returned instance can be modified during bean factory post-processing.
 	 * @return the ConstructorArgumentValues object (never {@code null})
+	 * 构造器参数
 	 */
 	ConstructorArgumentValues getConstructorArgumentValues();
 
@@ -204,6 +229,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Return the property values to be applied to a new instance of the bean.
 	 * <p>The returned instance can be modified during bean factory post-processing.
 	 * @return the MutablePropertyValues object (never {@code null})
+	 * Bean中的属性值
 	 */
 	MutablePropertyValues getPropertyValues();
 
@@ -224,6 +250,8 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
 	 * Return whether this bean is "abstract", that is, not meant to be instantiated.
+	 * 如果Bean被设置成abstract，就不能实例化
+	 * 常用于作为父Bean 用于继承
 	 */
 	boolean isAbstract();
 
