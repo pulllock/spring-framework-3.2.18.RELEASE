@@ -97,9 +97,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
 		logger.debug("Loading bean definitions");
-		//获取root
+		// 获取root
 		Element root = doc.getDocumentElement();
-		//使用root继续进行BeanDefinition的注册
+		// 从xml根节点开始解析文件
 		doRegisterBeanDefinitions(root);
 	}
 

@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
  */
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
 
-	//资源文件
+	// 资源文件
 	private Resource[] configResources;
 
 
@@ -140,6 +140,10 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 		super(parent);
 		setConfigLocations(configLocations);
 		if (refresh) {
+			/**
+			 * ApplicationContext建立起来以后，是可以通过调用refresh()方法进行重建的，
+			 * refresh()方法会将原来的ApplicationContext销毁，然后再重新执行一次初始化操作。
+			 */
 			refresh();
 		}
 	}

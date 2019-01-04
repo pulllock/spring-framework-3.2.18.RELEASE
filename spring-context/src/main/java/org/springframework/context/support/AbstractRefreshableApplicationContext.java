@@ -65,10 +65,10 @@ import org.springframework.context.ApplicationContextException;
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
-	//是否允许同名bean定义覆盖
+	// 是否允许同名bean定义覆盖
 	private Boolean allowBeanDefinitionOverriding;
 
-	//是否允许循环依赖
+	// 是否允许循环依赖
 	private Boolean allowCircularReferences;
 
 	/** Bean factory for this context
@@ -125,20 +125,29 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		//已经有BeanFactory，销毁并关闭
+		/**
+		 * 如果当前ApplicationContext中已经加载过BeanFactory，销毁所有Bean
+		 * 关闭BeanFactory
+		 */
 		if (hasBeanFactory()) {
 			destroyBeans();
 			closeBeanFactory();
 		}
 		try {
-			//创建一个DefaultListableBeanFactory
+			// 初始化一个DefaultListableBeanFactory
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
-			//设置序列化id
+			// 设置序列化id，用于BeanFactory的序列化
 			beanFactory.setSerializationId(getId());
-			//自定义BeanFactory
+			/**
+			 * 设置BeanFactory的两个配置属性：是否允许Bean覆盖；是否允许循环引用。
+			 */
 			customizeBeanFactory(beanFactory);
-			//初始化DocumentLoader，进行xml文件的读取和解析
-			//经过此步骤之后，DefaultListableBeanFactory中的遍历beanFactory中已经包含了所有解析好的配置
+
+			/**
+			 * 加载Bean到BeanFactory中
+			 * 初始化DocumentLoader，进行xml文件的读取和解析
+			 * 经过此步骤之后，DefaultListableBeanFactory中已经包含了所有解析好的配置
+			 */
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;
@@ -225,15 +234,15 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * 设置相关属性，包括是否允许覆盖同名的bean定义，设置是否允许循环依赖，设置@Autowire和@Qualifier注解解析器
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
-		//否允许覆盖同名的bean定义
+		// 否允许覆盖同名的bean定义
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
-		//设置是否允许循环依赖
+		// 设置是否允许循环依赖
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
-		//设置@Autowire和@Qualifier注解解析器
+		// 设置@Autowire和@Qualifier注解解析器
 		beanFactory.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 	}
 
