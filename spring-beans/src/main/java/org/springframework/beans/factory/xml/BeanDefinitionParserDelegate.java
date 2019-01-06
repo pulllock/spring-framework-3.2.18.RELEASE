@@ -451,21 +451,23 @@ public class BeanDefinitionParserDelegate {
 	 * 解析给定的bean元素
 	 */
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, BeanDefinition containingBean) {
-		//id属性
+		// id属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
-		//name属性
+		// name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
 		List<String> aliases = new ArrayList<String>();
-		//name可能是多个别名name1,;name2,;name3这样的
-		//解析别名
+		/**
+         * 解析别名
+		 * name可能是多个别名，按照“逗号 分号 空格”切分
+		 */
 		if (StringUtils.hasLength(nameAttr)) {
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
 		String beanName = id;
-		//没有id，但是有别名
+		// 没有id，但是有别名，就使用别名列表的第一个名字作为beanName
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
 			beanName = aliases.remove(0);
 			if (logger.isDebugEnabled()) {
@@ -474,16 +476,24 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
-		//如果containingBean不为空，也就是当前标签是一个子标签
+		// 如果containingBean不为空，也就是当前标签是一个子标签
 		if (containingBean == null) {
-			//检查beanName是否在当前层级元素中被使用
+			// 检查beanName是否在当前层级元素中被使用
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
-		//进一步解析其他属性，将所有属性统一封装起来
+		/**
+		 * 进一步解析其他属性，将所有属性统一封装起来
+		 * 根据<bean/>中的配置创建BeanDefinition
+		 */
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
+		/**
+		 * 走到这里整个<bean/>标签解析就结束了，一个BeanDefinition就生成了
+		 */
 		if (beanDefinition != null) {
-			//如果没有beanName，Spring根据命名规则会生成一个beanName
+			/**
+			 * 如果没有beanName，也就是id和name都没有设置，Spring根据命名规则会生成一个beanName
+			 */
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
@@ -513,7 +523,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
-			//将BeanDefinition，beanName，alias封装成一个BeanDefinitionHolder返回
+			// 将BeanDefinition，beanName，alias封装成一个BeanDefinitionHolder返回
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 
@@ -551,37 +561,44 @@ public class BeanDefinitionParserDelegate {
 		this.parseState.push(new BeanEntry(beanName));
 
 		String className = null;
-		//class属性
+		// class属性
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 
 		try {
 			String parent = null;
-			//parent属性
+			// parent属性
 			if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 				parent = ele.getAttribute(PARENT_ATTRIBUTE);
 			}
-			//使用className和parent属性封装成GenericBeanDefinition
+			/**
+			 * 使用className和parent属性封装成GenericBeanDefinition
+			 * 设置类信息
+			 */
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
-			//将属性应用到BeanDefinition中
+			// 设置BeanDefinition的一堆属性，属性定义在AbstractBeanDefinition中
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
-			//设置description
+			// 设置description
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
-			// 解析元数据元素
+			/**
+			 * 下面就是解析<bean/>内部的子元素，
+			 * 解析完后信息都放到bd中
+			 */
+			// 解析元数据元素<meta/>
 			parseMetaElements(ele, bd);
-			// 解析lookup-override子元素
+			// 解析lookup-override子元素<lookup-method/>
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
-			// 解析replace-method子元素
+			// 解析replace-method子元素<replaced-method/>
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
-			// 解析constructor-arg元素
+			// 解析constructor-arg元素<constructor-arg/>
 			parseConstructorArgElements(ele, bd);
-			// 解析property元素
+			// 解析property元素<property/>
 			parsePropertyElements(ele, bd);
-			// 解析qualifier元素
+			// 解析qualifier元素<qualifier/>
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -731,7 +748,7 @@ public class BeanDefinitionParserDelegate {
 	protected AbstractBeanDefinition createBeanDefinition(String className, String parentName)
 			throws ClassNotFoundException {
 
-		//封装成一个GenericBeanDefinition
+		// 封装成一个GenericBeanDefinition
 		return BeanDefinitionReaderUtils.createBeanDefinition(
 				parentName, className, this.readerContext.getBeanClassLoader());
 	}
