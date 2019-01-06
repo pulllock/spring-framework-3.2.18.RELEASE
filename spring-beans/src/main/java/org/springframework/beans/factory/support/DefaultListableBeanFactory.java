@@ -646,11 +646,29 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		// Trigger initialization of all non-lazy singleton beans...
+		// 触发所有的非懒加载的singleton beans的初始化操作
 		for (String beanName : beanNames) {
+			/**
+			 * 合并父Bean中的配置
+			 * <bean id="" class="" parent=""/>
+			 */
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			/**
+			 * 非抽象
+			 * 非懒加载
+			 * 如果是abstract="true"的，不需要初始化
+			 */
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 处理FactoryBean
 				if (isFactoryBean(beanName)) {
+					/**
+					 * FactoryBean，beanName前加上&符号
+					 * 再调用getBean
+					 */
 					final FactoryBean<?> factory = (FactoryBean<?>) getBean(FACTORY_BEAN_PREFIX + beanName);
+					/**
+					 * 判断FactoryBean是否是SmartFactoryBean的实现
+					 */
 					boolean isEagerInit;
 					if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
 						isEagerInit = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
@@ -668,6 +686,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					}
 				}
 				else {
+					// 普通的Bean 调用getBean进行初始化
 					getBean(beanName);
 				}
 			}
@@ -695,11 +714,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+		/**
+		 * allowBeanDefinitionOverriding
+		 * 允许bean覆盖
+		 */
 		BeanDefinition oldBeanDefinition;
 
 		synchronized (this.beanDefinitionMap) {
+			// 所有的Bean注册后，都会放到这个beanDefinitionMap中
 			oldBeanDefinition = this.beanDefinitionMap.get(beanName);
 			if (oldBeanDefinition != null) {
+				// 如果不允许覆盖，抛异常
 				if (!this.allowBeanDefinitionOverriding) {
 					throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
 							"Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
