@@ -689,7 +689,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		 * 在invokeAwareInterfaces方法中间接调用的Aware类型已经不是普通的bean了，
 		 * 所以要在bean的依赖注入的时候忽略他们
 		 *
-		 * 如果某个bean依赖于一下几个接口的实现类
+		 * 如果某个bean依赖于以下几个接口的实现类
 		 * 在自动装配的时候忽略他们
 		 * Spring会通过其他方式来处理这些依赖
 		 */

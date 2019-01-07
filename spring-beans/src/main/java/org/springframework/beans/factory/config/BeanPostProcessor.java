@@ -41,9 +41,6 @@ import org.springframework.beans.BeansException;
  *
  * 可以在bean初始化前后做操作
  * bean后置处理器
- * postProcessBeforeInitialization 方法在所有的实现中都只是直接返回bean，不做逻辑操作
- *
- * postProcessAfterInitialization 方法在实现中都有不同操作
  */
 public interface BeanPostProcessor {
 
