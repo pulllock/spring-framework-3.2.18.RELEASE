@@ -25,6 +25,8 @@ import org.springframework.core.env.Environment;
  *
  * @author Chris Beams
  * @since 3.1
+ *
+ * 用来接收应用程序的运行环境对象
  */
 public interface EnvironmentAware extends Aware {
 

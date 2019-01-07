@@ -29,6 +29,9 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
  * @author Juergen Hoeller
  * @since 3.0.1
  * @see org.springframework.context.annotation.ConfigurationClassPostProcessor
+ *
+ * 该扩展点可以让应用程序注册自定义的BeanDefinition
+ * 并且改扩展点在BeanFactoryPostProcessor前执行
  */
 public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProcessor {
 

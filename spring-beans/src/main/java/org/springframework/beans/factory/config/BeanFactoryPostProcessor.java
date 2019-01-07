@@ -41,6 +41,9 @@ import org.springframework.beans.BeansException;
  * @since 06.07.2003
  * @see BeanPostProcessor
  * @see PropertyResourceConfigurer
+ *
+ * 应用程序在Spring创建Bean对象前修改BeanDefinition。
+ * 比如：Bean属性配置的类型转换，占位符的替换等。
  */
 public interface BeanFactoryPostProcessor {
 

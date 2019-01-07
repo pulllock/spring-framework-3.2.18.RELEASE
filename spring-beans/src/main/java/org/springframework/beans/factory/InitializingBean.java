@@ -31,6 +31,14 @@ package org.springframework.beans.factory;
  * @see BeanFactory
  * @see org.springframework.beans.factory.support.RootBeanDefinition#getInitMethodName
  * @see org.springframework.context.ApplicationContextAware
+ *
+ * 用来实现自定义的Bean初始化逻辑
+ *
+ * 该接口的方法会在BeanFactoryAware或ApplicationContextAware接口方法调用后，
+ * 被BeanFactory调用
+ *
+ * init-method跟该接口的功能一样，如果同时有这两种方式，则InitializingBean接口
+ * 方法会先被执行
  */
 public interface InitializingBean {
 
