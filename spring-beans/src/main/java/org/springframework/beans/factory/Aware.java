@@ -33,6 +33,10 @@ package org.springframework.beans.factory;
  *
  * @author Chris Beams
  * @since 3.1
+ *
+ * Aware是一个标记接口，
+ * 该接口的实现类会被Spring选中
+ * 并得到某种通知
  */
 public interface Aware {
 

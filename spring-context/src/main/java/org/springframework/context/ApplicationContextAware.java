@@ -55,6 +55,11 @@ import org.springframework.beans.factory.Aware;
  * @see MessageSourceAware
  * @see org.springframework.context.support.ApplicationObjectSupport
  * @see org.springframework.beans.factory.BeanFactoryAware
+ *
+ * 该类的回调方法一般是在属性注入后，
+ * 但没有执行Bean的初始化方法之前被执行的。
+ *
+ * 初始化方法包括：init-method, InitializingBean的afterPropertiesSet方法
  */
 public interface ApplicationContextAware extends Aware {
 

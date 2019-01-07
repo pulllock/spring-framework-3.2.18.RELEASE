@@ -50,6 +50,7 @@ package org.springframework.beans.factory;
  * @see org.springframework.aop.framework.ProxyFactoryBean
  * @see org.springframework.jndi.JndiObjectFactoryBean
  * 工厂bean
+ * 实现该接口，可以自定义Bean的创建逻辑
  */
 public interface FactoryBean<T> {
 
