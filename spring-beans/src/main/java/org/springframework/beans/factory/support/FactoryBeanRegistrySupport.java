@@ -102,13 +102,13 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * 从FactoryBan中获取一个对象
 	 */
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
-		//单例并且包含单例bean，containsSingleton在DefaultSingletonBeanRegistry中实现
+		// 单例并且包含单例bean，containsSingleton在DefaultSingletonBeanRegistry中实现
 		if (factory.isSingleton() && containsSingleton(beanName)) {
 			synchronized (getSingletonMutex()) {
-				//从缓存中获取
+				// 从缓存中获取
 				Object object = this.factoryBeanObjectCache.get(beanName);
 				if (object == null) {
-					//缓存中不存在，调用doGetObjectFromFactoryBean方法获取
+					// 缓存中不存在，调用doGetObjectFromFactoryBean方法获取
 					object = doGetObjectFromFactoryBean(factory, beanName);
 					// Only post-process and store if not put there already during getObject() call above
 					// (e.g. because of circular reference processing triggered by custom getBean calls)
@@ -119,7 +119,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 					else {
 						if (object != null && shouldPostProcess) {
 							try {
-								//执行ObjectFactory的后处理器
+								// 执行ObjectFactory的后处理器
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							}
 							catch (Throwable ex) {
@@ -127,14 +127,14 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 										"Post-processing of FactoryBean's singleton object failed", ex);
 							}
 						}
-						//将生成的对象放到缓存中
+						// 将生成的对象放到缓存中
 						this.factoryBeanObjectCache.put(beanName, (object != null ? object : NULL_OBJECT));
 					}
 				}
 				return (object != NULL_OBJECT ? object : null);
 			}
 		}
-		else {//原型bean处理
+		else {// 原型bean处理
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (object != null && shouldPostProcess) {
 				try {
@@ -177,6 +177,9 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				}
 			}
 			else {
+				/**
+				 * 调用FactoryBean接口实现类的getObject方法创建对象
+				 */
 				object = factory.getObject();
 			}
 		}

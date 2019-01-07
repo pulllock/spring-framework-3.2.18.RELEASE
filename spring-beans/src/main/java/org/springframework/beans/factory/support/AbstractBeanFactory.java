@@ -1600,7 +1600,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
-		//如果name中是以&为前缀的，但是又不是FactoryBean类型的，抛异常
+		// 如果name中是以&为前缀的，但是又不是FactoryBean类型的，抛异常
 		if (BeanFactoryUtils.isFactoryDereference(name) && !(beanInstance instanceof FactoryBean)) {
 			throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
 		}
@@ -1608,30 +1608,30 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
 		// If it's a FactoryBean, we use it to create a bean instance, unless the
 		// caller actually wants a reference to the factory.
-		//如果是一个FactoryBean，而且该Bean还以&开头，说明用户想获取工厂实例，而不是工厂的getObject方法返回的值，直接返回该FactoryBean实例
+		// 如果是一个FactoryBean，而且该Bean还以&开头，说明用户想获取工厂实例，而不是工厂的getObject方法返回的值，直接返回该FactoryBean实例
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
 			return beanInstance;
 		}
 
 		Object object = null;
 		if (mbd == null) {
-			//尝试从缓存中加载bean
+			// 尝试从缓存中加载bean
 			object = getCachedObjectForFactoryBean(beanName);
 		}
-		//缓存中不存在
+		// 缓存中不存在
 		if (object == null) {
 			// Return bean instance from factory.
-			//这里一定是一个FactoryBean了
+			// 这里一定是一个FactoryBean了
 			FactoryBean<?> factory = (FactoryBean<?>) beanInstance;
 			// Caches object obtained from FactoryBean if it is a singleton.
 			//containsBeanDefinition在所有的已经加载的类中检测是否定义beanName
 			if (mbd == null && containsBeanDefinition(beanName)) {
-				//将存储XML配置文件的GernericBeanDefinition转换为RootBeanDefinition，如果是一个子bean，会合并父类的相关属性
+				// 将存储XML配置文件的GernericBeanDefinition转换为RootBeanDefinition，如果是一个子bean，会合并父类的相关属性
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
-			//是否是用户定义的，而不是应用程序本身定义的
+			// 是否是用户定义的，而不是应用程序本身定义的
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
-			//获取实例
+			// 获取实例
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
 		return object;
