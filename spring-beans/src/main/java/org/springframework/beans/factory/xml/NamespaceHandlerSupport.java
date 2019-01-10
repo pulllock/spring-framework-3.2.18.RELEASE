@@ -70,6 +70,11 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 * registered for that {@link Element}.
 	 */
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		/**
+		 * 先获取元素对应的解析器
+		 * 比如 property-placeholder对应的解析器是PropertyPlaceholderBeanDefinitionParser
+		 * 然后调用解析器的parse方法开始解析标签
+		 */
 		return findParserForElement(element, parserContext).parse(element, parserContext);
 	}
 
@@ -79,6 +84,11 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
 		String localName = parserContext.getDelegate().getLocalName(element);
+		/**
+		 * parsers在BeanDefinitionParserDelegate中解析自定义标签的时候进行了初始化
+		 * 这里可以直接根据名字取得对应的解析器，比如：
+		 * property-placeholder对应的是PropertyPlaceholderBeanDefinitionParser
+		 */
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(
