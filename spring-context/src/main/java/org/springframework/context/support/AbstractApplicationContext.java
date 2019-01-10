@@ -766,7 +766,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<String>();
-		// 对BeanDefinitionRegistry类型的进行处理
+		// 对BeanDefinitionRegistry类型的进行处理，通常处理的是@Configuration类型的
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
@@ -776,6 +776,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryPostProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
+					/**
+					 * 先执行BeanDefinitionRegistryPostProcessor类型的注册
+					 * 而BeanFactoryPostProcessor直接加到List中
+					 *
+					 * 一般是注解类@Configuration类型的Bean进行注册
+					 */
 					registryPostProcessor.postProcessBeanDefinitionRegistry(registry);
 					registryPostProcessors.add(registryPostProcessor);
 				}
@@ -788,6 +794,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			List<BeanDefinitionRegistryPostProcessor> registryPostProcessorBeans =
 					new ArrayList<BeanDefinitionRegistryPostProcessor>(beanMap.values());
 			OrderComparator.sort(registryPostProcessorBeans);
+			// TODO 怎么又调用了一次？
 			for (BeanDefinitionRegistryPostProcessor postProcessor : registryPostProcessorBeans) {
 				postProcessor.postProcessBeanDefinitionRegistry(registry);
 			}
