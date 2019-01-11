@@ -208,6 +208,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 		RootBeanDefinition iabpp = new RootBeanDefinition(ImportAwareBeanPostProcessor.class);
+		// 仅框架内部用
 		iabpp.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 		registry.registerBeanDefinition(IMPORT_AWARE_PROCESSOR_BEAN_NAME, iabpp);
 
@@ -222,6 +223,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 		this.registriesPostProcessed.add(registryId);
 
+		/**
+		 * 处理@Configuration注解的BeanDefinition
+		 */
 		processConfigBeanDefinitions(registry);
 	}
 
@@ -241,6 +245,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			// Simply call processConfigurationClasses lazily at this point then.
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
+		// TODO
 		enhanceConfigurationClasses(beanFactory);
 	}
 
@@ -250,8 +255,15 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		Set<BeanDefinitionHolder> configCandidates = new LinkedHashSet<BeanDefinitionHolder>();
+		// 获取所有的BeanDefinition进行遍历
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
+			/**
+			 * checkConfigurationClassCandidate
+			 * 判断BeanDefinition是不是Configuration类型
+			 * 就是使用了@Configuration注解或者@Component注解
+			 * 或者使用@Bean注解的方法
+			 */
 			if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
@@ -263,6 +275,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Detect any custom bean name generation strategy supplied through the enclosing application context
+		// 看下是不是有自定义的BeanName生成策略
 		SingletonBeanRegistry singletonRegistry = null;
 		if (registry instanceof SingletonBeanRegistry) {
 			singletonRegistry = (SingletonBeanRegistry) registry;
@@ -277,6 +290,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
+		/**
+		 * 解析每一个@Configuration注解的类
+		 */
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
@@ -291,9 +307,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				throw new BeanDefinitionStoreException("Failed to load bean class: " + bd.getBeanClassName(), ex);
 			}
 		}
+		// 校验
 		parser.validate();
 
 		// Handle any @PropertySource annotations
+		// @PropertySource注解的处理
 		Stack<PropertySource<?>> parsedPropertySources = parser.getPropertySources();
 		if (!parsedPropertySources.isEmpty()) {
 			if (!(this.environment instanceof ConfigurableEnvironment)) {
@@ -314,6 +332,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					registry, this.sourceExtractor, this.problemReporter, this.metadataReaderFactory,
 					this.resourceLoader, this.environment, this.importBeanNameGenerator);
 		}
+		/**
+		 * 加载BeanDefinition
+		 */
 		this.reader.loadBeanDefinitions(parser.getConfigurationClasses());
 
 		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes
