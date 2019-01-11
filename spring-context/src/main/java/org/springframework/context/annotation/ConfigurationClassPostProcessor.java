@@ -295,6 +295,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
+        // 解析@Configuration类
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
@@ -341,7 +342,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 					this.resourceLoader, this.environment, this.importBeanNameGenerator);
 		}
 		/**
-		 * 加载BeanDefinition
+		 * 上面被解析出来的类都在configurationClasses属性中
+		 * 接下来加载BeanDefinition
+		 * 使用ConfigurationClassBeanDefinitionReader去解析加载
 		 */
 		this.reader.loadBeanDefinitions(parser.getConfigurationClasses());
 

@@ -117,12 +117,15 @@ class ConfigurationClassBeanDefinitionReader {
 	 * class itself, all its {@link Bean} methods
 	 */
 	private void loadBeanDefinitionsForConfigurationClass(ConfigurationClass configClass) {
+		// 被@Import注解的
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		// 注册被@Bean注解的方法的bean
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
+		// 注册被@ImportResource注解的资源文件中的bean
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
 	}
 

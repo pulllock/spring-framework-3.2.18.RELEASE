@@ -173,9 +173,14 @@ class ConfigurationClassParser {
 	 */
 	protected AnnotationMetadata doProcessConfigurationClass(ConfigurationClass configClass, AnnotationMetadata metadata) throws IOException {
 		// Recursively process any member (nested) classes first
+		// 解析嵌套类
 		processMemberClasses(metadata);
 
 		// Process any @PropertySource annotations
+		/**
+		 * 处理@PropertySource注解
+		 * 进行配置信息的解析
+		 */
 		AnnotationAttributes propertySource = MetadataUtils.attributesFor(metadata,
 				org.springframework.context.annotation.PropertySource.class);
 		if (propertySource != null) {
@@ -183,6 +188,10 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @ComponentScan annotations
+		/**
+		 * 处理@ComponentScan注解
+		 * 使用ComponentScanAnnotationParser来扫描basePackage下需要解析的类
+		 */
 		AnnotationAttributes componentScan = MetadataUtils.attributesFor(metadata, ComponentScan.class);
 		if (componentScan != null) {
 			// The config class is annotated with @ComponentScan -> perform the scan immediately
@@ -198,14 +207,27 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		/**
+		 * 处理@Import注解
+		 * 先递归找到所有注解，并过滤出Import注解
+		 *
+		 */
 		Set<Object> imports = new LinkedHashSet<Object>();
 		Set<String> visited = new LinkedHashSet<String>();
 		collectImports(metadata, imports, visited);
 		if (!imports.isEmpty()) {
+			// 处理Import注解
 			processImport(configClass, metadata, imports, true);
 		}
 
 		// Process any @ImportResource annotations
+		/**
+		 * 处理@ImportResource注解
+		 * 获取注解的locations属性
+		 * 得到资源文件地址
+		 * 遍历资源文件
+		 * 添加到配置类的importedResources属性中
+		 */
 		if (metadata.isAnnotated(ImportResource.class.getName())) {
 			AnnotationAttributes importResource = MetadataUtils.attributesFor(metadata, ImportResource.class);
 			String[] resources = importResource.getStringArray("value");
@@ -217,12 +239,17 @@ class ConfigurationClassParser {
 		}
 
 		// Process individual @Bean methods
+		/**
+		 * 处理@Bean注解
+		 * 获取@Bean注解的方法，然后添加到beanMethods中
+		 */
 		Set<MethodMetadata> beanMethods = metadata.getAnnotatedMethods(Bean.class.getName());
 		for (MethodMetadata methodMetadata : beanMethods) {
 			configClass.addBeanMethod(new BeanMethod(methodMetadata, configClass));
 		}
 
 		// Process superclass, if any
+		// 处理父类
 		if (metadata.hasSuperClass()) {
 			String superclass = metadata.getSuperClassName();
 			if (!superclass.startsWith("java") && !this.knownSuperclasses.containsKey(superclass)) {
@@ -240,6 +267,7 @@ class ConfigurationClassParser {
 		}
 
 		// No superclass -> processing is complete
+		// 没有父类需要处理，说明结束了
 		return null;
 	}
 
