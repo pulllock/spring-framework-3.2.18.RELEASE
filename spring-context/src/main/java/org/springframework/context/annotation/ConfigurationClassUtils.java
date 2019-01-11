@@ -81,10 +81,12 @@ abstract class ConfigurationClassUtils {
 		}
 
 		if (metadata != null) {
+		    // @Configuration 注解
 			if (isFullConfigurationCandidate(metadata)) {
 				beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 				return true;
 			}
+			// @Component注解的类或者有@Bean注解的方法
 			else if (isLiteConfigurationCandidate(metadata)) {
 				beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 				return true;
