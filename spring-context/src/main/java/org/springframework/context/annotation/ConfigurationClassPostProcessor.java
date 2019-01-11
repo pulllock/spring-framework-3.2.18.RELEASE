@@ -81,6 +81,14 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.*;
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.0
+ *
+ * 这个processor是优先级最高的，getOrder方法可以看下
+ *
+ * 这个类会去BeanFactory中查找所有注解了@Configuration注解的bean
+ * 用ConfigurationClassParser去解析
+ *
+ * ConfigurationClass 内部存储了配置类的注解信息、被@Bean注解的方法
+ * 、@ImportResource注解的信息、ImportBeanDefinitionRegistar等
  */
 public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
 		Ordered, ResourceLoaderAware, BeanClassLoaderAware, EnvironmentAware {
