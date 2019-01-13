@@ -524,6 +524,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				/**
 				 * 调用实现了BeanFactoryPostProcessor接口的各个实现类的
 				 * postProcessBeanFactory方法
+				 * 这里调用ConfigurationClassPostProcessor的方法来解析@Configuration
+				 * 注解的类，就是解析注解方式的配置类
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 
@@ -923,7 +925,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * 注册BeanPostProcessor，真正调用是在getBean的时候
 	 */
 	protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
-		// 从beanFactory中找到所有的后置处理器的名字
+		// 从beanFactory中找到所有的BeanPostProcessor的名字
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 
 		// Register BeanPostProcessorChecker that logs an info message when
@@ -934,6 +936,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Separate between BeanPostProcessors that implement PriorityOrdered,
 		// Ordered, and the rest.
+		/**
+		 * 实现了PriorityOrdered的BeanPostProcessor先注册
+		 * 其次是实现了Ordered的注册
+		 * 最后是没有实现Ordered的注册
+		 */
 		List<BeanPostProcessor> priorityOrderedPostProcessors = new ArrayList<BeanPostProcessor>();
 		List<BeanPostProcessor> internalPostProcessors = new ArrayList<BeanPostProcessor>();
 		List<String> orderedPostProcessorNames = new ArrayList<String>();
