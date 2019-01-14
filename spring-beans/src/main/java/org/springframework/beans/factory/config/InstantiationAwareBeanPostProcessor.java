@@ -69,6 +69,16 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#hasBeanClass
 	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getFactoryMethodName
+	 * Bean实例化前调用
+	 * 返回的可能是一个代理，用来替换目标bean
+	 *
+	 * 如果该方法返回一个不为null的对象，bean的创建过程就会断路，之后就只有BeanPostProcessor的
+	 * postProcessorAfterInitialization方法会被调用
+	 *
+	 * 在调用doCreateBean之前调用
+	 *
+	 * 该方法在对象实例化之前调用，可以在这里应用代理，来代替原来的Bean，
+	 * 如果这里bean被代替了，就只剩postProcessorAfterInitialization方法会被调用
 	 */
 	Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
 
@@ -85,6 +95,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * Returning {@code false} will also prevent any subsequent InstantiationAwareBeanPostProcessor
 	 * instances being invoked on this bean instance.
 	 * @throws org.springframework.beans.BeansException in case of errors
+	 * Bean实例化之后调用
+	 * 这时候Bean已经被实例化，但是属性都还没被设置
 	 */
 	boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
@@ -105,6 +117,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * to skip property population
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.MutablePropertyValues
+	 * 该方法可以对属性值进行修改，这个时候属性值还未被设置
 	 */
 	PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)

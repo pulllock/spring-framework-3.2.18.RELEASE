@@ -954,18 +954,30 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @param beanName the name of the bean
 	 * @param mbd the bean definition for the bean
 	 * @return the shortcut-determined bean instance, or {@code null} if none
-	 * 实例化前应用post-processors
+	 * 实例化前应用post processors
 	 */
 	protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
 		Object bean = null;
-		//如果尚未被解析
+		// 如果尚未被解析
 		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
 			// Make sure bean class is actually resolved at this point.
 			if (mbd.hasBeanClass() && !mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
-				//实例化前应用post processors
+				/**
+				 * 实例化前应用post processors
+				 * 如果返回null，就直接返回，上一步会直接调用doCreateBean方法
+				 *
+				 * 如果返回不为null，就说明修改了Bean对象，会立马执行postProcessAfterInitialization
+				 * 方法
+				 *
+				 * 调用postProcessAfterInitialization如果返回null，就会直接返回，
+				 * 调用doCreateBean方法
+				 *
+				 * 调用postProcessAfterInitialization如果返回不为null，这个bean就会直接返回给容器，
+				 * 这是最后一个方法
+				 */
 				bean = applyBeanPostProcessorsBeforeInstantiation(mbd.getBeanClass(), beanName);
 				if (bean != null) {
-					//初始化后引用post processors
+					// 初始化后应用post processors
 					bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 				}
 			}
@@ -1247,7 +1259,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			pvs = newPvs;
 		}
 
-		// 后处理器已经初始化
+		/**
+		 * 往下是判断是否需要执行postProcessPropertyValues，来改变Bean的属性
+		 */
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
 		// 需要依赖检查
 		boolean needsDepCheck = (mbd.getDependencyCheck() != RootBeanDefinition.DEPENDENCY_CHECK_NONE);
@@ -1276,7 +1290,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
-		// 将属性应用到bean中
+		/**
+		 * 这里是真正的将属性设置的Bean的实例中去
+		 */
 		applyPropertyValues(beanName, mbd, bw, pvs);
 	}
 
