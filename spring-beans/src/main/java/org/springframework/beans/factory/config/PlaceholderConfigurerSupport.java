@@ -203,6 +203,7 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 			if (!(curName.equals(this.beanName) && beanFactoryToProcess.equals(this.beanFactory))) {
 				BeanDefinition bd = beanFactoryToProcess.getBeanDefinition(curName);
 				try {
+				    // 挨个BeanDefinition替换占位符
 					visitor.visitBeanDefinition(bd);
 				}
 				catch (Exception ex) {
@@ -212,9 +213,11 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 		}
 
 		// New in Spring 2.5: resolve placeholders in alias target names and aliases as well.
+		// 处理别名中的占位符
 		beanFactoryToProcess.resolveAliases(valueResolver);
 
 		// New in Spring 3.0: resolve placeholders in embedded values such as annotation attributes.
+		// 对注解中的占位符的处理，这里就只是添加了解析器，没有执行具体替换
 		beanFactoryToProcess.addEmbeddedValueResolver(valueResolver);
 	}
 

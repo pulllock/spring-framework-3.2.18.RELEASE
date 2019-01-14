@@ -88,6 +88,7 @@ public class BeanDefinitionVisitor {
 	protected void visitParentName(BeanDefinition beanDefinition) {
 		String parentName = beanDefinition.getParentName();
 		if (parentName != null) {
+			// 替换占位符
 			String resolvedName = resolveStringValue(parentName);
 			if (!parentName.equals(resolvedName)) {
 				beanDefinition.setParentName(resolvedName);
@@ -279,6 +280,7 @@ public class BeanDefinitionVisitor {
 			throw new IllegalStateException("No StringValueResolver specified - pass a resolver " +
 					"object into the constructor or override the 'resolveStringValue' method");
 		}
+		// 替换占位符
 		String resolvedValue = this.valueResolver.resolveStringValue(strVal);
 		// Return original String if not modified.
 		return (strVal.equals(resolvedValue) ? strVal : resolvedValue);
