@@ -75,12 +75,21 @@ public abstract class PropertyResourceConfigurer extends PropertiesLoaderSupport
 	 */
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		try {
+			/**
+			 * 这里是将从配置文件中加载的属性和localProperties进行合并
+			 * 分两种情况：
+			 * 1. 如果允许覆盖，则把配置文件中加载的属性和localProperties中的进行合并，
+			 *    并使用localProperties中的属性替换
+			 * 2. 如果不允许覆盖，则加载配置文件中的属性，并将localProperties中的覆盖掉
+			 */
 			Properties mergedProps = mergeProperties();
 
 			// Convert the merged properties, if necessary.
+			// 如果有需要，可以转换下属性的值
 			convertProperties(mergedProps);
 
 			// Let the subclass process the properties.
+			// 子类来处理真正的属性替换等的动作
 			processProperties(beanFactory, mergedProps);
 		}
 		catch (IOException ex) {

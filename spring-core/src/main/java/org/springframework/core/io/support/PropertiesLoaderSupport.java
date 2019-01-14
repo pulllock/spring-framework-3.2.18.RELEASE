@@ -136,9 +136,20 @@ public abstract class PropertiesLoaderSupport {
 	/**
 	 * Return a merged Properties instance containing both the
 	 * loaded properties and properties set on this FactoryBean.
+     *
+	 * 如果localOverride为true，表示允许使用localProperties中
+	 * 的属性替换掉从配置文件中加载的属性。
 	 */
 	protected Properties mergeProperties() throws IOException {
 		Properties result = new Properties();
+
+		/**
+		 * 如果允许localOverride，则先加载配置文件中的属性，
+		 * 然后使用localProperties中的属性进行替换。
+		 *
+		 * 如果不允许，就从配置文件中加载属性，并将localProperties
+		 * 中的属性覆盖
+		 */
 
 		if (this.localOverride) {
 			// Load properties from file upfront, to let local properties override.

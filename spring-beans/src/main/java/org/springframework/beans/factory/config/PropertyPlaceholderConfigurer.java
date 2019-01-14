@@ -61,6 +61,7 @@ import org.springframework.util.StringValueResolver;
  * @see PlaceholderConfigurerSupport
  * @see PropertyOverrideConfigurer
  * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+ * 3.1后可以用PropertySourcesPlaceholderConfigurer来替换这个类
  */
 public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport {
 
@@ -213,6 +214,8 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	/**
 	 * Visit each bean definition in the given bean factory and attempt to replace ${...} property
 	 * placeholders with values from the given properties.
+	 *
+	 * 处理属性占位符，替换为配置文件中的实际值
 	 */
 	@Override
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
@@ -254,6 +257,7 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 		}
 
 		public String resolveStringValue(String strVal) throws BeansException {
+			// 替换占位符
 			String value = this.helper.replacePlaceholders(strVal, this.resolver);
 			return (value.equals(nullValue) ? null : value);
 		}
