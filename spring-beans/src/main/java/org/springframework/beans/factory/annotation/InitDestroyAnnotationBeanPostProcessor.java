@@ -47,12 +47,14 @@ import org.springframework.util.ReflectionUtils;
  * that invokes annotated init and destroy methods. Allows for an annotation
  * alternative to Spring's {@link org.springframework.beans.factory.InitializingBean}
  * and {@link org.springframework.beans.factory.DisposableBean} callback interfaces.
+ * 可以调用注解形式的init和destroy方法。
  *
  * <p>The actual annotation types that this post-processor checks for can be
  * configured through the {@link #setInitAnnotationType "initAnnotationType"}
  * and {@link #setDestroyAnnotationType "destroyAnnotationType"} properties.
  * Any custom annotation can be used, since there are no required annotation
  * attributes.
+ * 真正的注解类型可以使用setInitAnnotationType方法和destroyAnnotationType来设置
  *
  * <p>Init and destroy annotations may be applied to methods of any visibility:
  * public, package-protected, protected, or private. Multiple such methods
@@ -64,6 +66,8 @@ import org.springframework.util.ReflectionUtils;
  * annotations out of the box, as init annotation and destroy annotation, respectively.
  * Furthermore, it also supports the {@link javax.annotation.Resource} annotation
  * for annotation-driven injection of named beans.
+ * 子类CommonAnnotationBeanPostProcessor支持JSR-250的@PostConstruct和@PreDestroy注解
+ * 同时也支持@Resource注解
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -127,6 +131,10 @@ public class InitDestroyAnnotationBeanPostProcessor
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
+            /**
+             * 调用注解的init方法
+             * 这里调用，要比InitializingBean的afterPropertiesSet方法和xml中定义的init-method早
+             */
 			metadata.invokeInitMethods(bean, beanName);
 		}
 		catch (InvocationTargetException ex) {

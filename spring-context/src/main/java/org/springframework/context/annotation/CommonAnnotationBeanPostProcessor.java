@@ -72,11 +72,13 @@ import org.springframework.util.StringUtils;
  * annotations in the {@code javax.annotation} package. These common Java
  * annotations are supported in many Java EE 5 technologies (e.g. JSF 1.2),
  * as well as in Java 6's JAX-WS.
+ * 对JSR-250中通用的Java注解进行支持
  *
  * <p>This post-processor includes support for the {@link javax.annotation.PostConstruct}
  * and {@link javax.annotation.PreDestroy} annotations - as init annotation
  * and destroy annotation, respectively - through inheriting from
  * {@link InitDestroyAnnotationBeanPostProcessor} with pre-configured annotation types.
+ * 支持@PostConstruct和@PreDestroy注解
  *
  * <p>The central element is the {@link javax.annotation.Resource} annotation
  * for annotation-driven injection of named beans, by default from the containing
@@ -85,6 +87,7 @@ import org.springframework.util.StringUtils;
  * equivalent to standard Java EE 5 resource injection for {@code name} references
  * and default names as well. The target beans can be simple POJOs, with no special
  * requirements other than the type having to match.
+ * 支持@Resource注解
  *
  * <p>The JAX-WS {@link javax.xml.ws.WebServiceRef} annotation is supported too,
  * analogous to {@link javax.annotation.Resource} but with the capability of creating
@@ -128,6 +131,10 @@ import org.springframework.util.StringUtils;
  * <p><b>NOTE:</b> Annotation injection will be performed <i>before</i> XML injection; thus
  * the latter configuration will override the former for properties wired through
  * both approaches.
+ * 使用<context:annotation-config/>和<context:component-scan/>标签，
+ * 会默认注册CommonAnnotationBeanPostProcessor
+ *
+ * 注解的注入会比xml的注入先执行
  *
  * @author Juergen Hoeller
  * @since 2.5
@@ -189,9 +196,21 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	 * respectively.
 	 */
 	public CommonAnnotationBeanPostProcessor() {
+		/**
+		 * 设置顺序，比AutowiredAnnotationBeanPostProcessor（Ordered.LOWEST_PRECEDENCE - 3）
+		 * 和RequiredAnnotationBeanPostProcessor（Ordered.LOWEST_PRECEDENCE - 2）
+		 * 都要先执行
+		 */
+
 		setOrder(Ordered.LOWEST_PRECEDENCE - 3);
+		/**
+		 * 设置init和destroy的注解类型
+		 */
 		setInitAnnotationType(PostConstruct.class);
 		setDestroyAnnotationType(PreDestroy.class);
+		/**
+		 * 使用@Resource注解的时候，忽略这里指定的资源
+		 */
 		ignoreResourceType("javax.xml.ws.WebServiceContext");
 	}
 
