@@ -364,7 +364,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		}
 
 		// Create proxy if we have advice.
-		// 存在增强方法，需要被代理
+		/**
+		 * 存在增强方法，需要被代理
+		 * 返回匹配当前bean的所有的advisor、advice、interceptor
+		 *
+		 * TargetSource里面封装了真实实现类的信息
+		 */
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		// 需要代理
 		if (specificInterceptors != DO_NOT_PROXY) {
@@ -450,9 +455,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * @param beanClass the class of the bean
 	 * @param beanName the name of the bean
 	 * @param specificInterceptors the set of interceptors that is
-	 * specific to this bean (may be empty, but not null)
+	 * specific to this bean (may be empty, but not null) 携带了advisors
 	 * @param targetSource the TargetSource for the proxy,
-	 * already pre-configured to access the bean
+	 * already pre-configured to access the bean 携带了真实的实现的信息
 	 * @return the AOP proxy for the bean
 	 * @see #buildAdvisors
 	 * 创建aop代理
@@ -465,6 +470,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		// 当前类中的相关属性
 		proxyFactory.copyFrom(this);
 
+		/**
+		 * 可以这样配置<aop:config proxy-target-class="true"></aop:config>
+		 * 设置为true表示用CGLIB来生成代理
+		 */
 		if (!shouldProxyTargetClass(beanClass, beanName)) {
 			// Must allow for introductions; can't just set interfaces to
 			// the target's interfaces only.
@@ -475,6 +484,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 			}
 		}
 
+		/**
+		 * 返回匹配了当前bean的advisors数组
+		 */
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		for (Advisor advisor : advisors) {
 			// 添加增强器
