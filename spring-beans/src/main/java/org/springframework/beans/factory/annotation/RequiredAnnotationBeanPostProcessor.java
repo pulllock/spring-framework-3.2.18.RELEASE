@@ -44,6 +44,7 @@ import org.springframework.util.Assert;
  * that enforces required JavaBean properties to have been configured.
  * Required bean properties are detected through a Java 5 annotation:
  * by default, Spring's {@link Required} annotation.
+ * 提供对@Requires注解的支持
  *
  * <p>The motivation for the existence of this BeanPostProcessor is to allow
  * developers to annotate the setter properties of their own classes with an

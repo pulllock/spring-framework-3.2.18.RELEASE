@@ -66,9 +66,11 @@ import org.springframework.util.StringUtils;
  * that autowires annotated fields, setter methods and arbitrary config methods.
  * Such members to be injected are detected through a Java 5 annotation: by default,
  * Spring's {@link Autowired @Autowired} and {@link Value @Value} annotations.
+ * 支持@Autowired注解和@Value注解
  *
  * <p>Also supports JSR-330's {@link javax.inject.Inject @Inject} annotation,
  * if available, as a direct alternative to Spring's own {@code @Autowired}.
+ * 也支持JSR-330的@Inject注解
  *
  * <p>Only one constructor (at max) of any given bean class may carry this
  * annotation with the 'required' parameter set to {@code true},
@@ -79,9 +81,11 @@ import org.springframework.util.StringUtils;
  * beans in the Spring container will be chosen. If none of the candidates
  * can be satisfied, then a default constructor (if present) will be used.
  * An annotated constructor does not have to be public.
+ * 只能有一个构造器可以注解@Autowired，并且required设置为true
  *
  * <p>Fields are injected right after construction of a bean, before any
  * config methods are invoked. Such a config field does not have to be public.
+ * 域的注入在bean的构造之后，在配置方法调用之前
  *
  * <p>Config methods may have an arbitrary name and any number of arguments; each of
  * those arguments will be autowired with a matching bean in the Spring container.
@@ -95,7 +99,8 @@ import org.springframework.util.StringUtils;
  * <p><b>NOTE:</b> Annotation injection will be performed <i>before</i> XML injection;
  * thus the latter configuration will override the former for properties wired through
  * both approaches.
- *
+ * 使用<context:annotation-config/>和<context:component-scan/>标签，
+ * 或注册默认的AutowiredAnnotationBeanPostProcessor
  * @author Juergen Hoeller
  * @author Mark Fisher
  * @since 2.5
@@ -133,6 +138,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 */
 	@SuppressWarnings("unchecked")
 	public AutowiredAnnotationBeanPostProcessor() {
+		/**
+		 * 注解类型：
+		 * Autowired
+		 * Value
+		 * Inject
+		 */
 		this.autowiredAnnotationTypes.add(Autowired.class);
 		this.autowiredAnnotationTypes.add(Value.class);
 		try {
@@ -220,6 +231,15 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		}
 	}
 
+	/**
+	 * 查看类的构造方法是否有@Autowired注解，
+	 * 并且被注解了的构造方法必须有参数，
+	 * 且最多只能有一个构造方法被设置为required=true
+	 * @param beanClass
+	 * @param beanName
+	 * @return 空或者构造方法数组
+	 * @throws BeansException
+	 */
 	@Override
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
@@ -233,7 +253,13 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					Constructor<?> requiredConstructor = null;
 					Constructor<?> defaultConstructor = null;
 					for (Constructor<?> candidate : rawCandidates) {
+						// 查找构造方法上有没有@Autowired注解
 						Annotation ann = findAutowiredAnnotation(candidate);
+						/**
+						 * 如果构造方法上有@Autowired注解的话：
+						 * 如果已经有required=true的构造方法，直接抛异常；
+						 * 如果被注解的构造方法没有参数，直接抛异常；
+						 */
 						if (ann != null) {
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
@@ -245,6 +271,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 								throw new IllegalStateException(
 										"Autowired annotation requires at least one argument: " + candidate);
 							}
+							// 查询required的状态，即required=true或者false
 							boolean required = determineRequiredStatus(ann);
 							if (required) {
 								if (!candidates.isEmpty()) {
@@ -257,12 +284,18 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 							}
 							candidates.add(candidate);
 						}
+						// 如果没有@Autowired注解的构造方法，就将参数个数为0的设置为默认构造方法
 						else if (candidate.getParameterTypes().length == 0) {
 							defaultConstructor = candidate;
 						}
 					}
+					// 不为空的话，说明有@Autowired注解的构造方法
 					if (!candidates.isEmpty()) {
 						// Add default constructor to list of optional constructors, as fallback.
+						/**
+						 * 如果没有required=true的构造器：
+						 * 如果有默认的构造器，就将默认的构造器添加到list中，备用
+						 */
 						if (requiredConstructor == null) {
 							if (defaultConstructor != null) {
 								candidates.add(defaultConstructor);
@@ -338,6 +371,13 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		return metadata;
 	}
 
+	/**
+	 * 对制定的class查找这个class和父类，一直找到最顶层，
+	 * 找到所有@Autowired注解的字段和方法，如果是桥接方法，
+	 * 需要找到原始方法，最后构造成InjectionMetadata对象返回。
+	 * @param clazz
+	 * @return
+	 */
 	private InjectionMetadata buildAutowiringMetadata(Class<?> clazz) {
 		LinkedList<InjectionMetadata.InjectedElement> elements = new LinkedList<InjectionMetadata.InjectedElement>();
 		Class<?> targetClass = clazz;
@@ -474,6 +514,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	/**
 	 * Class representing injection information about an annotated field.
+	 * 字段的注入
 	 */
 	private class AutowiredFieldElement extends InjectionMetadata.InjectedElement {
 
@@ -522,6 +563,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						}
 					}
 				}
+				// 通过反射注入
 				if (value != null) {
 					ReflectionUtils.makeAccessible(field);
 					field.set(bean, value);
@@ -536,6 +578,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	/**
 	 * Class representing injection information about an annotated method.
+	 * 方法的注入
 	 */
 	private class AutowiredMethodElement extends InjectionMetadata.InjectedElement {
 
@@ -606,6 +649,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						}
 					}
 				}
+				// 反射调用方法
 				if (arguments != null) {
 					ReflectionUtils.makeAccessible(method);
 					method.invoke(bean, arguments);

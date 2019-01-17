@@ -197,8 +197,8 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	 */
 	public CommonAnnotationBeanPostProcessor() {
 		/**
-		 * 设置顺序，比AutowiredAnnotationBeanPostProcessor（Ordered.LOWEST_PRECEDENCE - 3）
-		 * 和RequiredAnnotationBeanPostProcessor（Ordered.LOWEST_PRECEDENCE - 2）
+		 * 设置顺序，比AutowiredAnnotationBeanPostProcessor（Ordered.LOWEST_PRECEDENCE - 2）
+		 * 和RequiredAnnotationBeanPostProcessor（Ordered.LOWEST_PRECEDENCE - 1）
 		 * 都要先执行
 		 */
 
