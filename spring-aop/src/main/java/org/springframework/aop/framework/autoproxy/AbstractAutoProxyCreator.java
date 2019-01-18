@@ -357,7 +357,10 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
-		// 基础类，或者配置了指定bean的不需要被代理
+		/**
+		 * 如果是基础设施类，比如Pointcut、Advice、Advisor等接口的实现类，
+		 * 或者配置了指定bean的不需要被代理，不生成代理，直接返回
+		 */
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
@@ -365,7 +368,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 
 		// Create proxy if we have advice.
 		/**
-		 * 存在增强方法，需要被代理
+		 * 为bean筛选出合适的通知器
 		 * 返回匹配当前bean的所有的advisor、advice、interceptor
 		 *
 		 * TargetSource里面封装了真实实现类的信息
@@ -377,6 +380,9 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 			// 创建代理
 			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
+			/**
+			 * 返回代理对象
+			 */
 			return proxy;
 		}
 

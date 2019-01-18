@@ -205,6 +205,7 @@ public abstract class AopUtils {
 	 */
 	public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
 		Assert.notNull(pc, "Pointcut must not be null");
+		// 使用ClassFilter匹配class
 		if (!pc.getClassFilter().matches(targetClass)) {
 			return false;
 		}
@@ -220,6 +221,7 @@ public abstract class AopUtils {
 		for (Class<?> clazz : classes) {
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
+			    // 使用methodMatcher匹配方法
 				if ((introductionAwareMethodMatcher != null &&
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions)) ||
 						methodMatcher.matches(method, targetClass)) {
