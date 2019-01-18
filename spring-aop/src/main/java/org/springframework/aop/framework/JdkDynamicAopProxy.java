@@ -173,9 +173,15 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 
 			Object retVal;
 
-			// 目标对象内部的自我调用，无法实施切面中的增强，需要通过此属性暴露代理
+			/**
+			 * 目标对象内部的自我调用，无法实施切面中的增强，需要通过此属性暴露代理
+			 *
+			 * expose-proxy是为了解决目标方法调用同对象中其他方法时，其他方法的切面逻辑无法执行的问题
+			 */
+
 			if (this.advised.exposeProxy) {
 				// Make invocation available if necessary.
+				// 向AppContext中设置代理对象
 				oldProxy = AopContext.setCurrentProxy(proxy);
 				setProxyContext = true;
 			}
@@ -217,6 +223,10 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 				// Special case: it returned "this" and the return type of the method
 				// is type-compatible. Note that we can't help if the target sets
 				// a reference to itself in another returned object.
+				/**
+				 * 如果方法返回值为this，
+				 * 将代理对象proxy赋值给retVal
+				 */
 				retVal = proxy;
 			}
 			else if (retVal == null && returnType != Void.TYPE && returnType.isPrimitive()) {

@@ -72,6 +72,8 @@ public abstract class AopNamespaceUtils {
 		/**
 		 * 看是否需要使用cglib代理，
 		 * 以及对expose-proxy的处理
+		 *
+		 * expose-proxy是为了解决目标方法调用同对象中其他方法时，其他方法的切面逻辑无法执行的问题
 		 */
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
 		registerComponentIfNecessary(beanDefinition, parserContext);

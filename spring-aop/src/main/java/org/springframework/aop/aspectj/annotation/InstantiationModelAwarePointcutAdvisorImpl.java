@@ -86,7 +86,7 @@ class InstantiationModelAwarePointcutAdvisorImpl
 		}
 		else {
 			// A singleton aspect.
-			// 根据注解中的信息，初始化对应的增强器
+			// 根据注解中的信息，初始化对应的增强器，创建通知Advice
 			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
 			this.pointcut = declaredPointcut;
 			this.lazy = false;
