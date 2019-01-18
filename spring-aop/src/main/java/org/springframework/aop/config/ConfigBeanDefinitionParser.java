@@ -57,6 +57,7 @@ import org.springframework.util.xml.DomUtils;
  * @author Mark Fisher
  * @author Ramnivas Laddad
  * @since 2.0
+ * <aop:config></aop:config>标签解析器
  */
 class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -100,17 +101,25 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 				new CompositeComponentDefinition(element.getTagName(), parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compositeDef);
 
+		/**
+		 * 向Spring容器注册一个beanName为o.s.a.c.internalAutoProxyCreator的BeanDefinition，
+		 * 可以自定义也可以使用Spring提供的，需要根据优先级来判断。
+		 * Spring默认提供AspectJAwareAdvisorAutoProxyCreator
+		 */
 		configureAutoProxyCreator(parserContext, element);
 
 		List<Element> childElts = DomUtils.getChildElements(element);
 		for (Element elt: childElts) {
 			String localName = parserContext.getDelegate().getLocalName(elt);
+			// ponitcut标签
 			if (POINTCUT.equals(localName)) {
 				parsePointcut(elt, parserContext);
 			}
+			// advisor标签
 			else if (ADVISOR.equals(localName)) {
 				parseAdvisor(elt, parserContext);
 			}
+			// aspect标签
 			else if (ASPECT.equals(localName)) {
 				parseAspect(elt, parserContext);
 			}
@@ -213,6 +222,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			boolean adviceFoundAlready = false;
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Node node = nodeList.item(i);
+				/**
+				 * isAdviceNode方法判断aspect下的标签是否是：
+				 * <aop:before></aop:before>
+				 * <aop:after></aop:after>
+				 * <aop:after-returning></aop:after-returning>
+				 * <aop:after-throwing></aop:after-throwing>
+				 * <aop:around></aop:around>
+				 */
 				if (isAdviceNode(node, parserContext)) {
 					if (!adviceFoundAlready) {
 						adviceFoundAlready = true;
@@ -224,6 +241,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 						}
 						beanReferences.add(new RuntimeBeanReference(aspectName));
 					}
+					// 解析advice
 					AbstractBeanDefinition advisorDefinition = parseAdvice(
 							aspectName, i, aspectElement, (Element) node, parserContext, beanDefinitions, beanReferences);
 					beanDefinitions.add(advisorDefinition);
