@@ -24,6 +24,12 @@ import java.util.EventObject;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ *
+ * 应用事件，也就是被发布者发布的东西，
+ * 相当于观察者模式中一个隐藏的概念：状态改变。
+ *
+ * 该抽象类继承了EventObject，EventObject是JDK中的类，
+ * 并建议所有的事件都应该继承自EventObject
  */
 public abstract class ApplicationEvent extends EventObject {
 
