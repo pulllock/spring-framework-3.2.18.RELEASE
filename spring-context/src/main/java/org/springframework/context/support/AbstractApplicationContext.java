@@ -357,9 +357,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		if (logger.isTraceEnabled()) {
 			logger.trace("Publishing event in " + getDisplayName() + ": " + event);
 		}
-		//获取应用事件广播器，广播事件
+		// 获取应用事件广播器，广播事件
 		getApplicationEventMulticaster().multicastEvent(event);
-		//父上下文也广播事件
+		// 父上下文也广播事件
 		if (this.parent != null) {
 			this.parent.publishEvent(event);
 		}
@@ -1049,8 +1049,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * 初始化应用事件广播器
 	 */
 	protected void initApplicationEventMulticaster() {
+		// 拿到当前的BeanFactory
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		//配置文件中存在名字为applicationEventMulticaster的bean，就使用自定的
+		/**
+		 * 如果说Spring的配置文件中存在名字为applicationEventMulticaster的Bean，
+		 * 也就是说我们自己定义了一个事件广播器，就会使用我们自己定义的。
+		 * 配置文件中不存在自定义的广播器，就使用默认的SimpleApplicationEventMulticaster。
+		 */
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
@@ -1058,7 +1063,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				logger.debug("Using ApplicationEventMulticaster [" + this.applicationEventMulticaster + "]");
 			}
 		}
-		else {//配置文件中不存在，就使用默认的SimpleApplicationEventMulticaster
+		else {
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isDebugEnabled()) {
@@ -1115,16 +1120,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void registerListeners() {
 		// Register statically specified listeners first.
-		//硬编码方式注册的监听器
+		/**
+		 * 先注册硬编码方式的监听器
+		 */
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let post-processors apply to them!
-		//配置文件注册的监听器
+		// 我们自己的监听器
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
+			/**
+			 * 先获取广播器，之前的步骤初始化广播器已经实例化过了
+			 * 然后将这些监听器添加到广播器中
+			 */
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 	}
@@ -1638,6 +1649,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * BeanPostProcessor that detects beans which implement the ApplicationListener interface.
 	 * This catches beans that can't reliably be detected by getBeanNamesForType.
+	 * Bean实例化后会调用这个postProcessAfterInitialization将监听器添加到广播其中去
 	 */
 	private class ApplicationListenerDetector implements MergedBeanDefinitionPostProcessor {
 

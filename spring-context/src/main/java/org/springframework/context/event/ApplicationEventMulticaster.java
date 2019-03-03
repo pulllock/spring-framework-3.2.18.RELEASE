@@ -29,6 +29,11 @@ import org.springframework.context.ApplicationListener;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ *
+ * 应用事件广播器。这个角色好像在观察者模式中不存在，
+ * 但是仔细想想后，发现它也可以是观察者模式中的抽象主题，
+ * 又或者说ApplicationEventPublisher拿着这个广播器来进行发布事件通知。
+ * 将publisher和multicaster组装到一起才是观察者模式中的抽象主题。
  */
 public interface ApplicationEventMulticaster {
 

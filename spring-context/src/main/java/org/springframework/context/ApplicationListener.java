@@ -32,6 +32,12 @@ import java.util.EventListener;
  * @author Juergen Hoeller
  * @param <E> the specific ApplicationEvent subclass to listen to
  * @see org.springframework.context.event.ApplicationEventMulticaster
+ *
+ * 应用监听器、监听者，是一个接口，
+ * 相当于观察者模式中的抽象观察者，它的实现类相当于具体观察者。
+ *
+ * 该接口继承了EventListener接口。
+ * EventListener接口是JDK中的，建议所有的事件监听器都应该继承EventListener。
  */
 public interface ApplicationListener<E extends ApplicationEvent> extends EventListener {
 

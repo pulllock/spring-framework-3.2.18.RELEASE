@@ -26,6 +26,9 @@ package org.springframework.context;
  * @see ApplicationEventPublisherAware
  * @see org.springframework.context.ApplicationEvent
  * @see org.springframework.context.event.EventPublicationInterceptor
+ *
+ * 面理解为应用事件发布者，就是它可以发布应用事件，是一个接口。
+ * 作用等同于观察者模式的抽象主题，它的实现类就相当于具体主题。
  */
 public interface ApplicationEventPublisher {
 
