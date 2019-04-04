@@ -48,24 +48,24 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	public void registerAlias(String name, String alias) {
 		Assert.hasText(name, "'name' must not be empty");
 		Assert.hasText(alias, "'alias' must not be empty");
-		//别名和bean的名字相同，不需要注册别名，从缓存中删除别名
+		// 别名和bean的名字相同，不需要注册别名，从缓存中删除别名
 		if (alias.equals(name)) {
 			this.aliasMap.remove(alias);
 		}
-		//别名和bean名字不同
+		// 别名和bean名字不同
 		else {
-			//别名不能被覆盖
+			// 别名不能被覆盖
 			if (!allowAliasOverriding()) {
-				//如果已经注册过，抛异常说明别名已经被注册了，不允许覆盖
+				// 如果已经注册过，抛异常说明别名已经被注册了，不允许覆盖
 				String registeredName = this.aliasMap.get(alias);
 				if (registeredName != null && !registeredName.equals(name)) {
 					throw new IllegalStateException("Cannot register alias '" + alias + "' for name '" +
 							name + "': It is already registered for name '" + registeredName + "'.");
 				}
 			}
-			//别名可以被覆盖，先检查别名的循环依赖
+			// 别名可以被覆盖，先检查别名的循环依赖
 			checkForAliasCircle(name, alias);
-			//添加进缓存
+			// 添加进缓存
 			this.aliasMap.put(alias, name);
 		}
 	}

@@ -960,7 +960,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		MethodOverrides methodOverrides = getMethodOverrides();
 		if (!methodOverrides.isEmpty()) {
 			for (MethodOverride mo : methodOverrides.getOverrides()) {
-				//真正处理的地方
+				// 真正处理的地方
 				prepareMethodOverride(mo);
 			}
 		}
@@ -975,7 +975,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * 验证和准备当覆盖方法
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
-		//获取对应类中方法的个数
+		// 获取对应类中方法的个数
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
@@ -984,7 +984,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 		else if (count == 1) {
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
-			//标记方法暂未被覆盖，避免参数类型检查的开销
+			// 标记方法暂未被覆盖，避免参数类型检查的开销
 			mo.setOverloaded(false);
 		}
 	}
