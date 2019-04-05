@@ -1746,17 +1746,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			else {
-				//在InitializingBean中有个afterPropertiesSet方法，可以实现自己的逻辑
+				// 在InitializingBean中有个afterPropertiesSet方法，可以实现自己的逻辑
 				((InitializingBean) bean).afterPropertiesSet();
 			}
 		}
 
 		if (mbd != null) {
-			//获取init-method
+			// 获取init-method
 			String initMethodName = mbd.getInitMethodName();
 			if (initMethodName != null && !(isInitializingBean && "afterPropertiesSet".equals(initMethodName)) &&
 					!mbd.isExternallyManagedInitMethod(initMethodName)) {
-				//调用自定义的init方法
+				// 调用自定义的init方法
 				invokeCustomInitMethod(beanName, bean, mbd);
 			}
 		}
@@ -1816,7 +1816,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		else {
 			try {
-				//使用反射调用
+				// 使用反射调用
 				ReflectionUtils.makeAccessible(initMethod);
 				initMethod.invoke(bean);
 			}
