@@ -526,6 +526,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				 * postProcessBeanFactory方法
 				 * 这里调用ConfigurationClassPostProcessor的方法来解析@Configuration
 				 * 注解的类，就是解析注解方式的配置类
+				 *
+				 * PropertyPlaceholderConfigurer也是在这里被调用
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 

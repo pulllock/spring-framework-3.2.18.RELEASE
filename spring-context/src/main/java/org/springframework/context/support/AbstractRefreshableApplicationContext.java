@@ -140,6 +140,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			beanFactory.setSerializationId(getId());
 			/**
 			 * 设置BeanFactory的两个配置属性：是否允许Bean覆盖；是否允许循环引用。
+			 * 设置@Autowire和@Qualifier注解解析器:QualifierAnnotationAutowireCandidateResolver
 			 */
 			customizeBeanFactory(beanFactory);
 
