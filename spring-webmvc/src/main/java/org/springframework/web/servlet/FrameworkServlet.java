@@ -514,6 +514,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 						// the root application context (if any; may be null) as the parent
 						cwac.setParent(rootContext);
 					}
+					// 刷新上下文环境
 					configureAndRefreshWebApplicationContext(cwac);
 				}
 			}
@@ -594,7 +595,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext
 	 */
 	protected WebApplicationContext createWebApplicationContext(ApplicationContext parent) {
-		// 获取创建类型
+		// 获取servlet初始化参数contextClass，默认是XmlWebApplicationContext
 		Class<?> contextClass = getContextClass();
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug("Servlet with name '" + getServletName() +
@@ -615,9 +616,9 @@ public abstract class FrameworkServlet extends HttpServletBean {
 		wac.setEnvironment(getEnvironment());
 		wac.setParent(parent);
 		// 将设置的contextConfigLocation参数传给wac
-		// 默认传入WEB-INFO/[ServletName]-Servlet.xml
+		// 默认传入WEB-INF/[ServletName]-Servlet.xml
 		wac.setConfigLocation(getContextConfigLocation());
-
+		// 初始化Spring环境，包括加载配置文件等
 		configureAndRefreshWebApplicationContext(wac);
 
 		return wac;

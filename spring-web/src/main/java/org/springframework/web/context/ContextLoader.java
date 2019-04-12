@@ -273,6 +273,7 @@ public class ContextLoader {
 	 * @see #CONFIG_LOCATION_PARAM
 	 */
 	public WebApplicationContext initWebApplicationContext(ServletContext servletContext) {
+	    // web.xml文件中存在多次ContextLoader定义，抛异常
 		if (servletContext.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null) {
 			throw new IllegalStateException(
 					"Cannot initialize context because there is already a root application context present - " +
@@ -289,6 +290,7 @@ public class ContextLoader {
 		try {
 			// Store context in local instance variable, to guarantee that
 			// it is available on ServletContext shutdown.
+            // 创建WebApplicationContext
 			if (this.context == null) {
 				this.context = createWebApplicationContext(servletContext);
 			}
@@ -306,6 +308,7 @@ public class ContextLoader {
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
+			// 记录在servletContext中
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -478,6 +481,11 @@ public class ContextLoader {
 			}
 		}
 		else {
+            /**
+             * defaultStrategies在静态代码块中初始化，
+             * 会到同级目录下找到ContextLoader.properties文件中配置的内容
+             * 默认是org.springframework.web.context.support.XmlWebApplicationContext
+             */
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {
 				return ClassUtils.forName(contextClassName, ContextLoader.class.getClassLoader());

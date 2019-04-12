@@ -120,14 +120,17 @@ public abstract class HttpServletBean extends HttpServlet
 
 		// Set bean properties from init parameters.
 		try {
-			// 将Servlet中配置的参数封装到pvs中
+			// 将Servlet中配置的参数init-param封装到pvs中
 			PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 			/**
 			 * BeanWrapper是Spring提供的一个用来操作JavaBean属性的工具
 			 * 可以直接修改一个对象的属性
+			 *
+			 * 将当前的这个Servlet类转化为一个BeanWrapper，从而能够以Spring的方式来对init-param的值进行注入
 			 */
 			BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 			ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+			// 注册自定义属性编辑器，一旦遇到Resource类型的属性，将会使用ResourceEditor进行解析
 			bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
 			// 模板方法，子类调用，做初始化工作。bw代表DispatcherServlet
 			initBeanWrapper(bw);
