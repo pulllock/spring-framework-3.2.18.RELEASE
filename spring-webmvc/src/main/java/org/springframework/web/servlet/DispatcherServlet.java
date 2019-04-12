@@ -440,6 +440,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	/**
 	 * This implementation calls {@link #initStrategies}.
 	 * DispatcherServlet的入口方法
+     * 刷新web功能中所必须使用的全局变量
 	 */
 	@Override
 	protected void onRefresh(ApplicationContext context) {
