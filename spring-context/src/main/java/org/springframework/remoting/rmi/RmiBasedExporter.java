@@ -58,6 +58,7 @@ public abstract class RmiBasedExporter extends RemoteInvocationBasedExporter {
 			if (logger.isDebugEnabled()) {
 				logger.debug("RMI service [" + getService() + "] is an RMI invoker");
 			}
+			// 对service进行封装
 			return new RmiInvocationWrapper(getProxyForService(), this);
 		}
 	}

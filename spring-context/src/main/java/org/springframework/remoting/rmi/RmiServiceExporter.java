@@ -235,6 +235,7 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 	 * @throws RemoteException if service registration failed
 	 */
 	public void prepare() throws RemoteException {
+		// 检查验证service
 		checkService();
 
 		if (this.serviceName == null) {
@@ -263,6 +264,7 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 		this.createdRegistry = false;
 
 		// Determine RMI registry to use.
+		// 确定RMI registry
 		if (this.registry == null) {
 			this.registry = getRegistry(this.registryHost, this.registryPort,
 				this.registryClientSocketFactory, this.registryServerSocketFactory);
@@ -270,6 +272,10 @@ public class RmiServiceExporter extends RmiBasedExporter implements Initializing
 		}
 
 		// Initialize and cache exported object.
+		/**
+		 * 初始化、缓存导出的对象
+		 * 通常使用RmiInvocationWrapper封装的JDK代理
+		 */
 		this.exportedObject = getObjectToExport();
 
 		if (logger.isInfoEnabled()) {
