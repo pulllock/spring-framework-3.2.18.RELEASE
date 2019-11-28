@@ -87,19 +87,20 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
-		//class path
+		// class path
+		// 以classpath:开头，返回ClassPathResource类型的资源
 		if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
-				//尝试以URL来解析
+				// 尝试以URL来解析，UrlResource类型的资源
 				// Try to parse the location as a URL...
 				URL url = new URL(location);
 				return new UrlResource(url);
 			}
 			catch (MalformedURLException ex) {
-				//路径
+				// ClassPathContextResource类型的资源
 				// No URL -> resolve as resource path.
 				return getResourceByPath(location);
 			}
