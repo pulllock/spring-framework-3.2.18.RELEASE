@@ -209,6 +209,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
+			// 多个Resource资源需要进行处理
 			try {
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
 				// 使用给定的资源加载BeanDefinition
@@ -230,6 +231,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 		}
 		else {
 			// Can only load single resources by absolute URL.
+			// 单个Resource资源
 			Resource resource = resourceLoader.getResource(location);
 			int loadCount = loadBeanDefinitions(resource);
 			if (actualResources != null) {
