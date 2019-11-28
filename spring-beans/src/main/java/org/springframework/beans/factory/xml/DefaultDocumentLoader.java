@@ -67,11 +67,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
 
+		// 创建一个DocumentBuilderFactory对象，用来创建DocumentBuilder
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		// 创建一个DocumentBuilder
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		// 解析InputSource，返回Document
 		return builder.parse(inputSource);
 	}
 
@@ -86,12 +89,17 @@ public class DefaultDocumentLoader implements DocumentLoader {
 	protected DocumentBuilderFactory createDocumentBuilderFactory(int validationMode, boolean namespaceAware)
 			throws ParserConfigurationException {
 
+		// 创建一个DocumentBuilderFactory实例
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+		// 设置是否支持命名空间
 		factory.setNamespaceAware(namespaceAware);
 
+		// 开启校验
 		if (validationMode != XmlValidationModeDetector.VALIDATION_NONE) {
 			factory.setValidating(true);
 
+			// xsd模式
 			if (validationMode == XmlValidationModeDetector.VALIDATION_XSD) {
 				// Enforce namespace aware for XSD...
 				factory.setNamespaceAware(true);
@@ -127,11 +135,14 @@ public class DefaultDocumentLoader implements DocumentLoader {
 			DocumentBuilderFactory factory, EntityResolver entityResolver, ErrorHandler errorHandler)
 			throws ParserConfigurationException {
 
+		// 创建DocumentBuilder对象
 		DocumentBuilder docBuilder = factory.newDocumentBuilder();
 		if (entityResolver != null) {
+			// 设置EntityResolver属性
 			docBuilder.setEntityResolver(entityResolver);
 		}
 		if (errorHandler != null) {
+			// 设置ErrorHandler属性
 			docBuilder.setErrorHandler(errorHandler);
 		}
 		return docBuilder;

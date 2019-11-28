@@ -34,6 +34,7 @@ import org.springframework.core.env.Environment;
  * @author Rob Harrop
  * @since 18.12.2003
  * @see XmlBeanDefinitionReader#setDocumentReaderClass
+ * 定义读取Document并注册BeanDefinition功能
  */
 public interface BeanDefinitionDocumentReader {
 
@@ -47,10 +48,11 @@ public interface BeanDefinitionDocumentReader {
 	void setEnvironment(Environment environment);
 
 	/**
+	 * 从给定的Document对象中解析BeanDefinition，并将他们注册到注册表中
 	 * Read bean definitions from the given DOM document and
 	 * register them with the registry in the given reader context.
-	 * @param doc the DOM document
-	 * @param readerContext the current context of the reader
+	 * @param doc the DOM document 待解析的Document对象
+	 * @param readerContext the current context of the reader 解析器当前上下文，包括目标注册表和被解析的资源，它是根据Resource进行创建的
 	 * (includes the target registry and the resource being parsed)
 	 * @throws BeanDefinitionStoreException in case of parsing errors
 	 */
