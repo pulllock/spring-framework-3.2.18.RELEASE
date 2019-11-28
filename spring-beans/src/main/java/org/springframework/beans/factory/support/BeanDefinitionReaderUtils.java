@@ -57,12 +57,15 @@ public class BeanDefinitionReaderUtils {
 			String parentName, String className, ClassLoader classLoader) throws ClassNotFoundException {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
+		// 设置parentName
 		bd.setParentName(parentName);
 		if (className != null) {
 			if (classLoader != null) {
+				// 设置beanClass
 				bd.setBeanClass(ClassUtils.forName(className, classLoader));
 			}
 			else {
+				// 设置beanClassName
 				bd.setBeanClassName(className);
 			}
 		}
@@ -86,12 +89,16 @@ public class BeanDefinitionReaderUtils {
 			BeanDefinition definition, BeanDefinitionRegistry registry, boolean isInnerBean)
 			throws BeanDefinitionStoreException {
 
+		// 获取beanClassName
 		String generatedBeanName = definition.getBeanClassName();
 		if (generatedBeanName == null) {
+			// 父标签有name
 			if (definition.getParentName() != null) {
+				// 拼接成：父标签名称$child
 				generatedBeanName = definition.getParentName() + "$child";
 			}
 			else if (definition.getFactoryBeanName() != null) {
+				// FactorynBeanName$created
 				generatedBeanName = definition.getFactoryBeanName() + "$created";
 			}
 		}
@@ -101,13 +108,16 @@ public class BeanDefinitionReaderUtils {
 		}
 
 		String id = generatedBeanName;
+		// 是一个子标签，生成的名字需要带上#哈希值
 		if (isInnerBean) {
 			// Inner bean: generate identity hashcode suffix.
+			// generatedBeanName#hascode
 			id = generatedBeanName + GENERATED_BEAN_NAME_SEPARATOR + ObjectUtils.getIdentityHexString(definition);
 		}
 		else {
 			// Top-level bean: use plain class name.
 			// Increase counter until the id is unique.
+			// 顶级标签生成的名字，如果已经存在相同的名字，需要加上编号：generatedBeanName#1
 			int counter = -1;
 			while (counter == -1 || registry.containsBeanDefinition(id)) {
 				counter++;
