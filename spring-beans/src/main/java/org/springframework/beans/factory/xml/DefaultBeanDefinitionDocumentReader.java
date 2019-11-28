@@ -78,6 +78,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 	private Environment environment;
 
+	/**
+	 * 解析器当前上下文
+	 */
 	private XmlReaderContext readerContext;
 
 	private BeanDefinitionParserDelegate delegate;
@@ -97,9 +100,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
 		logger.debug("Loading bean definitions");
-		// 获取root
+		// 获取xml的root元素
 		Element root = doc.getDocumentElement();
-		// 从xml根节点开始解析文件
+		// 从xml根节点开始解析文件，执行注册BeanDefinition
 		doRegisterBeanDefinitions(root);
 	}
 
@@ -135,8 +138,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		 */
 		String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 		if (StringUtils.hasText(profileSpec)) {
+			// 可能会有多个profile
 			String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 					profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
+			// 所有的profile都无效，不进行注册
 			if (!getEnvironment().acceptsProfiles(specifiedProfiles)) {
 				return;
 			}
@@ -148,13 +153,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// the new (child) delegate with a reference to the parent for fallback purposes,
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
-		// BeanDefinition解析器代理
 		/**
+		 * BeanDefinition解析器代理
 		 * BeanDefinitionParserDelegate负责解析Bean定义
 		 * <beans/>内部可以定义<beans/>，所以这个方法的root不一定就是xml的根节点，
 		 * 也可以是嵌套在里面的<beans/>节点
 		 */
+		// parent记录老的解析器代理对象
 		BeanDefinitionParserDelegate parent = this.delegate;
+		// 创建BeanDefinitionParserDelegate对象，并设置到delegate属性
 		this.delegate = createDelegate(this.readerContext, root, parent);
 
 		// 允许解析xml之前进行处理
@@ -164,6 +171,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 允许解析xml之后进行处理
 		postProcessXml(root);
 
+		// 设置delegate为老的BeanDefinitionParserDelegate对象
 		this.delegate = parent;
 	}
 
@@ -172,7 +180,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		BeanDefinitionParserDelegate delegate = createHelper(readerContext, root, parentDelegate);
 		if (delegate == null) {
+			// 创建对象
 			delegate = new BeanDefinitionParserDelegate(readerContext, getEnvironment());
+			// 初始化默认
 			delegate.initDefaults(root, parentDelegate);
 		}
 		return delegate;
@@ -215,7 +225,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				}
 			}
 		}
-		else {// 解析自定义的标签
+		else {
+			// 解析自定义的标签
 			delegate.parseCustomElement(root);
 		}
 	}

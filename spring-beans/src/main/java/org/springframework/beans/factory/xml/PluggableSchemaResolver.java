@@ -53,6 +53,8 @@ import org.springframework.util.CollectionUtils;
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ * 读取classpath下所有的META-INF/spring.schemas成一个namespaceUrl与schema文件地址的映射
  */
 public class PluggableSchemaResolver implements EntityResolver {
 
@@ -69,7 +71,9 @@ public class PluggableSchemaResolver implements EntityResolver {
 
 	private final String schemaMappingsLocation;
 
-	/** Stores the mapping of schema URL -> local schema path */
+	/**
+	 * schema url和本地schema文件路径的对应关系
+	 * Stores the mapping of schema URL -> local schema path */
 	private volatile Map<String, String> schemaMappings;
 
 
@@ -100,6 +104,13 @@ public class PluggableSchemaResolver implements EntityResolver {
 		this.schemaMappingsLocation = schemaMappingsLocation;
 	}
 
+	/**
+	 *
+	 * @param publicId
+	 * @param systemId http://www.springframework.org/schema/beans/spring-beans.xsd
+	 * @return
+	 * @throws IOException
+	 */
 	public InputSource resolveEntity(String publicId, String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Trying to resolve XML entity with public id [" + publicId +
@@ -107,10 +118,13 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			// 获取resource所在位置
 			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation != null) {
+				// 创建ClassPathResource对象
 				Resource resource = new ClassPathResource(resourceLocation, this.classLoader);
 				try {
+					// 创建InputSource对象，并设置publicId和SystemId
 					InputSource source = new InputSource(resource.getInputStream());
 					source.setPublicId(publicId);
 					source.setSystemId(systemId);
@@ -140,11 +154,13 @@ public class PluggableSchemaResolver implements EntityResolver {
 						logger.debug("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
 					}
 					try {
+						// 以Properties方式，读取schemaMappingsLocation
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
 						if (logger.isDebugEnabled()) {
 							logger.debug("Loaded schema mappings: " + mappings);
 						}
+						// 映射到map中
 						Map<String, String> schemaMappings = new ConcurrentHashMap<String, String>(mappings.size());
 						CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
 						this.schemaMappings = schemaMappings;

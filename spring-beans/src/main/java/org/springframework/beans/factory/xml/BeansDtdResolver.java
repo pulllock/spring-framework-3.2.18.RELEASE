@@ -40,6 +40,8 @@ import org.springframework.core.io.Resource;
  * @author Colin Sampaleanu
  * @since 04.06.2003
  * @see ResourceEntityResolver
+ *
+ * Spring Bean dtd解析器，用来从classpath或jar文件中加载dtd
  */
 public class BeansDtdResolver implements EntityResolver {
 
@@ -50,22 +52,34 @@ public class BeansDtdResolver implements EntityResolver {
 	private static final Log logger = LogFactory.getLog(BeansDtdResolver.class);
 
 
+	/**
+	 *
+	 * @param publicId //SPRING//DTD BEAN 2.0//EN
+	 * @param systemId http://www.springframework.org/dtd/spring-beans.dtd
+	 * @return
+	 * @throws IOException
+	 */
 	public InputSource resolveEntity(String publicId, String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Trying to resolve XML entity with public ID [" + publicId +
 					"] and system ID [" + systemId + "]");
 		}
+		// dtd结尾
 		if (systemId != null && systemId.endsWith(DTD_EXTENSION)) {
+			// 最后一个/位置
 			int lastPathSeparator = systemId.lastIndexOf("/");
 			for (String DTD_NAME : DTD_NAMES) {
 				int dtdNameStart = systemId.indexOf(DTD_NAME);
 				if (dtdNameStart > lastPathSeparator) {
+					// dtd文件
 					String dtdFile = systemId.substring(dtdNameStart);
 					if (logger.isTraceEnabled()) {
 						logger.trace("Trying to locate [" + dtdFile + "] in Spring jar");
 					}
 					try {
+						// 创建ClassPathResource对象
 						Resource resource = new ClassPathResource(dtdFile, getClass());
+						// 创建InputSource对象，并设置publicId和systemId
 						InputSource source = new InputSource(resource.getInputStream());
 						source.setPublicId(publicId);
 						source.setSystemId(systemId);
@@ -85,6 +99,7 @@ public class BeansDtdResolver implements EntityResolver {
 		}
 
 		// Use the default behavior -> download from website or wherever.
+		// 使用默认行为，从网络下载
 		return null;
 	}
 
