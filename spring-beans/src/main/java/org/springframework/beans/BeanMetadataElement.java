@@ -22,6 +22,8 @@ package org.springframework.beans;
  *
  * @author Juergen Hoeller
  * @since 2.0
+ *
+ * Bean元对象持有的配置元素可以通过getSource方法获取
  */
 public interface BeanMetadataElement {
 

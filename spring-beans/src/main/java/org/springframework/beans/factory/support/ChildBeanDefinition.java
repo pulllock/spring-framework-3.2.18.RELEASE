@@ -42,6 +42,7 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @see GenericBeanDefinition
  * @see RootBeanDefinition
+ * 如果配置文件中定义了父bean和子bean，则父bean用RootBeanDefinition表示，子bean用ChildBeanDefinition表示，没有父bean的话使用RootBeanDefinition表示
  */
 @SuppressWarnings("serial")
 public class ChildBeanDefinition extends AbstractBeanDefinition {

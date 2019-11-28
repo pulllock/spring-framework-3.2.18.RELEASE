@@ -478,7 +478,7 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
-		// 如果containingBean不为空，也就是当前标签是一个子标签
+		// 如果containingBean不为空，也就是当前标签是一个子标签，containingBean为空，表示当前是一个父标签
 		if (containingBean == null) {
 			// 检查beanName是否在当前层级元素中被使用
 			checkNameUniqueness(beanName, aliases, ele);
@@ -498,11 +498,14 @@ public class BeanDefinitionParserDelegate {
 			 */
 			if (!StringUtils.hasText(beanName)) {
 				try {
+					// containingBean不为空，表示当前是一个子标签
 					if (containingBean != null) {
+						// 生成唯一的beanName
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
 					}
 					else {
+						// 生成唯一的beanname
 						beanName = this.readerContext.generateBeanName(beanDefinition);
 						// Register an alias for the plain bean class name, if still possible,
 						// if the generator returned the class name plus a suffix.
@@ -635,7 +638,7 @@ public class BeanDefinitionParserDelegate {
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
 			BeanDefinition containingBean, AbstractBeanDefinition bd) {
 
-		//scope属性
+		// scope属性
 		if (ele.hasAttribute(SCOPE_ATTRIBUTE)) {
 			// Spring 2.x "scope" attribute
 			bd.setScope(ele.getAttribute(SCOPE_ATTRIBUTE));
@@ -649,7 +652,7 @@ public class BeanDefinitionParserDelegate {
 			bd.setScope(TRUE_VALUE.equals(ele.getAttribute(SINGLETON_ATTRIBUTE)) ?
 					BeanDefinition.SCOPE_SINGLETON : BeanDefinition.SCOPE_PROTOTYPE);
 		}
-		//使用包含包含bean的作用于
+		// 使用包含包含bean的作用于
 		else if (containingBean != null) {
 			// Take default from containing bean in case of an inner bean definition.
 			bd.setScope(containingBean.getScope());
