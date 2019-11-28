@@ -592,7 +592,12 @@ public class BeanDefinitionParserDelegate {
 			 * 下面就是解析<bean/>内部的子元素，
 			 * 解析完后信息都放到bd中
 			 */
-			// 解析元数据元素<meta/>
+
+			/**
+			 * 解析元数据元素<meta/>
+			 * meta中声明的key并不会在Bean中体现，只是一个额外的声明，
+			 * 当我们使用里面的信息时，通过调用BeanDefinition的getAttribute方法来获取
+			 */
 			parseMetaElements(ele, bd);
 			// 解析lookup-override子元素<lookup-method/>
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
@@ -762,12 +767,17 @@ public class BeanDefinitionParserDelegate {
 		NodeList nl = ele.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 标签名为meta
 			if (isCandidateElement(node) && nodeNameEquals(node, META_ELEMENT)) {
 				Element metaElement = (Element) node;
+				// key
 				String key = metaElement.getAttribute(KEY_ATTRIBUTE);
+				// value
 				String value = metaElement.getAttribute(VALUE_ATTRIBUTE);
+				// 创建BeanMetadataAttribute对象
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
+				// 添加到BeanMetadataAttributeAccessor中，BeanDefinition继承了AttributeAccessor, BeanMetadataElement
 				attributeAccessor.addMetadataAttribute(attribute);
 			}
 		}
