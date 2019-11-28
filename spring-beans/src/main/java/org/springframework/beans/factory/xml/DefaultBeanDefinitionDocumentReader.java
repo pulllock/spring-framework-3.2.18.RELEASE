@@ -286,10 +286,10 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 
 		// Absolute or relative?
-		// 绝对地址
+		// 绝对地址，递归调用Bean解析过程，进行另一次解析
 		if (absoluteLocation) {
 			try {
-				// 加载BeanDefinition
+				// 添加配置文件地址的Resource到actualResources中，并加载BeanDefinition
 				int importCount = getReaderContext().getReader().loadBeanDefinitions(location, actualResources);
 				if (logger.isDebugEnabled()) {
 					logger.debug("Imported " + importCount + " bean definitions from URL location [" + location + "]");
@@ -302,15 +302,18 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 		else {
 			// No URL -> considering resource location as relative to the current file.
-			// 相对地址
+			// 相对地址，先计算出绝对路径得到Resource，然后解析
 			try {
 				int importCount;
+				// 创建相对地址的Resource
 				Resource relativeResource = getReaderContext().getResource().createRelative(location);
+				// 如果存在，加载BeanDefinition，并添加到actualResources中
 				if (relativeResource.exists()) {
 					importCount = getReaderContext().getReader().loadBeanDefinitions(relativeResource);
 					actualResources.add(relativeResource);
 				}
 				else {
+					// 不存在，获取根路径
 					String baseLocation = getReaderContext().getResource().getURL().toString();
 					importCount = getReaderContext().getReader().loadBeanDefinitions(
 							StringUtils.applyRelativePath(baseLocation, location), actualResources);
