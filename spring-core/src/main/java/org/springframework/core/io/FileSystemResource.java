@@ -31,7 +31,10 @@ import org.springframework.util.StringUtils;
 /**
  * {@link Resource} implementation for {@code java.io.File} handles.
  * Supports resolution as a {@code File} and also as a {@code URL}.
- * Implements the extended {@link WritableResource} interface.
+ * Implements the extended {@link WritableResource} interface
+ *
+ * 对java.io.File类型资源的封装，只要是跟File打交道的，基本上都可以使用FileSystemResource。
+ * 支持文件，URL形式，实现WritableResource。
  *
  * @author Juergen Hoeller
  * @since 28.12.2003

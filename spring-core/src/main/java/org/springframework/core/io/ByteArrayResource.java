@@ -30,6 +30,9 @@ import java.util.Arrays;
  * Particularly useful for creating mail attachments from local content,
  * where JavaMail needs to be able to read the stream multiple times.
  *
+ * 对字节数组提供的数据的封装，如果通过InputStream形式访问该类型的资源，该实现会根据
+ * 字节数组的数据构造一个ByteArrayInputStream。
+ *
  * @author Juergen Hoeller
  * @since 1.2.3
  * @see java.io.ByteArrayInputStream
