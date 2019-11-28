@@ -35,6 +35,8 @@ import org.springframework.util.StringUtils;
  * Supports resolution as a {@code URL} and also as a {@code File} in
  * case of the {@code "file:"} protocol.
  *
+ * 对java.net.URL类型资源的封装，内部委派URL进行具体资源操作。
+ *
  * @author Juergen Hoeller
  * @since 28.12.2003
  * @see java.net.URL

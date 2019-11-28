@@ -30,6 +30,8 @@ import java.io.InputStream;
  * {@code isOpen()}. Do not use it if you need to keep the resource
  * descriptor somewhere, or if you need to read a stream multiple times.
  *
+ * 将给定的InputStream作为一种资源的实现
+ *
  * @author Juergen Hoeller
  * @since 28.12.2003
  * @see ByteArrayResource
