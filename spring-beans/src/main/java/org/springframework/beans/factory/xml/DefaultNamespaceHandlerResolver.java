@@ -64,7 +64,11 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 	/** Resource location to search for */
 	private final String handlerMappingsLocation;
 
-	/** Stores the mappings from namespace URI to NamespaceHandler class name / instance */
+	/**
+	 * Stores the mappings from namespace URI to NamespaceHandler class name / instance
+	 *
+	 * key是命名空间 value是：未初始化的时候是NamespaceHandler类路径；已初始化的时候是对应的NamespaceHandler对象
+	 */
 	private volatile Map<String, Object> handlerMappings;
 
 
@@ -124,13 +128,16 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 		 * 第一次获取可能是类名，经过下面的反射进行实例化后，就变成了Handler实例
 		 */
 		Object handlerOrClassName = handlerMappings.get(namespaceUri);
+		// 不存在，返回null
 		if (handlerOrClassName == null) {
 			return null;
 		}
 		else if (handlerOrClassName instanceof NamespaceHandler) {
+			// 已经初始化过了，直接返回
 			return (NamespaceHandler) handlerOrClassName;
 		}
 		else {
+			// 需要进行初始化
 			String className = (String) handlerOrClassName;
 			try {
 				// 反射得到class
@@ -176,6 +183,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 						if (logger.isDebugEnabled()) {
 							logger.debug("Loaded NamespaceHandler mappings: " + mappings);
 						}
+						// 初始化到handlerMappings中去
 						Map<String, Object> handlerMappings = new ConcurrentHashMap<String, Object>(mappings.size());
 						CollectionUtils.mergePropertiesIntoMap(mappings, handlerMappings);
 						this.handlerMappings = handlerMappings;
