@@ -624,6 +624,7 @@ public class BeanDefinitionParserDelegate {
 			 * 使用set方法设置元素
 			 */
 			parsePropertyElements(ele, bd);
+
 			// 解析qualifier元素<qualifier/>
 			parseQualifierElements(ele, bd);
 
@@ -880,9 +881,11 @@ public class BeanDefinitionParserDelegate {
 	 * Parse qualifier sub-elements of the given bean element.
 	 */
 	public void parseQualifierElements(Element beanEle, AbstractBeanDefinition bd) {
+		// 遍历子元素
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 只处理qualifier标签
 			if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ELEMENT)) {
 				parseQualifierElement((Element) node, bd);
 			}
@@ -1060,6 +1063,7 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a qualifier element.
 	 */
 	public void parseQualifierElement(Element ele, AbstractBeanDefinition bd) {
+		// type属性，必须的
 		String typeName = ele.getAttribute(TYPE_ATTRIBUTE);
 		if (!StringUtils.hasLength(typeName)) {
 			error("Tag 'qualifier' must have a 'type' attribute", ele);
@@ -1067,22 +1071,30 @@ public class BeanDefinitionParserDelegate {
 		}
 		this.parseState.push(new QualifierEntry(typeName));
 		try {
+			// 创建AutowireCandidateQualifier对象
 			AutowireCandidateQualifier qualifier = new AutowireCandidateQualifier(typeName);
 			qualifier.setSource(extractSource(ele));
+			// value属性，设置到AutowireCandidateQualifier对象中
 			String value = ele.getAttribute(VALUE_ATTRIBUTE);
 			if (StringUtils.hasLength(value)) {
 				qualifier.setAttribute(AutowireCandidateQualifier.VALUE_KEY, value);
 			}
+			// 遍历子节点
 			NodeList nl = ele.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);
+				// attribute标签
 				if (isCandidateElement(node) && nodeNameEquals(node, QUALIFIER_ATTRIBUTE_ELEMENT)) {
 					Element attributeEle = (Element) node;
+					// key属性
 					String attributeName = attributeEle.getAttribute(KEY_ATTRIBUTE);
+					// value属性
 					String attributeValue = attributeEle.getAttribute(VALUE_ATTRIBUTE);
 					if (StringUtils.hasLength(attributeName) && StringUtils.hasLength(attributeValue)) {
+						// 创建BeanMetadataAttribute对象
 						BeanMetadataAttribute attribute = new BeanMetadataAttribute(attributeName, attributeValue);
 						attribute.setSource(extractSource(attributeEle));
+						// 添加到attributes中
 						qualifier.addMetadataAttribute(attribute);
 					}
 					else {
@@ -1091,6 +1103,7 @@ public class BeanDefinitionParserDelegate {
 					}
 				}
 			}
+			// 添加到qualifiers中
 			bd.addQualifier(qualifier);
 		}
 		finally {
