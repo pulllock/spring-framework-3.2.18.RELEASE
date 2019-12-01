@@ -605,7 +605,10 @@ public class BeanDefinitionParserDelegate {
 			 * 可以用于设计一些可插拔的功能上，接触程序依赖
 			 */
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
-			// 解析replace-method子元素<replaced-method/>
+			/**
+			 * 解析replace-method子元素<replaced-method/>
+			 * 在运行时调用新的方法替换现有的方法，还能动态更新原有方法的逻辑
+			 */
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
 			// 解析constructor-arg元素<constructor-arg/>
@@ -901,17 +904,24 @@ public class BeanDefinitionParserDelegate {
 	 * Parse replaced-method sub-elements of the given bean element.
 	 */
 	public void parseReplacedMethodSubElements(Element beanEle, MethodOverrides overrides) {
+		// 获取子节点遍历
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 只处理replace-method标签
 			if (isCandidateElement(node) && nodeNameEquals(node, REPLACED_METHOD_ELEMENT)) {
 				Element replacedMethodEle = (Element) node;
+				// name属性
 				String name = replacedMethodEle.getAttribute(NAME_ATTRIBUTE);
+				// replacer属性
 				String callback = replacedMethodEle.getAttribute(REPLACER_ATTRIBUTE);
+				// 创建ReplaceOverride对象
 				ReplaceOverride replaceOverride = new ReplaceOverride(name, callback);
 				// Look for arg-type match elements.
+				// arg-type子标签
 				List<Element> argTypeEles = DomUtils.getChildElementsByTagName(replacedMethodEle, ARG_TYPE_ELEMENT);
 				for (Element argTypeEle : argTypeEles) {
+					// arg-type子标签的match属性
 					String match = argTypeEle.getAttribute(ARG_TYPE_MATCH_ATTRIBUTE);
 					match = (StringUtils.hasText(match) ? match : DomUtils.getTextValue(argTypeEle));
 					if (StringUtils.hasText(match)) {
@@ -919,6 +929,7 @@ public class BeanDefinitionParserDelegate {
 					}
 				}
 				replaceOverride.setSource(extractSource(replacedMethodEle));
+				// 添加到MehodOverrides属性中
 				overrides.addOverride(replaceOverride);
 			}
 		}
