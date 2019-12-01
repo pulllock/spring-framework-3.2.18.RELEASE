@@ -618,7 +618,11 @@ public class BeanDefinitionParserDelegate {
 			 * 可以实现对一个Bean自动寻找对应的构造方法，并在初始化的时候将值当做参数进行设置
 			 */
 			parseConstructorArgElements(ele, bd);
-			// 解析property元素<property/>
+
+			/**
+			 * 解析property元素<property/>
+			 * 使用set方法设置元素
+			 */
 			parsePropertyElements(ele, bd);
 			// 解析qualifier元素<qualifier/>
 			parseQualifierElements(ele, bd);
@@ -861,9 +865,11 @@ public class BeanDefinitionParserDelegate {
 	 * Parse property sub-elements of the given bean element.
 	 */
 	public void parsePropertyElements(Element beanEle, BeanDefinition bd) {
+		// 获取子元素遍历
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 只处理property标签
 			if (isCandidateElement(node) && nodeNameEquals(node, PROPERTY_ELEMENT)) {
 				parsePropertyElement((Element) node, bd);
 			}
@@ -1022,6 +1028,7 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a property element.
 	 */
 	public void parsePropertyElement(Element ele, BeanDefinition bd) {
+		// name属性
 		String propertyName = ele.getAttribute(NAME_ATTRIBUTE);
 		if (!StringUtils.hasLength(propertyName)) {
 			error("Tag 'property' must have a 'name' attribute", ele);
@@ -1029,14 +1036,19 @@ public class BeanDefinitionParserDelegate {
 		}
 		this.parseState.push(new PropertyEntry(propertyName));
 		try {
+			// 不能存在相同的name
 			if (bd.getPropertyValues().contains(propertyName)) {
 				error("Multiple 'property' definitions for property '" + propertyName + "'", ele);
 				return;
 			}
+			// 解析属性值
 			Object val = parsePropertyValue(ele, bd, propertyName);
+			// 创建Property对象
 			PropertyValue pv = new PropertyValue(propertyName, val);
+			// 解析property下的meta子标签
 			parseMetaElements(ele, pv);
 			pv.setSource(extractSource(ele));
+			// 添加到PropertyValue集合中
 			bd.getPropertyValues().addPropertyValue(pv);
 		}
 		finally {
