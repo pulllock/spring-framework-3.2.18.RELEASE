@@ -777,7 +777,11 @@ public class BeanDefinitionParserDelegate {
 				// 创建BeanMetadataAttribute对象
 				BeanMetadataAttribute attribute = new BeanMetadataAttribute(key, value);
 				attribute.setSource(extractSource(metaElement));
-				// 添加到BeanMetadataAttributeAccessor中，BeanDefinition继承了AttributeAccessor, BeanMetadataElement
+				/**
+				 * 添加到BeanMetadataAttributeAccessor中，BeanDefinition继承了AttributeAccessor, BeanMetadataElement
+				 * AbstractBeanDefinition继承了BeanMetadataAttributeAccessor
+				 * BeanMetadataAtrributeAccessor继承了AttributeAccessorSupport
+				 */
 				attributeAccessor.addMetadataAttribute(attribute);
 			}
 		}
