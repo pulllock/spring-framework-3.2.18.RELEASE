@@ -599,7 +599,11 @@ public class BeanDefinitionParserDelegate {
 			 * 当我们使用里面的信息时，通过调用BeanDefinition的getAttribute方法来获取
 			 */
 			parseMetaElements(ele, bd);
-			// 解析lookup-override子元素<lookup-method/>
+			/**
+			 * 解析lookup-override子元素<lookup-method/>
+			 * 把一个方法声明为返回某种类型的Bean，但实际上要返回的Bean是在配置文件里配置的。
+			 * 可以用于设计一些可插拔的功能上，接触程序依赖
+			 */
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 			// 解析replace-method子元素<replaced-method/>
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
@@ -873,15 +877,21 @@ public class BeanDefinitionParserDelegate {
 	 * Parse lookup-override sub-elements of the given bean element.
 	 */
 	public void parseLookupOverrideSubElements(Element beanEle, MethodOverrides overrides) {
+	    // 获取子节点
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 只处理标签名为lookup-method的
 			if (isCandidateElement(node) && nodeNameEquals(node, LOOKUP_METHOD_ELEMENT)) {
 				Element ele = (Element) node;
+				// name属性
 				String methodName = ele.getAttribute(NAME_ATTRIBUTE);
+				// bean属性
 				String beanRef = ele.getAttribute(BEAN_ELEMENT);
+				// 创建LookupOverride对象
 				LookupOverride override = new LookupOverride(methodName, beanRef);
 				override.setSource(extractSource(ele));
+				// 添加到AbstractBeanDefinition中的MethodOverrides属性中
 				overrides.addOverride(override);
 			}
 		}
