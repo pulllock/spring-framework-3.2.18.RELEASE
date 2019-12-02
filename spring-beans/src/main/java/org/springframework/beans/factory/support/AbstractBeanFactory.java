@@ -1780,10 +1780,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * <p>All the other methods in this class invoke this method, although
 	 * beans may be cached after being instantiated by this method. All bean
 	 * instantiation within this class is performed by this method.
-	 * @param beanName the name of the bean
-	 * @param mbd the merged bean definition for the bean
+	 * @param beanName the name of the bean bean名字
+	 * @param mbd the merged bean definition for the bean 已经合并了父类属性的BeanDefinition对象
 	 * @param args arguments to use if creating a prototype using explicit arguments to a
 	 * static factory method. This parameter must be {@code null} except in this case.
+     *             用于构造方法或者工厂方法创建Bean实例对象的参数
 	 * @return a new instance of the bean
 	 * @throws BeanCreationException if the bean could not be created
 	 * 用给定的definition创建一个bean实例
