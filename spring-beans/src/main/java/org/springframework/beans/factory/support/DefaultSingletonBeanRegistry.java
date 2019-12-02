@@ -281,7 +281,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<Exception>();
 				}
 				try {
-					// 从单例工厂中获取单例对象
+					// 从单例工厂中获取单例对象，调用的是createBean方法
 					singletonObject = singletonFactory.getObject();
 				}
 				catch (BeanCreationException ex) {
@@ -329,23 +329,23 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 */
 	protected void removeSingleton(String beanName) {
 		synchronized (this.singletonObjects) {
-			//单例对象缓存中移除
+			// 单例对象缓存中移除
 			this.singletonObjects.remove(beanName);
-			//单例工厂缓存中移除
+			// 单例工厂缓存中移除
 			this.singletonFactories.remove(beanName);
-			//早期单例对象缓存中移除
+			// 早期单例对象缓存中移除
 			this.earlySingletonObjects.remove(beanName);
-			//已注册的单例名字缓存中移除
+			// 已注册的单例名字缓存中移除
 			this.registeredSingletons.remove(beanName);
 		}
 	}
 
 	public boolean containsSingleton(String beanName) {
-		//单例对象缓存中是否包含
+		// 单例对象缓存中是否包含
 		return (this.singletonObjects.containsKey(beanName));
 	}
 
-	//单例的名字，直接从缓存的set中获取
+	// 单例的名字，直接从缓存的set中获取
 	public String[] getSingletonNames() {
 		synchronized (this.singletonObjects) {
 			return StringUtils.toStringArray(this.registeredSingletons);
@@ -354,13 +354,13 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	public int getSingletonCount() {
 		synchronized (this.singletonObjects) {
-			//缓存的已注册的单例的数量
+			// 缓存的已注册的单例的数量
 			return this.registeredSingletons.size();
 		}
 	}
 
 
-	//设置单例正在创建中
+	// 设置单例正在创建中
 	public void setCurrentlyInCreation(String beanName, boolean inCreation) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		if (!inCreation) {

@@ -102,10 +102,10 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * 从FactoryBan中获取一个对象
 	 */
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
-		// 单例并且包含单例bean，containsSingleton在DefaultSingletonBeanRegistry中实现
+		// 单例并且缓存中包含单例bean，containsSingleton在DefaultSingletonBeanRegistry中实现
 		if (factory.isSingleton() && containsSingleton(beanName)) {
 			synchronized (getSingletonMutex()) {
-				// 从缓存中获取
+				// 从缓存中获取factoryBean
 				Object object = this.factoryBeanObjectCache.get(beanName);
 				if (object == null) {
 					// 缓存中不存在，调用doGetObjectFromFactoryBean方法获取
@@ -134,10 +134,12 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				return (object != NULL_OBJECT ? object : null);
 			}
 		}
-		else {// 原型bean处理
+		else {
+			// 原型bean处理或者单例bean但在缓存中不存在，从FactoryBean中获得对象
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
 			if (object != null && shouldPostProcess) {
 				try {
+					// 后处理
 					object = postProcessObjectFromFactoryBean(object, beanName);
 				}
 				catch (Throwable ex) {
