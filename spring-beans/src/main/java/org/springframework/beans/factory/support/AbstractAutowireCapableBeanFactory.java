@@ -462,11 +462,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		// Make sure bean class is actually resolved at this point.
 		// 确保BeanDefinition中的Class被加载
+		// 主要是因为动态解析的class无法保存到共享的BeanDefinition
 		resolveBeanClass(mbd, beanName);
 
 		// Prepare method overrides.
 		try {
-			// 准备覆盖的方法，对lookup-method和replace-method的处理
+			// 验证和准备覆盖的方法，对lookup-method和replace-method的处理
 			mbd.prepareMethodOverrides();
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -476,7 +477,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
-			// 给BeanPostProcessors一个机会来返回代理，来代替真正的实例
+			/**
+			 * 给BeanPostProcessors一个机会来返回代理，来代替真正的实例
+			 * 实例化的前置处理
+			 * aop功能也是在这里面进行处理
+			 */
 			Object bean = resolveBeforeInstantiation(beanName, mbd);
 			/**
 			 * 重要的地方！！！！
@@ -522,15 +527,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected Object doCreateBean(final String beanName, final RootBeanDefinition mbd, final Object[] args) {
 		// Instantiate the bean.
+        /**
+         * BeanWrapper是对Bean的包装
+         */
 		BeanWrapper instanceWrapper = null;
+		// 单例bean
 		if (mbd.isSingleton()) {
-			// 缓存中移除并获取
+			// 从未完成的FactoryBean缓存中移除并获取
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 
 		// 说明不是FactoryBean
 		if (instanceWrapper == null) {
-			// 根据指定bean使用对应的策略创建新的实例
+			// 根据指定bean使用对应的策略创建新的实例，比如：工厂方法、构造方法自动驻入、简单初始化等
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
 		// bean实例
@@ -542,6 +551,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		synchronized (mbd.postProcessingLock) {
 			if (!mbd.postProcessed) {
 				/**
+                 * 后置处理修改BeanDefinition
 				 * 应用MergedBeanDefinitionPostProcessors
 				 * 比如@Autowired注解是通过次方法实现诸如类型的预解析
  				 */
@@ -571,11 +581,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// Initialize the bean instance.
+        // 初始化Bean实例对象
 		Object exposedObject = bean;
 		try {
 			/**
 			 * 负责属性装配
 			 * 前面Bean只是实例化了，并没有设值，这里设值
+             * 将各个属性值注入
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
 			if (exposedObject != null) {
@@ -595,8 +607,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 循环依赖处理
 		// 如果是提早曝光的bean
 		if (earlySingletonExposure) {
+		    // 获取earlySingletonReference
 			Object earlySingletonReference = getSingleton(beanName, false);
 			// 只有在检测到有循环依赖的情况下才会不为空
 			if (earlySingletonReference != null) {
@@ -628,7 +642,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Register bean as disposable.
 		try {
-			//注册disposable bean 也就是destory-method
+			// 注册disposable bean 也就是destory-method
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
 		catch (BeanDefinitionValidationException ex) {
