@@ -145,6 +145,7 @@ public abstract class BeanUtils {
 		Assert.notNull(ctor, "Constructor must not be null");
 		try {
 			ReflectionUtils.makeAccessible(ctor);
+			// 使用构造方法创建对象
 			return ctor.newInstance(args);
 		}
 		catch (InstantiationException ex) {
