@@ -593,6 +593,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			populateBean(beanName, mbd, instanceWrapper);
 			if (exposedObject != null) {
 				/**
+				 * 激活aware方法
 				 * 调用初始化方法init-method等
 				 * 处理初始化完成后的各种回调
 				 */

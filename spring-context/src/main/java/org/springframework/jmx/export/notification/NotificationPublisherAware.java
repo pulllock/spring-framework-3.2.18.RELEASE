@@ -42,6 +42,7 @@ import org.springframework.beans.factory.Aware;
 public interface NotificationPublisherAware extends Aware {
 
 	/**
+	 * JMX通知
 	 * Set the {@link NotificationPublisher} instance for the current managed resource instance.
 	 */
 	void setNotificationPublisher(NotificationPublisher notificationPublisher);

@@ -38,6 +38,8 @@ package org.springframework.beans.factory;
 public interface BeanClassLoaderAware extends Aware {
 
 	/**
+	 * 将BeanClassLoader提供给bean实例回调
+	 * 在bean属性填充后，初始化回调之前回调
 	 * Callback that supplies the bean {@link ClassLoader class loader} to
 	 * a bean instance.
 	 * <p>Invoked <i>after</i> the population of normal bean properties but

@@ -33,6 +33,7 @@ import org.springframework.beans.factory.Aware;
 public interface BootstrapContextAware extends Aware {
 
 	/**
+	 * 资源适配器，如JCA CCI
 	 * Set the BootstrapContext that this object runs in.
 	 * <p>Invoked after population of normal bean properties but before an init
 	 * callback like InitializingBean's {@code afterPropertiesSet} or a

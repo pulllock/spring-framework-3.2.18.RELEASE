@@ -31,6 +31,7 @@ import org.springframework.instrument.classloading.LoadTimeWeaver;
 public interface LoadTimeWeaverAware extends Aware {
 
 	/**
+	 * 加载Spring Bean时织入第三方模块，如AspectJ
 	 * Set the {@link LoadTimeWeaver} of this object's containing
 	 * {@link org.springframework.context.ApplicationContext ApplicationContext}.
 	 * <p>Invoked after the population of normal bean properties but before an

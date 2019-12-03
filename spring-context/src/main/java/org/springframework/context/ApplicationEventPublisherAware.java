@@ -31,6 +31,7 @@ import org.springframework.beans.factory.Aware;
 public interface ApplicationEventPublisherAware extends Aware {
 
 	/**
+	 * 应用事件
 	 * Set the ApplicationEventPublisher that this object runs in.
 	 * <p>Invoked after population of normal bean properties but before an init
 	 * callback like InitializingBean's afterPropertiesSet or a custom init-method.
