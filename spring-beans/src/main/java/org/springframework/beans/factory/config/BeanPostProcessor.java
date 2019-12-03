@@ -49,8 +49,8 @@ public interface BeanPostProcessor {
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
 	 * or a custom init-method). The bean will already be populated with property values.
 	 * The returned bean instance may be a wrapper around the original.
-	 * @param bean the new bean instance
-	 * @param beanName the name of the bean
+	 * @param bean the new bean instance 已经实例化了的bean
+	 * @param beanName the name of the bean bean名字
 	 * @return the bean instance to use, either the original or a wrapped one; if
 	 * {@code null}, no subsequent BeanPostProcessors will be invoked
 	 * @throws org.springframework.beans.BeansException in case of errors
