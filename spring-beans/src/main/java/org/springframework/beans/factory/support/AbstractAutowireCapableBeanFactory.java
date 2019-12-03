@@ -1059,7 +1059,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					"Bean class isn't public, and non-public access not allowed: " + beanClass.getName());
 		}
 
-		// 使用工厂方法初始化策略
+		// 使用工厂方法初始化策略，使用FactoryBean的factory-method来创建，支持静态工厂和实例工厂
 		if (mbd.getFactoryMethodName() != null)  {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
@@ -1070,6 +1070,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
 				// 一个类有多个构造函数，每个构造函数都有不同的参数，所以调用前需要先根据参数锁定构造函数或对应的工厂方法
+                // 如果已经缓存的解析的构造方法或者工厂方法不为空，则可以利用构造方法解析
+                // 根据参数确认到底使用哪个构造方法比较耗性能，所以使用缓存机制
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
 					autowireNecessary = mbd.constructorArgumentsResolved;
@@ -1078,19 +1080,22 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		// 已经解析过，则使用已经解析好的构造函数，不需要再次锁定
 		if (resolved) {
+		    // autowire自动注入
 			if (autowireNecessary) {
-				// 构造函数自动注入
+				// 构造方法自动注入
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
-				// 默认构造函数注入
+				// 使用默认构造方法构造
 				return instantiateBean(beanName, mbd);
 			}
 		}
 
 		// Need to determine the constructor...
 		// 需要根据参数解析构造函数
+        // 主要是检查已经注册的SmartInstantiationAwareBeanPostProcessor
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
+		// 有参数的情况，利用参数个数、类型等确定最匹配的构造方法
 		if (ctors != null ||
 				mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args))  {
@@ -1099,7 +1104,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		// No special handling: simply use no-arg constructor.
-		// 默认构造函数注入
+		// 默认构造方法创建
 		return instantiateBean(beanName, mbd);
 	}
 
@@ -1151,6 +1156,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				// 直接调用实例化策略来实例化
 				beanInstance = getInstantiationStrategy().instantiate(mbd, beanName, parent);
 			}
+			// 封装BeanWrapperImpl并完成初始化
 			BeanWrapper bw = new BeanWrapperImpl(beanInstance);
 			initBeanWrapper(bw);
 			return bw;

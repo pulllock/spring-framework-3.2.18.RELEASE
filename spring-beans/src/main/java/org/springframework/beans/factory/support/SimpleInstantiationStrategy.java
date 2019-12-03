@@ -115,6 +115,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	public Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
 			final Constructor<?> ctor, Object[] args) {
 
+		// 没有覆盖，也就是没有配置lookup-method、replace-method、@Lookup，直接使用反射实例化
 		if (beanDefinition.getMethodOverrides().isEmpty()) {
 			if (System.getSecurityManager() != null) {
 				// use own privileged to change accessibility (when security is on)
@@ -125,9 +126,11 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				});
 			}
+			// 直接使用构造器对象实例化Bean对象
 			return BeanUtils.instantiateClass(ctor, args);
 		}
 		else {
+			// 如果存在需要覆盖的方法或动态替换的方法，生成CGLib创建的子类对象
 			return instantiateWithMethodInjection(beanDefinition, beanName, owner, ctor, args);
 		}
 	}
@@ -158,12 +161,14 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				});
 			}
 			else {
+				// 设置Method可访问
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
 
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
 			try {
 				currentlyInvokedFactoryMethod.set(factoryMethod);
+				// 创建Bean对象
 				return factoryMethod.invoke(factoryBean, args);
 			}
 			finally {
