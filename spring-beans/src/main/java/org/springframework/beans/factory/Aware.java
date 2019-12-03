@@ -35,8 +35,7 @@ package org.springframework.beans.factory;
  * @since 3.1
  *
  * Aware是一个标记接口，
- * 该接口的实现类会被Spring选中
- * 并得到某种通知
+ * 实现了该接口的bean是具有被Spring容器通知的能力，通知的方式是采用回调的方式
  */
 public interface Aware {
 
