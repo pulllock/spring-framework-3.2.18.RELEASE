@@ -588,6 +588,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			 * 负责属性装配
 			 * 前面Bean只是实例化了，并没有设值，这里设值
              * 将各个属性值注入
+             * 将BeanDefinition中的属性值赋值给BeanWrapper对象
 			 */
 			populateBean(beanName, mbd, instanceWrapper);
 			if (exposedObject != null) {
@@ -1240,7 +1241,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean continueWithPropertyPopulation = true;
 
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+		    // 遍历所有的BeanPostProcessor
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
+			    // InstantiationAwareBeanPostProcessor
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {
 					InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 					/**
@@ -1259,8 +1262,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return;
 		}
 
+		// 自动注入
 		if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_NAME ||
 				mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_TYPE) {
+            /**
+             * 将PropertyValues封装成MutablePropertyValues对象
+             * MutablePropertyValues允许对属性进行简单操作，并提供构造方法以支持Map深度复制和构造
+             */
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 
 			// Add property values based on autowire by name if applicable.
@@ -1285,8 +1293,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		/**
 		 * 往下是判断是否需要执行postProcessPropertyValues，来改变Bean的属性
 		 */
+		// 是否已经注册了InstantiationAwareBeanPostProcessors
 		boolean hasInstAwareBpps = hasInstantiationAwareBeanPostProcessors();
-		// 需要依赖检查
+		// 是否需要依赖检查
 		boolean needsDepCheck = (mbd.getDependencyCheck() != RootBeanDefinition.DEPENDENCY_CHECK_NONE);
 
 		if (hasInstAwareBpps || needsDepCheck) {
@@ -1308,7 +1317,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				}
 			}
 			if (needsDepCheck) {
-				// 依赖检查
+				// 依赖检查，对应depends-on属性
 				checkDependencies(beanName, mbd, filteredPds, pvs);
 			}
 		}
@@ -1370,13 +1379,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	protected void autowireByType(
 			String beanName, AbstractBeanDefinition mbd, BeanWrapper bw, MutablePropertyValues pvs) {
 
+	    // 获取TypeConverter实例
+        // 使用自定义的TypeConverter，用于取代默认的PropertyEditor机制
 		TypeConverter converter = getCustomTypeConverter();
 		if (converter == null) {
 			converter = bw;
 		}
 
 		Set<String> autowiredBeanNames = new LinkedHashSet<String>(4);
-		// 需要依赖注入的属性
+		// 需要依赖注入的属性，非简单属性
 		String[] propertyNames = unsatisfiedNonSimpleProperties(mbd, bw);
 		for (String propertyName : propertyNames) {
 			try {
@@ -1394,6 +1405,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						pvs.add(propertyName, autowiredArgument);
 					}
 					for (String autowiredBeanName : autowiredBeanNames) {
+					    // 属性依赖注入
 						registerDependentBean(autowiredBeanName, beanName);
 						if (logger.isDebugEnabled()) {
 							logger.debug("Autowiring by type from bean name '" + beanName + "' via property '" +
@@ -1540,6 +1552,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		MutablePropertyValues mpvs = null;
+		// 原始类型
 		List<PropertyValue> original;
 
 		if (System.getSecurityManager() != null) {
@@ -1554,6 +1567,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (mpvs.isConverted()) {
 				// Shortcut: use the pre-converted values as-is.
 				try {
+				    // 为实例化对象设置属性，依赖注入真正的实现
 					bw.setPropertyValues(mpvs);
 					return;
 				}
@@ -1587,6 +1601,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			else {
 				String propertyName = pv.getName();
 				Object originalValue = pv.getValue();
+				// 转换属性值，例如将引用转换为ioc容器中实例化对象引用
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) &&
@@ -1620,6 +1635,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Set our (possibly massaged) deep copy.
 		try {
+		    // 进行属性依赖注入，依赖注入真正的地方
 			bw.setPropertyValues(new MutablePropertyValues(deepCopy));
 		}
 		catch (BeansException ex) {

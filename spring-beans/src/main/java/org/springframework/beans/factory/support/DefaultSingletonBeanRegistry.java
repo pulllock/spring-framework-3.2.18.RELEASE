@@ -467,6 +467,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * 注册依赖的bean到缓存中
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
+		// 获取beanName
 		String canonicalName = canonicalName(beanName);
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
