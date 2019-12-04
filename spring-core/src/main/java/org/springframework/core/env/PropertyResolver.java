@@ -23,6 +23,7 @@ package org.springframework.core.env;
  * @since 3.1
  * @see Environment
  * @see PropertySourcesPropertyResolver
+ * 属性解析器，用于解析属性配置
  */
 public interface PropertyResolver {
 
