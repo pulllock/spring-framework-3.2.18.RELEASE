@@ -46,6 +46,10 @@ import java.beans.PropertyDescriptor;
  * @see org.springframework.validation.BeanPropertyBindingResult
  * @see org.springframework.validation.DataBinder#initBeanPropertyAccess()
  * 提供了设置和获取属性值，获取属性描述信息，查询只读或者可写属性等功能
+ *
+ * 属性编辑器
+ * 属性编辑器注册表
+ * 类型转换器
  */
 public interface BeanWrapper extends ConfigurablePropertyAccessor {
 
