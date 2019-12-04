@@ -60,6 +60,9 @@ import org.springframework.beans.factory.BeanInitializationException;
  * @since 12.03.2003
  * @see #convertPropertyValue
  * @see PropertyPlaceholderConfigurer
+ * 允许我们使用占位符来明确表明bean定义中的property与properties文件中的各配置项之间的对应关系
+ *
+ * 可以覆盖任何bena中的任何属性
  */
 public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 
@@ -100,9 +103,11 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	protected void processProperties(ConfigurableListableBeanFactory beanFactory, Properties props)
 			throws BeansException {
 
+		// 遍历配置文件中的配置
 		for (Enumeration names = props.propertyNames(); names.hasMoreElements();) {
 			String key = (String) names.nextElement();
 			try {
+				// 处理
 				processKey(beanFactory, key, props.getProperty(key));
 			}
 			catch (BeansException ex) {
@@ -123,14 +128,18 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	protected void processKey(ConfigurableListableBeanFactory factory, String key, String value)
 			throws BeansException {
 
+		// 使用"."进行分割
 		int separatorIndex = key.indexOf(this.beanNameSeparator);
 		if (separatorIndex == -1) {
 			throw new BeanInitializationException("Invalid key '" + key +
 					"': expected 'beanName" + this.beanNameSeparator + "property'");
 		}
+		// 得到beanName
 		String beanName = key.substring(0, separatorIndex);
+		// 得到属性
 		String beanProperty = key.substring(separatorIndex+1);
 		this.beanNames.put(beanName, Boolean.TRUE);
+		// 替换
 		applyPropertyValue(factory, beanName, beanProperty, value);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Property '" + key + "' set to value [" + value + "]");
@@ -143,10 +152,12 @@ public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 	protected void applyPropertyValue(
 			ConfigurableListableBeanFactory factory, String beanName, String property, String value) {
 
+		// 获取BeanDefinition
 		BeanDefinition bd = factory.getBeanDefinition(beanName);
 		while (bd.getOriginatingBeanDefinition() != null) {
 			bd = bd.getOriginatingBeanDefinition();
 		}
+		// 通过PropertyValue设置到BeanDefinition中
 		PropertyValue pv = new PropertyValue(property, value);
 		pv.setOptional(this.ignoreInvalidKeys);
 		bd.getPropertyValues().addPropertyValue(pv);
