@@ -31,6 +31,10 @@ import org.springframework.beans.factory.BeanFactory;
  * @author Rod Johnson
  * @since 1.1
  * 实例化bean的策略
+ * 根据创建对象情况不同，提供了三种策略：
+ * 无参构造方法
+ * 有参构造方法
+ * 工厂方法
  */
 public interface InstantiationStrategy {
 
@@ -43,7 +47,7 @@ public interface InstantiationStrategy {
 	 * @param owner owning BeanFactory
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation failed
-	 * 实例化
+	 * 实例化，默认构造方法
 	 */
 	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner)
 			throws BeansException;
@@ -60,6 +64,7 @@ public interface InstantiationStrategy {
 	 * @param args the constructor arguments to apply
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation failed
+	 * 指定构造方法
 	 */
 	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
 			Constructor<?> ctor, Object[] args) throws BeansException;
@@ -78,6 +83,7 @@ public interface InstantiationStrategy {
 	 * @param args the factory method arguments to apply
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation failed
+	 * 工厂方法
 	 */
 	Object instantiate(RootBeanDefinition beanDefinition, String beanName, BeanFactory owner,
 			Object factoryBean, Method factoryMethod, Object[] args) throws BeansException;
