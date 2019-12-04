@@ -24,6 +24,7 @@ package org.springframework.core.convert;
  * @author Phillip Webb
  * @since 3.0
  * 转换服务接口，用来进行类型转换
+ * 3.0以后推出，用来替代PropertyEditor转换模式的转换体系
  */
 public interface ConversionService {
 
@@ -80,10 +81,10 @@ public interface ConversionService {
 	 * Convert the given {@code source} to the specified {@code targetType}.
 	 * The TypeDescriptors provide additional context about the source and target locations
 	 * where conversion will occur, often object fields or property locations.
-	 * @param source the source object to convert (may be {@code null})
-	 * @param sourceType context about the source type to convert from
+	 * @param source the source object to convert (may be {@code null}) 要转换的原对象，可以为null
+	 * @param sourceType context about the source type to convert from source的类型的上下文
 	 * (may be {@code null} if source is {@code null})
-	 * @param targetType context about the target type to convert to (required)
+	 * @param targetType context about the target type to convert to (required) source要转换的类型的上下文
 	 * @return the converted object, an instance of {@link TypeDescriptor#getObjectType() targetType}
 	 * @throws ConversionException if a conversion exception occurred
 	 * @throws IllegalArgumentException if targetType is {@code null},

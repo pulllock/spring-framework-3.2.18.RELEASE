@@ -104,6 +104,7 @@ import org.springframework.util.StringUtils;
  * @see DefaultBindingErrorProcessor
  * @see org.springframework.context.MessageSource
  * @see org.springframework.web.bind.ServletRequestDataBinder
+ * 用于参数绑定
  */
 public class DataBinder implements PropertyEditorRegistry, TypeConverter {
 
