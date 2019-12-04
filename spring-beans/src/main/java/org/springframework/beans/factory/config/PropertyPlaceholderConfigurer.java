@@ -62,6 +62,7 @@ import org.springframework.util.StringValueResolver;
  * @see PropertyOverrideConfigurer
  * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
  * 3.1后可以用PropertySourcesPlaceholderConfigurer来替换这个类
+ * 允许在XML配置文件中使用占位符并将这些占位符所代表的资源单独配置到简单的properties文件中来加载
  */
 public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport {
 
@@ -220,8 +221,9 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	@Override
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
 			throws BeansException {
-
+		// 创建StringValueResolver对象
 		StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(props);
+		// 处理替换占位符
 		doProcessProperties(beanFactoryToProcess, valueResolver);
 	}
 

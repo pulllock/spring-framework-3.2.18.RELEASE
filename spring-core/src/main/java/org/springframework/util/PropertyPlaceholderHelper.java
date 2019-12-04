@@ -131,10 +131,13 @@ public class PropertyPlaceholderHelper {
 
 		StringBuilder result = new StringBuilder(strVal);
 
+		// "${"前缀的索引位置
 		int startIndex = strVal.indexOf(this.placeholderPrefix);
 		while (startIndex != -1) {
+			// 获取"}"后缀的索引位置
 			int endIndex = findPlaceholderEndIndex(result, startIndex);
 			if (endIndex != -1) {
+				// 获取"${" "}"中间的值
 				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
 				String originalPlaceholder = placeholder;
 				if (!visitedPlaceholders.add(originalPlaceholder)) {
@@ -142,15 +145,21 @@ public class PropertyPlaceholderHelper {
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
+				// 解析占位符中包含的占位符
 				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
 				// Now obtain the value for the fully resolved key...
+				// 从Properties中获取placeHolder对应的值
 				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
 				if (propVal == null && this.valueSeparator != null) {
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
 					if (separatorIndex != -1) {
+						// 前面部分的占位符
 						String actualPlaceholder = placeholder.substring(0, separatorIndex);
+						// 后面部分的默认值
 						String defaultValue = placeholder.substring(separatorIndex + this.valueSeparator.length());
+						// 从Properties中获取actualPlaceholder对应的值
 						propVal = placeholderResolver.resolvePlaceholder(actualPlaceholder);
+						// 如果没有，返回默认值
 						if (propVal == null) {
 							propVal = defaultValue;
 						}
@@ -181,6 +190,7 @@ public class PropertyPlaceholderHelper {
 			}
 		}
 
+		// 返回替换后的值
 		return result.toString();
 	}
 
@@ -211,6 +221,7 @@ public class PropertyPlaceholderHelper {
 
 	/**
 	 * Strategy interface used to resolve replacement values for placeholders contained in Strings.
+	 * 用于解析字符串中包含占位符的替换值的策略接口
 	 */
 	public static interface PlaceholderResolver {
 
@@ -218,6 +229,7 @@ public class PropertyPlaceholderHelper {
 		 * Resolve the supplied placeholder name to the replacement value.
 		 * @param placeholderName the name of the placeholder to resolve
 		 * @return the replacement value, or {@code null} if no replacement is to be made
+		 * 返回占位符的替换值
 		 */
 		String resolvePlaceholder(String placeholderName);
 	}
