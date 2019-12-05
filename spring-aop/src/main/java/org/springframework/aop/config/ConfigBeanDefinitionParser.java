@@ -201,8 +201,26 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 		return advisorDefinition;
 	}
 
+	/**
+	 *     <!--业务实现类-->
+	 *     <bean id="loginService" class="me.cxis.spring.aop.config.LoginServiceImpl"></bean>
+	 *
+	 *     <!--增强类-->
+	 *     <bean id="logBeforeLogin" class="me.cxis.spring.aop.config.LogBeforeLogin"></bean>
+	 *
+	 *     <aop:config>
+	 *         <aop:aspect id="loginAspect" ref="logBeforeLogin">
+	 *             <aop:pointcut expression="execution(* me.cxis.spring.aop.config.*.*(..))" id="beforeLoginPointCut"/>
+	 *             <aop:before method="beforeLogin" pointcut-ref="beforeLoginPointCut"/>
+	 *         </aop:aspect>
+	 *     </aop:config>
+	 * @param aspectElement
+	 * @param parserContext
+	 */
 	private void parseAspect(Element aspectElement, ParserContext parserContext) {
+		// id属性
 		String aspectId = aspectElement.getAttribute(ID);
+		// ref属性
 		String aspectName = aspectElement.getAttribute(REF);
 
 		try {
