@@ -107,6 +107,7 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 					// 检测是否包含@Aspect注解
 					if (this.advisorFactory.isAspect(beanType)) {
 						aspectNames.add(beanName);
+						// 新建一个AspectMetadata对象
 						AspectMetadata amd = new AspectMetadata(beanType, beanName);
 						if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
 							MetadataAwareAspectInstanceFactory factory =

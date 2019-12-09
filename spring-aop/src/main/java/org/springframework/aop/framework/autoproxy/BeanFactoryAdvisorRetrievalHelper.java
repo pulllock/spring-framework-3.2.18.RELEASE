@@ -66,6 +66,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		// Determine list of advisor bean names, if not cached already.
 		String[] advisorNames = null;
 		synchronized (this) {
+			// advisor名称的缓存
 			advisorNames = this.cachedAdvisorBeanNames;
 			if (advisorNames == null) {
 				// Do not initialize FactoryBeans here: We need to leave all regular beans
@@ -73,6 +74,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 				// 从容器中查找Advisor类型的bean名称
 				advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 						this.beanFactory, Advisor.class, true, false);
+				// 设置缓存
 				this.cachedAdvisorBeanNames = advisorNames;
 			}
 		}
@@ -83,6 +85,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		List<Advisor> advisors = new LinkedList<Advisor>();
 		for (String name : advisorNames) {
 			if (isEligibleBean(name)) {
+				// 忽略正在创建中的bean
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipping currently created advisor '" + name + "'");
@@ -92,7 +95,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 					try {
 						/**
 						 * 从容器中获取指定名字，并且类型是Advisor的bean
-						 * 然后添加到advisors列表中国
+						 * 然后添加到advisors列表中
 						 */
 						advisors.add(this.beanFactory.getBean(name, Advisor.class));
 					}
