@@ -495,11 +495,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		 */
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
 		for (Advisor advisor : advisors) {
-			// 添加增强器
+			// 添加增强器到AdvisedSupport中
 			proxyFactory.addAdvisor(advisor);
 		}
 
-		// 设置要代理的类
+		// 设置要代理的类，一般是SingletonTargetSource
 		proxyFactory.setTargetSource(targetSource);
 		// 定制代理
 		customizeProxyFactory(proxyFactory);
