@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
+ * 在程序运行的时候，根据某种特定条件，动态的替换目标对象类的具体实现
  */
 public class HotSwappableTargetSource implements TargetSource, Serializable {
 
