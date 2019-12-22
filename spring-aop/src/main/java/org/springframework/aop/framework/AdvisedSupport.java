@@ -57,6 +57,9 @@ import org.springframework.util.CollectionUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AopProxy
+ * 是一个生成代理对象所需要的信息的载体
+ * ProxyConfig记载生成代理对象的控制信息
+ * Advised承载生成代理对象所需要的必要信息，比如相关目标类、Advice、Advisor等
  */
 @SuppressWarnings("unchecked")
 public class AdvisedSupport extends ProxyConfig implements Advised {

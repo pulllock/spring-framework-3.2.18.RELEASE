@@ -87,6 +87,7 @@ import org.springframework.util.ObjectUtils;
  * @see org.aopalliance.intercept.MethodInterceptor
  * @see org.springframework.aop.Advisor
  * @see Advised
+ * 是一个FactoryBean
  */
 @SuppressWarnings("serial")
 public class ProxyFactoryBean extends ProxyCreatorSupport
@@ -100,6 +101,14 @@ public class ProxyFactoryBean extends ProxyCreatorSupport
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 可以指定多个将要织入目标对象的Advice、拦截器以及Advisor
+	 * 如果没有通过相应设置目标对象的方法明确为ProxyFactoryBean设置目标对象，
+	 * 可以在interceptorNames最后一个元素位置，放置目标对象的bean定义名称。
+	 *
+	 * 通过在指定interceptorNames某个元素名称之后添加*通配符，可以让ProxyFactoryBean
+	 * 在容器中搜寻符合条件的所有Advisor并应用到目标对象。
+	 */
 	private String[] interceptorNames;
 
 	private String targetName;
