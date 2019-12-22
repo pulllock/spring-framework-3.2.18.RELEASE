@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see AdvisedSupport
+ * 用于记载生成代理对象的控制信息
  */
 public class ProxyConfig implements Serializable {
 
@@ -34,14 +35,31 @@ public class ProxyConfig implements Serializable {
 	private static final long serialVersionUID = -8409359707199703185L;
 
 
+	/**
+	 * 为true的话，使用CGLIB对目标对象进行代理，默认为false
+	 */
 	private boolean proxyTargetClass = false;
 
+	/**
+	 * 为true时，使用CGLIB进行代理对象的生成，默认为false
+	 */
 	private boolean optimize = false;
 
+	/**
+	 * 用于控制生成的代理对象是否可以强制转换类型为Advised，默认false，表示任何生成的代理
+	 * 对象都可以强制抓换为Advised，通过Advised可以查询代理对象的一些状态。
+	 */
 	boolean opaque = false;
 
+	/**
+	 * 设置了exposeProxy可以让Spring在生成代理对象时，将当前代理对象绑定到ThreadLocal，
+	 * 如果目标对象需要访问当前代理对象，可以通过AopContext.currentProxy()取得，默认false
+	 */
 	boolean exposeProxy = false;
 
+	/**
+	 * 为true的时候，如果代理对象生成的各项信息配置完成，则不能进行更改。
+	 */
 	private boolean frozen = false;
 
 
