@@ -333,7 +333,10 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 * @see #doBegin
 	 */
 	public final TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
-		// 获取事务
+		/**
+		 * 获取事务，需要判断是否存在事务，如果存在则根据TransactionDefinition中的传播行为
+		 * 来决定是挂起当前事务还是抛出异常。如果不存在，则根据传播行为来决定如何处理。
+ 		 */
 		Object transaction = doGetTransaction();
 
 		// Cache debug flag to avoid repeated checks.
