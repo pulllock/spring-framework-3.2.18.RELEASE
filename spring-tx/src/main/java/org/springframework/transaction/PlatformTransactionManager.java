@@ -40,6 +40,7 @@ package org.springframework.transaction;
  * @see org.springframework.transaction.support.TransactionTemplate
  * @see org.springframework.transaction.interceptor.TransactionInterceptor
  * @see org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+ *
  */
 public interface PlatformTransactionManager {
 

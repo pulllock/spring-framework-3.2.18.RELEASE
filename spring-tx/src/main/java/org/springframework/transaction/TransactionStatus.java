@@ -33,6 +33,8 @@ package org.springframework.transaction;
  * @see PlatformTransactionManager#getTransaction
  * @see org.springframework.transaction.support.TransactionCallback#doInTransaction
  * @see org.springframework.transaction.interceptor.TransactionInterceptor#currentTransactionStatus()
+ *
+ * 表示整个事务处理过程中的事务状态。
  */
 public interface TransactionStatus extends SavepointManager {
 
