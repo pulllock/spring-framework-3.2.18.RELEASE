@@ -12,14 +12,12 @@ jxl.log
 jmx.log
 derby.log
 spring-test/test-output/
-.gradle
 argfile*
-pom.xml
 
 /build
 buildSrc/build
 /spring-*/build
-# target/
+target/
 
 # Eclipse artifacts, including WTP generated manifests
 .classpath
