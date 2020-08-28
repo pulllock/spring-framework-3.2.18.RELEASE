@@ -35,6 +35,8 @@ import org.springframework.beans.factory.xml.ParserContext;
  * @author Christian Dupuis
  * @since 2.5
  * @see AnnotationConfigUtils
+ * 
+ * annotation-config标签解析器
  */
 public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -42,6 +44,7 @@ public class AnnotationConfigBeanDefinitionParser implements BeanDefinitionParse
 		Object source = parserContext.extractSource(element);
 
 		// Obtain bean definitions for all relevant BeanPostProcessors.
+		// 注册处理annotation-config等标签的处理器，是一些BeanPostProcessor
 		Set<BeanDefinitionHolder> processorDefinitions =
 				AnnotationConfigUtils.registerAnnotationConfigProcessors(parserContext.getRegistry(), source);
 

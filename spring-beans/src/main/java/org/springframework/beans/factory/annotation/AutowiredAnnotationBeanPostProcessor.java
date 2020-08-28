@@ -135,6 +135,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 * Create a new AutowiredAnnotationBeanPostProcessor
 	 * for Spring's standard {@link Autowired} annotation.
 	 * <p>Also supports JSR-330's {@link javax.inject.Inject} annotation, if available.
+	 * 实例化的时候会先把Autowired、Value、Inject注解加入到Set中缓存起来
 	 */
 	@SuppressWarnings("unchecked")
 	public AutowiredAnnotationBeanPostProcessor() {
@@ -239,21 +240,28 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 * @param beanName
 	 * @return 空或者构造方法数组
 	 * @throws BeansException
+	 * 这个方法用来查找构造器，在实例化当前Bean的时候会被先执行
 	 */
 	@Override
 	public Constructor<?>[] determineCandidateConstructors(Class<?> beanClass, String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
+		// 先从缓存中查找查找Bean有没有已经缓存的构造器
 		Constructor<?>[] candidateConstructors = this.candidateConstructorsCache.get(beanClass);
+		// 缓存中没有Bean对应的构造器，需要进行解析构造器
 		if (candidateConstructors == null) {
 			synchronized (this.candidateConstructorsCache) {
 				candidateConstructors = this.candidateConstructorsCache.get(beanClass);
 				if (candidateConstructors == null) {
+					// 利用反射得到Bean的构造器
 					Constructor<?>[] rawCandidates = beanClass.getDeclaredConstructors();
 					List<Constructor<?>> candidates = new ArrayList<Constructor<?>>(rawCandidates.length);
 					Constructor<?> requiredConstructor = null;
 					Constructor<?> defaultConstructor = null;
+
+					// 遍历构造器
 					for (Constructor<?> candidate : rawCandidates) {
-						// 查找构造方法上有没有@Autowired注解
+						// 查找构造方法上有没有@Autowired等注解，需要从autowiredAnnotationTypes这个Set中进行遍历
+						// 这个Set中保存有Autowired、Value、Inject三个注解
 						Annotation ann = findAutowiredAnnotation(candidate);
 						/**
 						 * 如果构造方法上有@Autowired注解的话：
@@ -261,12 +269,15 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 						 * 如果被注解的构造方法没有参数，直接抛异常；
 						 */
 						if (ann != null) {
+
+							//
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
 										"Invalid autowire-marked constructor: " + candidate +
 										". Found constructor with 'required' Autowired annotation already: " +
 										requiredConstructor);
 							}
+							// 如果是无参构造方法，抛异常。@Autowired注解的构造方法需要有参数
 							if (candidate.getParameterTypes().length == 0) {
 								throw new IllegalStateException(
 										"Autowired annotation requires at least one argument: " + candidate);
