@@ -792,6 +792,7 @@ public abstract class ClassUtils {
 	 * {@code targetClass} doesn't implement it or is {@code null}
 	 */
 	public static Method getMostSpecificMethod(Method method, Class<?> targetClass) {
+		// 方法可重写，方法是目标类中的方法
 		if (method != null && isOverridable(method, targetClass) &&
 				targetClass != null && !targetClass.equals(method.getDeclaringClass())) {
 			try {
@@ -820,6 +821,10 @@ public abstract class ClassUtils {
 	 * Determine whether the given method is overridable in the given target class.
 	 * @param method the method to check
 	 * @param targetClass the target class to check against
+	 *
+	 * 方法是否可重写
+	 * 私有方法不能，共有和保护的方法可以
+	 *
 	 */
 	private static boolean isOverridable(Method method, Class<?> targetClass) {
 		if (Modifier.isPrivate(method.getModifiers())) {

@@ -132,14 +132,20 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, Set<String>> containedBeanMap = new ConcurrentHashMap<String, Set<String>>(16);
 
 	/** Map between dependent bean names: bean name --> Set of dependent bean names
-	 * bean名字对应的bean被依赖的bean的名字缓存
-	 * key是被依赖的bean
+	 * key是被依赖的Bean的名字
+	 * value是目标Bean的名字
+	 *
+	 * 也就是value对应的Bean依赖key对应的Bean，和下面的dependenciesForBeanMap是反过来的关系
+	 *
+	 * 就是谁（value）依赖了我（key）
 	 * */
 	private final Map<String, Set<String>> dependentBeanMap = new ConcurrentHashMap<String, Set<String>>(64);
 
 	/** Map between depending bean names: bean name --> Set of bean names for the bean's dependencies
-	 * bean名字对应的bean所依赖的bean的名字缓存
-	 * value是被依赖的bean
+	 * key是目标Bean的名字
+	 * value是被依赖的bean的名字
+	 *
+	 * 我（key）依赖了谁（value）
 	 * */
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<String, Set<String>>(64);
 
@@ -464,11 +470,12 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * to be destroyed before the given bean is destroyed.
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
-	 * 注册依赖的bean到缓存中
+	 * 注册依赖的bean到缓存中，就是将我依赖谁和谁依赖我的关系分别记录到两个Map中
 	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
-		// 获取beanName
+		// 获取beanName，被依赖Bean对象
 		String canonicalName = canonicalName(beanName);
+		// 这个map中存放的是谁依赖我
 		synchronized (this.dependentBeanMap) {
 			Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
 			if (dependentBeans == null) {
@@ -477,6 +484,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			}
 			dependentBeans.add(dependentBeanName);
 		}
+
+		// 这个map中存放的是我依赖谁
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean = this.dependenciesForBeanMap.get(dependentBeanName);
 			if (dependenciesForBean == null) {

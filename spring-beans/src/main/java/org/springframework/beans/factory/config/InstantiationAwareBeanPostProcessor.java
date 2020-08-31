@@ -118,6 +118,7 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.MutablePropertyValues
 	 * 该方法可以对属性值进行修改，这个时候属性值还未被设置
+	 * 在AutowiredAnnotationBeanPostProcessor中用来注入被@Autowired等注解标注的元数据
 	 */
 	PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)

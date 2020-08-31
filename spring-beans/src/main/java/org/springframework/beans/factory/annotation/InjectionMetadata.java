@@ -43,13 +43,20 @@ import org.springframework.util.ReflectionUtils;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ * 注入的元数据表示类
  */
 public class InjectionMetadata {
 
 	private static final Log logger = LogFactory.getLog(InjectionMetadata.class);
 
+	/**
+	 * 将要注入元素的目标类
+	 */
 	private final Class<?> targetClass;
 
+	/**
+	 * 要被注入的元素
+	 */
 	private final Collection<InjectedElement> injectedElements;
 
 	private volatile Set<InjectedElement> checkedElements;
@@ -109,10 +116,19 @@ public class InjectionMetadata {
 	}
 
 
+	/**
+	 * 自动注入元素
+	 */
 	public static abstract class InjectedElement {
 
+		/**
+		 * 被注入的元素
+		 */
 		protected final Member member;
 
+		/**
+		 * 是否是字段
+		 */
 		protected final boolean isField;
 
 		protected final PropertyDescriptor pd;
