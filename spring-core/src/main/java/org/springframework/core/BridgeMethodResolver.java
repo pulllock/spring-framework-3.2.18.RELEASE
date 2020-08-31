@@ -56,6 +56,9 @@ public abstract class BridgeMethodResolver {
 	 * @param bridgeMethod the method to introspect
 	 * @return the original method (either the bridged method or the passed-in method
 	 * if no more specific one could be found)
+	 * 如果是桥接方法，则查找原始方法
+	 *
+	 * // TODO 桥接方法
 	 */
 	public static Method findBridgedMethod(Method bridgeMethod) {
 		if (bridgeMethod == null || !bridgeMethod.isBridge()) {

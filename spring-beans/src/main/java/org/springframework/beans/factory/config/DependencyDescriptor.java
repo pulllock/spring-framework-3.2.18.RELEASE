@@ -36,14 +36,21 @@ import org.springframework.util.Assert;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ * 用来表示一个要被注入的依赖
  */
 @SuppressWarnings("serial")
 public class DependencyDescriptor implements Serializable {
 
 	private transient MethodParameter methodParameter;
 
+	/**
+	 * 要被注入的字段
+	 */
 	private transient Field field;
 
+	/**
+	 * 被注入字段的类型
+	 */
 	private Class<?> declaringClass;
 
 	private String methodName;
