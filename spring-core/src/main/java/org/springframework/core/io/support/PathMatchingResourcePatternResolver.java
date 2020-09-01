@@ -275,6 +275,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			// 路径包含通配符
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
 				// a class path resource pattern
+				// 找到匹配所给定的路径下的所有资源
 				return findPathMatchingResources(locationPattern);
 			}
 			else {
