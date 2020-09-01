@@ -234,26 +234,37 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * but rather leaves this up to the caller.
 	 * @param basePackages the packages to check for annotated classes
 	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
+	 * 扫描指定包下面的Bean定义
 	 */
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
 		for (String basePackage : basePackages) {
+			// 扫描候选的Bean定义
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
+			// 遍历查找到的各种Bean定义
 			for (BeanDefinition candidate : candidates) {
+				// 使用AnnotationScopeMetadataResolver来解析scope相关属性
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
 				candidate.setScope(scopeMetadata.getScopeName());
+				// 使用AnnotationBeanNameGenerator来生成Bean名字
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
+				// 对扫描到的BeanDefinition做些后置处理
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
+				// 注解的Bean定义，这里处理@Primary等一些直接
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
+				// 检查Bean定义
 				if (checkCandidate(beanName, candidate)) {
+					// 创建BeanDefinitionHolder对象，持有Bean定义
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
+
+					// 将BeanDefinition注册到容器中去
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}

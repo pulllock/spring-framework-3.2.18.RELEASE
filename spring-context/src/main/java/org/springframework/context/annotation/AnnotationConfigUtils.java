@@ -190,6 +190,8 @@ public class AnnotationConfigUtils {
 	 * that this registration was triggered from. May be {@code null}.
 	 * @return a Set of BeanDefinitionHolders, containing all bean definitions
 	 * that have actually been registered by this call
+	 *
+	 * 注解一些注解的处理器到容器中
 	 */
 	public static Set<BeanDefinitionHolder> registerAnnotationConfigProcessors(
 			BeanDefinitionRegistry registry, Object source) {
@@ -252,17 +254,25 @@ public class AnnotationConfigUtils {
 		return new BeanDefinitionHolder(definition, beanName);
 	}
 
+	/**
+	 * 处理@Primary、@DependsOn、@Lazy、@Role等注解
+	 * @param abd
+	 */
 	public static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd) {
 		AnnotationMetadata metadata = abd.getMetadata();
+		// 如果有@Primary注解，设置primary属性为true
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			abd.setPrimary(true);
 		}
+		// 设置lazyInit属性
 		if (metadata.isAnnotated(Lazy.class.getName())) {
 			abd.setLazyInit(MetadataUtils.attributesFor(metadata, Lazy.class).getBoolean("value"));
 		}
+		// 设置dependsOn属性
 		if (metadata.isAnnotated(DependsOn.class.getName())) {
 			abd.setDependsOn(MetadataUtils.attributesFor(metadata, DependsOn.class).getStringArray("value"));
 		}
+		// 设置role属性
 		if (abd instanceof AbstractBeanDefinition) {
 			if (metadata.isAnnotated(Role.class.getName())) {
 				Integer role = MetadataUtils.attributesFor(metadata, Role.class).getNumber("value");

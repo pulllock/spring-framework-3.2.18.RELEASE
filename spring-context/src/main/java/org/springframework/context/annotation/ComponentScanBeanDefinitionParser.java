@@ -49,6 +49,8 @@ import org.springframework.util.StringUtils;
  * @author Ramnivas Laddad
  * @author Juergen Hoeller
  * @since 2.5
+ * 
+ * 解析component-scan标签
  */
 public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -76,37 +78,53 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 获取xml中配置的base-package属性，可以有多个
 		String[] basePackages = StringUtils.tokenizeToStringArray(element.getAttribute(BASE_PACKAGE_ATTRIBUTE),
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 
 		// Actually scan for bean definitions and register them.
+		// 获取配置扫描器，创建ClassPathBeanDefinitionScanner实例的时候会注册Component、ManagedBea、Named等注解到includeFilters中去
+		// 下一步扫描的时候会把这些注解标注的类都扫描进容器
+		// Repository、Service、Controller等注解其实都是Component注解，所以也会一起扫描
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
+		// 使用ClassPathBeanDefinitionScanner进行扫描，扫描范围是base-package指定的包
 		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
+		// 注册组件
 		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 
 		return null;
 	}
 
+	/**
+	 * 获取配置扫描器
+	 * @param parserContext
+	 * @param element
+	 * @return
+	 */
 	protected ClassPathBeanDefinitionScanner configureScanner(ParserContext parserContext, Element element) {
 		XmlReaderContext readerContext = parserContext.getReaderContext();
 
+		// 配置文件中的use-default-filters属性
 		boolean useDefaultFilters = true;
 		if (element.hasAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE)) {
 			useDefaultFilters = Boolean.valueOf(element.getAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE));
 		}
 
 		// Delegate bean definition registration to scanner class.
+		// 创建一个ClassPathBeanDefinitionScanner对象，用来扫描指定的包下面的Bean定义
 		ClassPathBeanDefinitionScanner scanner = createScanner(readerContext, useDefaultFilters);
 		scanner.setResourceLoader(readerContext.getResourceLoader());
 		scanner.setEnvironment(parserContext.getDelegate().getEnvironment());
 		scanner.setBeanDefinitionDefaults(parserContext.getDelegate().getBeanDefinitionDefaults());
 		scanner.setAutowireCandidatePatterns(parserContext.getDelegate().getAutowireCandidatePatterns());
 
+		// 配置中的resource-pattern属性
 		if (element.hasAttribute(RESOURCE_PATTERN_ATTRIBUTE)) {
 			scanner.setResourcePattern(element.getAttribute(RESOURCE_PATTERN_ATTRIBUTE));
 		}
 
 		try {
+			// 解析配置文件中指定的name-generator属性，用来生成Bean名称
 			parseBeanNameGenerator(element, scanner);
 		}
 		catch (Exception ex) {
@@ -114,12 +132,14 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 
 		try {
+			// 解析scope相关属性
 			parseScope(element, scanner);
 		}
 		catch (Exception ex) {
 			readerContext.error(ex.getMessage(), readerContext.extractSource(element), ex.getCause());
 		}
 
+		// 解析include-filter和exclude-filter属性，根据情况添加各种TypeFilter到scaner中
 		parseTypeFilters(element, scanner, readerContext, parserContext);
 
 		return scanner;
@@ -133,6 +153,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			XmlReaderContext readerContext, Set<BeanDefinitionHolder> beanDefinitions, Element element) {
 
 		Object source = readerContext.extractSource(element);
+		// 名为context:component-scam的ComponentDefinition，用来存储扫描出来的其他的BeanDefinition
 		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(), source);
 
 		for (BeanDefinitionHolder beanDefHolder : beanDefinitions) {
@@ -140,11 +161,13 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 
 		// Register annotation config processors, if necessary.
+		// 如果使用了annotation-config属性，需要注册Configuration、Antowired、Required等注解处理器进容器
 		boolean annotationConfig = true;
 		if (element.hasAttribute(ANNOTATION_CONFIG_ATTRIBUTE)) {
 			annotationConfig = Boolean.valueOf(element.getAttribute(ANNOTATION_CONFIG_ATTRIBUTE));
 		}
 		if (annotationConfig) {
+			// 注册Configuration、Antowired、Required等注解处理器进容器
 			Set<BeanDefinitionHolder> processorDefinitions =
 					AnnotationConfigUtils.registerAnnotationConfigProcessors(readerContext.getRegistry(), source);
 			for (BeanDefinitionHolder processorDefinition : processorDefinitions) {
@@ -152,9 +175,15 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			}
 		}
 
+		// 组件注册事件
 		readerContext.fireComponentRegistered(compositeDef);
 	}
 
+	/**
+	 * 解析配置文件中name-generator属性，如果指定了的话，实例化这个Bean实例
+	 * @param element
+	 * @param scanner
+	 */
 	protected void parseBeanNameGenerator(Element element, ClassPathBeanDefinitionScanner scanner) {
 		if (element.hasAttribute(NAME_GENERATOR_ATTRIBUTE)) {
 			BeanNameGenerator beanNameGenerator = (BeanNameGenerator) instantiateUserDefinedStrategy(
