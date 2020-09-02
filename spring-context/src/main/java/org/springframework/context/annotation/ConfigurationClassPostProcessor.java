@@ -213,11 +213,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	/**
 	 * Derive further bean definitions from the configuration classes in the registry.
+	 * 在容器刷新的invokeBeanFactoryPostProcessor这一步会调用该方法
 	 */
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+		// 先注册一个ImportAwareBeanPostProcessor的Bean定义
 		RootBeanDefinition iabpp = new RootBeanDefinition(ImportAwareBeanPostProcessor.class);
 		// 仅框架内部用
 		iabpp.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		// 注册到容器中，名字是ConfigurationClassPostProcessor.importAwareProcessor
 		registry.registerBeanDefinition(IMPORT_AWARE_PROCESSOR_BEAN_NAME, iabpp);
 
 		int registryId = System.identityHashCode(registry);
@@ -263,8 +266,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		Set<BeanDefinitionHolder> configCandidates = new LinkedHashSet<BeanDefinitionHolder>();
-		// 获取所有的BeanDefinition进行遍历
+		// 获取所有的BeanDefinition进行遍历，
+		// 在ComponentScanBeanDefinitionParser扫描注解的Bean的时候@Configuration注解的Bean已经被扫描到容器中
+		// 这里只需要遍历所有的Bean定义名字
 		for (String beanName : registry.getBeanDefinitionNames()) {
+			// 从容器中获取Bean定义
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
 			/**
 			 * checkConfigurationClassCandidate
@@ -273,11 +279,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			 * 或者使用@Bean注解的方法
 			 */
 			if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
+				// 是配置类，添加到配置类候选集合中
 				configCandidates.add(new BeanDefinitionHolder(beanDef, beanName));
 			}
 		}
 
 		// Return immediately if no @Configuration classes were found
+		// 如果没有找到配置类，直接返回
 		if (configCandidates.isEmpty()) {
 			return;
 		}
@@ -295,7 +303,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
-        // 解析@Configuration类
+        // 解析每一个标注了@Configuration注解的类
+		// ConfigurationClassParser用来解析配置类
 		ConfigurationClassParser parser = new ConfigurationClassParser(
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
@@ -303,8 +312,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		 * 解析每一个@Configuration注解的类
 		 */
 		for (BeanDefinitionHolder holder : configCandidates) {
+			// 配置类的Bean定义
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
+				// 调用ConfigurationClassParser进行配置类的解析
 				if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
 					parser.parse(((AbstractBeanDefinition) bd).getBeanClass(), holder.getBeanName());
 				}

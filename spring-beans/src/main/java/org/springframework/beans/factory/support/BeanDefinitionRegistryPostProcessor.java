@@ -31,7 +31,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
  * @see org.springframework.context.annotation.ConfigurationClassPostProcessor
  *
  * 该扩展点可以让应用程序注册自定义的BeanDefinition
- * 并且改扩展点在BeanFactoryPostProcessor前执行
+ * 并且该扩展点在BeanFactoryPostProcessor前执行
  */
 public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProcessor {
 
@@ -42,6 +42,8 @@ public interface BeanDefinitionRegistryPostProcessor extends BeanFactoryPostProc
 	 * bean definitions before the next post-processing phase kicks in.
 	 * @param registry the bean definition registry used by the application context
 	 * @throws org.springframework.beans.BeansException in case of errors
+	 * 在容器实例化后，用来修改容器内部使用的一些BeanDefinition，比如ConfigurationClassPostProcessor会实现该方法
+	 * 在容器刷新的invokeBeanFactoryPostProcessor这一步会调用该方法
 	 */
 	void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException;
 

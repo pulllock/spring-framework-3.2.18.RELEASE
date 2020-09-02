@@ -54,6 +54,11 @@ abstract class ConfigurationClassUtils {
 	 * @param beanDef the bean definition to check
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
+	 * 检查一个Bean定义是不是配置类
+	 * 被@Configuration、@Bean、@Component注解的类
+	 *
+	 * 从Bean定义的类的元数据中获取注解元数据，检查是否有相关注解，如果有的话，设置这个Bean定义的属性，
+	 * 标记这个Bean定义是个配置类
 	 */
 	public static boolean checkConfigurationClassCandidate(BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 		AnnotationMetadata metadata = null;
@@ -65,10 +70,13 @@ abstract class ConfigurationClassUtils {
 			metadata = new StandardAnnotationMetadata(beanClass, true);
 		}
 		else {
+			// Bean定义的class名称
 			String className = beanDef.getBeanClassName();
 			if (className != null) {
 				try {
+					// 获取这个Bean对应的元数据读取器，可以获得这个Bean的元数据
 					MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
+					// 从元数据中获取注解元数据
 					metadata = metadataReader.getAnnotationMetadata();
 				}
 				catch (IOException ex) {
@@ -81,13 +89,15 @@ abstract class ConfigurationClassUtils {
 		}
 
 		if (metadata != null) {
-		    // @Configuration 注解
+		    // 标注了@Configuration注解
 			if (isFullConfigurationCandidate(metadata)) {
+				// 如果是@Configuration注解的类，设置属性org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass : full
 				beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 				return true;
 			}
-			// @Component注解的类或者有@Bean注解的方法
+			// 标注了@Component注解的类或者有@Bean注解的方法
 			else if (isLiteConfigurationCandidate(metadata)) {
+				// 设置属性：org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass : lite
 				beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 				return true;
 			}
