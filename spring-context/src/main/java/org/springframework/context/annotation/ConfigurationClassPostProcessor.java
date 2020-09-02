@@ -316,6 +316,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
 				// 调用ConfigurationClassParser进行配置类的解析
+				// 主要解析配置类上的@PropertySource、@ComponentScan、@Import、@ImportResource、@Bean等注解
 				if (bd instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) bd).hasBeanClass()) {
 					parser.parse(((AbstractBeanDefinition) bd).getBeanClass(), holder.getBeanName());
 				}
@@ -328,10 +329,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			}
 		}
 		// 校验
+		// 配置类不能是final的类，CGLIB的限制
+		// 注解@Bean的名字不能一样
 		parser.validate();
 
 		// Handle any @PropertySource annotations
 		// @PropertySource注解的处理
+		// 上面解析配置类的时候，已经把@PropertySource注解信息拿到了，这里进行解析
 		Stack<PropertySource<?>> parsedPropertySources = parser.getPropertySources();
 		if (!parsedPropertySources.isEmpty()) {
 			if (!(this.environment instanceof ConfigurableEnvironment)) {
@@ -341,12 +345,15 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			else {
 				MutablePropertySources envPropertySources = ((ConfigurableEnvironment)this.environment).getPropertySources();
 				while (!parsedPropertySources.isEmpty()) {
+					//  将解析到的PropertySource添加到MutablePropertySources.propertySourceList集合中去
 					envPropertySources.addLast(parsedPropertySources.pop());
 				}
 			}
 		}
 
 		// Read the model and create bean definitions based on its content
+		// 构造ConfigurationClassBeanDefinitionReader，用来将上面解析到的所有的类都加载到容器中变成BeanDefinition
+		// 就是我们标注了@Service、@Component等等注解的类
 		if (this.reader == null) {
 			this.reader = new ConfigurationClassBeanDefinitionReader(
 					registry, this.sourceExtractor, this.problemReporter, this.metadataReaderFactory,

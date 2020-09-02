@@ -107,6 +107,7 @@ class ConfigurationClassBeanDefinitionReader {
 	 * based on its contents.
 	 */
 	public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
+		// 遍历扫描到的配置类，挨个加载为BeanDefinition
 		for (ConfigurationClass configClass : configurationModel) {
 			loadBeanDefinitionsForConfigurationClass(configClass);
 		}
@@ -117,8 +118,9 @@ class ConfigurationClassBeanDefinitionReader {
 	 * class itself, all its {@link Bean} methods
 	 */
 	private void loadBeanDefinitionsForConfigurationClass(ConfigurationClass configClass) {
-		// 被@Import注解的
+		// 被@Import注解的，也是就是要被导入到其他类中的类
 		if (configClass.isImported()) {
+			// 注册成BeanDefinition，这里被导入的类不包括ImportSelector和ImportBeanDefinitionRegistrar实现类，只是@Import导入的普通配置类
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
 		// 注册被@Bean注解的方法的bean
@@ -131,12 +133,18 @@ class ConfigurationClassBeanDefinitionReader {
 
 	/**
 	 * Register the {@link Configuration} class itself as a bean definition.
+	 * 将被导入的配置类解析为BeanDefinition添加到容器中
 	 */
 	private void registerBeanDefinitionForImportedConfigurationClass(ConfigurationClass configClass) {
+		// 获取类上的注解元数据
 		AnnotationMetadata metadata = configClass.getMetadata();
+		// 封装成AnnotatedGenericBeanDefinition
 		BeanDefinition configBeanDef = new AnnotatedGenericBeanDefinition(metadata);
+		// 判断是否是配置类
 		if (ConfigurationClassUtils.checkConfigurationClassCandidate(configBeanDef, this.metadataReaderFactory)) {
+			// 获取配置类名
 			String configBeanName = this.importBeanNameGenerator.generateBeanName(configBeanDef, this.registry);
+			// 注册成BeanDefinition到容器中去
 			this.registry.registerBeanDefinition(configBeanName, configBeanDef);
 			configClass.setBeanName(configBeanName);
 			if (logger.isDebugEnabled()) {
@@ -152,20 +160,26 @@ class ConfigurationClassBeanDefinitionReader {
 	/**
 	 * Read the given {@link BeanMethod}, registering bean definitions
 	 * with the BeanDefinitionRegistry based on its contents.
+	 * 将注解了@Bean的方法解析成BeanDefinition注册到容器中
 	 */
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
+		// method所在的类
 		ConfigurationClass configClass = beanMethod.getConfigurationClass();
+		// method元数据
 		MethodMetadata metadata = beanMethod.getMetadata();
 
+		// 封装成ConfigurationClassBeanDefinition
 		ConfigurationClassBeanDefinition beanDef = new ConfigurationClassBeanDefinition(configClass);
 		beanDef.setResource(configClass.getResource());
 		beanDef.setSource(this.sourceExtractor.extractSource(metadata, configClass.getResource()));
+
+		// 静态@Bean方法
 		if (metadata.isStatic()) {
 			// static @Bean method
 			beanDef.setBeanClassName(configClass.getMetadata().getClassName());
 			beanDef.setFactoryMethodName(metadata.getMethodName());
 		}
-		else {
+		else { // 实例Bean方法
 			// instance @Bean method
 			beanDef.setFactoryBeanName(configClass.getBeanName());
 			beanDef.setUniqueFactoryMethodName(metadata.getMethodName());

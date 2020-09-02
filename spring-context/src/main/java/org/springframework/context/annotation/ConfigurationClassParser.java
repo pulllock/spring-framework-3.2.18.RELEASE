@@ -164,8 +164,9 @@ class ConfigurationClassParser {
 		}
 
 		// Recursively process the configuration class and its superclass hierarchy.
+		// 递归处理，从当前类到父类一直往上
 		do {
-			// 解析配置类
+			// 解析配置类，主要解析@PropertySource、@ComponentScan、@Import、@ImportResource、@Bean等注解
 			metadata = doProcessConfigurationClass(configClass, metadata);
 		}
 		while (metadata != null);
@@ -236,7 +237,7 @@ class ConfigurationClassParser {
 
 		// Process any @ImportResource annotations
 		/**
-		 * 处理@ImportResource注解
+		 * 处理@ImportResource注解，用来导入配置文件
 		 * 获取注解的locations属性
 		 * 得到资源文件地址
 		 * 遍历资源文件
@@ -244,17 +245,20 @@ class ConfigurationClassParser {
 		 */
 		if (metadata.isAnnotated(ImportResource.class.getName())) {
 			AnnotationAttributes importResource = MetadataUtils.attributesFor(metadata, ImportResource.class);
+			// value里指定的配置
 			String[] resources = importResource.getStringArray("value");
 			Class<? extends BeanDefinitionReader> readerClass = importResource.getClass("reader");
 			for (String resource : resources) {
+				// 解析配置文件名中的占位符
 				String resolvedResource = this.environment.resolveRequiredPlaceholders(resource);
+				// 添加到ConfigurationClass中的importedResources属性中
 				configClass.addImportedResource(resolvedResource, readerClass);
 			}
 		}
 
 		// Process individual @Bean methods
 		/**
-		 * 处理@Bean注解
+		 * 处理@Configuration注解的类中的@Bean注解的方法
 		 * 获取@Bean注解的方法，然后添加到beanMethods中
 		 */
 		Set<MethodMetadata> beanMethods = metadata.getAnnotatedMethods(Bean.class.getName());
@@ -263,7 +267,7 @@ class ConfigurationClassParser {
 		}
 
 		// Process superclass, if any
-		// 处理父类
+		// 看有没有父类，如果有的话，返回父类，继续递归处理父类
 		if (metadata.hasSuperClass()) {
 			String superclass = metadata.getSuperClassName();
 			if (!superclass.startsWith("java") && !this.knownSuperclasses.containsKey(superclass)) {
@@ -469,6 +473,8 @@ class ConfigurationClassParser {
 						// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar ->
 						// process it as a @Configuration class
 						// 除了上面两种类型的，其余的当做@Configuration注解的类来处理
+						// 当前版本还不支持直接导入普通类，除了上面两种情况，其余的会被当做是@Configuration标注的类处理，类里面必须有@Bean注解的方法
+						// 如果只是导入普通类，会在之后的解析中报错，Spring4.2以及以后版本才支持导入普通类
 						this.importStack.registerImport(metadata,
 								(candidate instanceof Class ? ((Class) candidate).getName() : (String) candidate));
 						// 调用processConfigurationClass处理配置类
