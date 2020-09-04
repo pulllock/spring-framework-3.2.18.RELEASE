@@ -53,6 +53,7 @@ import org.springframework.util.Assert;
  * @since 3.0
  * @see #enhance
  * @see ConfigurationClassPostProcessor
+ * 对@Configuration注解的类进行增强，使用CGLIB进行增强，配置了在容器中是以代理对象的形式存在的
  */
 class ConfigurationClassEnhancer {
 

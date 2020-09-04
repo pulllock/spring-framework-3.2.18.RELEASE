@@ -214,6 +214,10 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Derive further bean definitions from the configuration classes in the registry.
 	 * 在容器刷新的invokeBeanFactoryPostProcessor这一步会调用该方法
+	 * 被@Configuration注解的类在ComponentScanBeanDefinitionParser扫描注解的时候已经被注册到容器中
+	 * 这一步就是要解析这些被@Configuration注解的BeanDefinition，用来扫描这些类中可能有的Bean到容器中，
+	 * 并注册成BeanDefinition。
+	 * 还会处理@Import、@ImportResource等等注解，将这些要导入的Bean注册到容器中
 	 */
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
 		// 先注册一个ImportAwareBeanPostProcessor的Bean定义
@@ -256,7 +260,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			// Simply call processConfigurationClasses lazily at this point then.
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
-		// TODO
+		// 增强配置类
 		enhanceConfigurationClasses(beanFactory);
 	}
 
@@ -367,12 +371,14 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		this.reader.loadBeanDefinitions(parser.getConfigurationClasses());
 
 		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes
+		// 将org.springframework.context.annotation.ConfigurationClassPostProcessor.importRegistry也注册成一个Bean
 		if (singletonRegistry != null) {
 			if (!singletonRegistry.containsSingleton(IMPORT_REGISTRY_BEAN_NAME)) {
 				singletonRegistry.registerSingleton(IMPORT_REGISTRY_BEAN_NAME, parser.getImportRegistry());
 			}
 		}
 
+		// 清除缓存
 		if (this.metadataReaderFactory instanceof CachingMetadataReaderFactory) {
 			((CachingMetadataReaderFactory) this.metadataReaderFactory).clearCache();
 		}
@@ -386,8 +392,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<String, AbstractBeanDefinition>();
+		// 遍历容器中所有的BeanDefinition名字
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
+			// 根据名字获取BeanDefinition
 			BeanDefinition beanDef = beanFactory.getBeanDefinition(beanName);
+			// 被@Configuration注解的类，并且是full模式，配置类分为full和lite两种模式，在上面步骤解析的时候会有
 			if (ConfigurationClassUtils.isFullConfigurationClass(beanDef)) {
 				if (!(beanDef instanceof AbstractBeanDefinition)) {
 					throw new BeanDefinitionStoreException("Cannot enhance @Configuration bean definition '" +
@@ -400,6 +409,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			// nothing to enhance -> return immediately
 			return;
 		}
+		// 使用cglib增强
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer(beanFactory);
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();

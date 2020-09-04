@@ -188,12 +188,14 @@ class ConfigurationClassBeanDefinitionReader {
 		beanDef.setAttribute(RequiredAnnotationBeanPostProcessor.SKIP_REQUIRED_CHECK_ATTRIBUTE, Boolean.TRUE);
 
 		// consider role
+		// 看有没有@Role注解
 		AnnotationAttributes role = MetadataUtils.attributesFor(metadata, Role.class);
 		if (role != null) {
 			beanDef.setRole(role.<Integer>getNumber("value"));
 		}
 
 		// consider name and any aliases
+		// 获取@Bean注解的name属性，作为别名
 		AnnotationAttributes bean = MetadataUtils.attributesFor(metadata, Bean.class);
 		List<String> names = new ArrayList<String>(Arrays.asList(bean.getStringArray("name")));
 		String beanName = (names.size() > 0 ? names.remove(0) : beanMethod.getMetadata().getMethodName());
@@ -202,19 +204,23 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		// has this already been overridden (e.g. via XML)?
+		// 看下这个BeanDefinition是不是已经被加载过
 		if (this.registry.containsBeanDefinition(beanName)) {
 			BeanDefinition existingBeanDef = this.registry.getBeanDefinition(beanName);
 			// Is the existing bean definition one that was created from a configuration class?
 			// -> allow the current bean method to override, since both are at second-pass level.
 			// However, if the bean method is an overloaded case on the same configuration class,
 			// preserve the existing bean definition.
+			// 如果也是通过配置类中加载的BeanDefinition
 			if (existingBeanDef instanceof ConfigurationClassBeanDefinition) {
 				ConfigurationClassBeanDefinition ccbd = (ConfigurationClassBeanDefinition) existingBeanDef;
+				// 同一个类中的相同名字的@Bean，不覆盖
 				if (ccbd.getMetadata().getClassName().equals(beanMethod.getConfigurationClass().getMetadata().getClassName())) {
 					return;
 				}
 			}
 			else {
+				// 如果是xml中已经有的BeanDefinition，不覆盖
 				// no -> then it's an external override, probably XML
 				// overriding is legal, return immediately
 				if (logger.isDebugEnabled()) {
@@ -225,11 +231,13 @@ class ConfigurationClassBeanDefinitionReader {
 			}
 		}
 
+		// @Primary注解
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			beanDef.setPrimary(true);
 		}
 
 		// is this bean to be instantiated lazily?
+		// @Lazy注解
 		if (metadata.isAnnotated(Lazy.class.getName())) {
 			AnnotationAttributes lazy = MetadataUtils.attributesFor(metadata, Lazy.class);
 			beanDef.setLazyInit(lazy.getBoolean("value"));
@@ -239,6 +247,7 @@ class ConfigurationClassBeanDefinitionReader {
 			beanDef.setLazyInit(lazy.getBoolean("value"));
 		}
 
+		// @DependsOn注解
 		if (metadata.isAnnotated(DependsOn.class.getName())) {
 			AnnotationAttributes dependsOn = MetadataUtils.attributesFor(metadata, DependsOn.class);
 			String[] otherBeans = dependsOn.getStringArray("value");
@@ -247,22 +256,26 @@ class ConfigurationClassBeanDefinitionReader {
 			}
 		}
 
+		// @Bean的autowire属性
 		Autowire autowire = bean.getEnum("autowire");
 		if (autowire.isAutowire()) {
 			beanDef.setAutowireMode(autowire.value());
 		}
 
+		// @Bean的initMethod属性
 		String initMethodName = bean.getString("initMethod");
 		if (StringUtils.hasText(initMethodName)) {
 			beanDef.setInitMethodName(initMethodName);
 		}
 
+		// @Bean的destroyMethod属性
 		String destroyMethodName = bean.getString("destroyMethod");
 		if (StringUtils.hasText(destroyMethodName)) {
 			beanDef.setDestroyMethodName(destroyMethodName);
 		}
 
 		// Consider scoping
+		// @Scope注解
 		ScopedProxyMode proxyMode = ScopedProxyMode.NO;
 		AnnotationAttributes scope = MetadataUtils.attributesFor(metadata, Scope.class);
 		if (scope != null) {
@@ -274,6 +287,7 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		// Replace the original bean definition with the target one, if necessary
+		// 这里可以根据配置，替换掉原始的BeanDefinition
 		BeanDefinition beanDefToRegister = beanDef;
 		if (proxyMode != ScopedProxyMode.NO) {
 			BeanDefinitionHolder proxyDef = ScopedProxyCreator.createScopedProxy(
@@ -287,6 +301,7 @@ class ConfigurationClassBeanDefinitionReader {
 					configClass.getMetadata().getClassName(), beanName));
 		}
 
+		// 注册BeanDefinition到容器中
 		this.registry.registerBeanDefinition(beanName, beanDefToRegister);
 	}
 
@@ -294,6 +309,7 @@ class ConfigurationClassBeanDefinitionReader {
 	private void loadBeanDefinitionsFromImportedResources(
 			Map<String, Class<? extends BeanDefinitionReader>> importedResources) {
 
+		// 遍历要读取的xml资源文件
 		Map<Class<?>, BeanDefinitionReader> readerInstanceCache = new HashMap<Class<?>, BeanDefinitionReader>();
 		for (Map.Entry<String, Class<? extends BeanDefinitionReader>> entry : importedResources.entrySet()) {
 			String resource = entry.getKey();
@@ -318,6 +334,8 @@ class ConfigurationClassBeanDefinitionReader {
 			}
 			BeanDefinitionReader reader = readerInstanceCache.get(readerClass);
 			// TODO SPR-6310: qualify relative path locations as done in AbstractContextLoader.modifyLocations
+			// 使用BeanDefinitionReader从配置文件中加载BeanDefinition
+			// 跟容器启动的时候加载xml文件一样
 			reader.loadBeanDefinitions(resource);
 		}
 	}
