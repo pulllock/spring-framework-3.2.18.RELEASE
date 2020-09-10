@@ -24,11 +24,16 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates one or more {@link Configuration @Configuration} classes to import.
+ * 用来导入一个或多个@Configuration注解的类
  *
  * <p>Provides functionality equivalent to the {@code <import/>} element in Spring XML.
  * Only supported for classes annotated with {@code @Configuration} or declaring at least
  * one {@link Bean @Bean} method, as well as {@link ImportSelector} and
  * {@link ImportBeanDefinitionRegistrar} implementations.
+ *
+ * 提供了和xml配置中的<import/>标签差不多的功能
+ * 仅支持导入@Configuration注解的类，或者声明了@Bean的方法，或者是ImportSelector以及ImportBeanDefinitionRegistrar的实现类
+ * 其他的不能使用@Import来导入
  *
  * <p>{@code @Bean} definitions declared in imported {@code @Configuration} classes
  * should be accessed by using {@link org.springframework.beans.factory.annotation.Autowired @Autowired}
@@ -40,6 +45,7 @@ import java.lang.annotation.Target;
  *
  * <p>If XML or other non-{@code @Configuration} bean definition resources need to be
  * imported, use {@link ImportResource @ImportResource}
+ * 如果导入xml资源文件或者非@Configuration注解的类，需要使用@ImportResource来导入
  *
  * @author Chris Beams
  * @since 3.0

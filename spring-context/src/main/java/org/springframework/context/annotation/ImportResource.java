@@ -28,6 +28,7 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 
 /**
  * Indicates one or more resources containing bean definitions to import.
+ * 用来导入一个或多个包含了Bean定义的资源
  *
  * <p>Like {@link Import @Import}, this annotation provides functionality similar to the
  * {@code <import/>} element in Spring XML.  It is typically used when

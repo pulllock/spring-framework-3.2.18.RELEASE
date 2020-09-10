@@ -28,6 +28,10 @@ import org.springframework.util.Assert;
  * classes using {@code javax.inject} annotations. Allows for registering classes one by
  * one using {@link #register(Class...)} as well as for classpath scanning using
  * {@link #scan(String...)}.
+ * 基于注解的配置类来加载Spring上下文
+ * 使用@Configuration注解或者是@Component注解以及@Inject注解都可以被注册进容器
+ * 也可以是register方法来注册
+ * 也可以使用scan方法来进行classpath的扫描
  *
  * <p>In case of multiple {@code @Configuration} classes, @{@link Bean} methods defined in
  * later classes will override those defined in earlier classes. This can be leveraged to
