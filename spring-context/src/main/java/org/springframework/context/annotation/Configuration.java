@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
  *         // instantiate, configure and return bean ...
  *     }
  * }</pre>
+ * 用来表示一个配置类，该配置类中会有一个或多个@Bean注解的方法，这些方法会被解析成Bean到容器中，相当于xml配置文件
  *
  * <h2>Bootstrapping {@code @Configuration} classes</h2>
  * <h3>Via {@code AnnotationConfigApplicationContext}</h3>
@@ -46,6 +47,9 @@ import org.springframework.stereotype.Component;
  * {@link AnnotationConfigApplicationContext} or its web-capable variant,
  * {@link org.springframework.web.context.support.AnnotationConfigWebApplicationContext
  * AnnotationConfigWebApplicationContext}.
+ *
+ * 被@Configuration注解的类，通常使用AnnotationConfigApplicationContext或者AnnotationConfigWebApplicationContext来注册
+ *
  * A simple example with the former follows:
  * <pre class="code">
  * AnnotationConfigApplicationContext ctx =
@@ -69,6 +73,9 @@ import org.springframework.stereotype.Component;
  *    <context:annotation-config/>
  *    <bean class="com.acme.AppConfig"/>
  * </beans>}</pre>
+ * 也可以使用xml的方式来将@Configuration注解的类注册到容器中
+ * 需要在xml中使用<context:annotation-config/>来启用ConfigurationClassPostProcessor
+ * ConfigurationClassPostProcessor用来扫描和处理@Configuration注解的类
  *
  * In the example above, {@code <context:annotation-config/>} is required in order to
  * enable {@link ConfigurationClassPostProcessor} and other annotation-related
@@ -80,9 +87,15 @@ import org.springframework.stereotype.Component;
  * Spring XML's {@code <context:component-scan/>} element) and therefore may also take
  * advantage of {@link Autowired @Autowired}/{@link javax.inject.Inject @Inject}
  * at the field and method level (but not at the constructor level).
+ *
+ * 在@Configuration注解上有@Component注解，所以@Configuration其实也是有@Component的功能
+ * 因此@Configuration注解也可以被当做组件扫描到，也可以使用@Autowired来进行注入，但是注入只能是字段注入和方法级别注入
+ * 不支持构造器注入
+ *
  * <p>{@code @Configuration} classes may not only be bootstrapped using
  * component scanning, but may also themselves <em>configure</em> component scanning using
  * the {@link ComponentScan @ComponentScan} annotation:
+ * 被@Configuration注解的类可以被当做组件扫描进容器，同时也可以和@ComponentScan配合使用，用来扫描其他的组件
  * <pre class="code">
  * &#064;Configuration
  * &#064;ComponentScan("com.acme.app.services")

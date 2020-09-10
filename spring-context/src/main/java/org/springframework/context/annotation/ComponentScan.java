@@ -28,6 +28,8 @@ import org.springframework.core.type.filter.TypeFilter;
 /**
  * Configures component scanning directives for use with @{@link Configuration} classes.
  * Provides support parallel with Spring XML's {@code <context:component-scan>} element.
+ * 和@Configuration配合使用，用来扫描其他组件
+ * 和xml中的<context:component-scan>标签功能一样
  *
  * <p>One of {@link #basePackageClasses()}, {@link #basePackages()} or its alias
  * {@link #value()} may be specified to define specific packages to scan.  If specific
