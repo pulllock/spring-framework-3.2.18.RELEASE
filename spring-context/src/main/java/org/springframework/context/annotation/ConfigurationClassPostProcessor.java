@@ -247,6 +247,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Prepare the Configuration classes for servicing bean requests at runtime
 	 * by replacing them with CGLIB-enhanced subclasses.
+	 * 将Configuration注解的类使用CGLIB进行增强，容器运行中使用Bean的时候，会使用增强的类来进行创建Bean或者返回Bean
 	 */
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		int factoryId = System.identityHashCode(beanFactory);
@@ -260,7 +261,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			// Simply call processConfigurationClasses lazily at this point then.
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
-		// 增强配置类
+		// 增强配置类，遍历容器中所有Configuration注解的类进行增强
 		enhanceConfigurationClasses(beanFactory);
 	}
 
@@ -389,6 +390,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 * any candidates are then enhanced by a {@link ConfigurationClassEnhancer}.
 	 * Candidate status is determined by BeanDefinition attribute metadata.
 	 * @see ConfigurationClassEnhancer
+	 * 遍历容器中@Configuration注解的类的Bean定义，使用ConfigurationClassEnhancer进行增强，
+	 * 增强完后，对Configuration注解的类的处理就完成了，后面会继续实例化相关Bean，会调用增强的类的方法进行处理
 	 */
 	public void enhanceConfigurationClasses(ConfigurableListableBeanFactory beanFactory) {
 		Map<String, AbstractBeanDefinition> configBeanDefs = new LinkedHashMap<String, AbstractBeanDefinition>();
@@ -409,18 +412,20 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			// nothing to enhance -> return immediately
 			return;
 		}
-		// 使用cglib增强
+		// 使用cglib增强，ConfigurationClassEnhancer实现了一个@Bean注解的方法调用另外一个@Bean注解的方法的正确处理
 		ConfigurationClassEnhancer enhancer = new ConfigurationClassEnhancer(beanFactory);
 		for (Map.Entry<String, AbstractBeanDefinition> entry : configBeanDefs.entrySet()) {
 			AbstractBeanDefinition beanDef = entry.getValue();
 			try {
 				Class<?> configClass = beanDef.resolveBeanClass(this.beanClassLoader);
+				// 使用ConfigurationClassEnhancer进行增强
 				Class<?> enhancedClass = enhancer.enhance(configClass);
 				if (configClass != enhancedClass) {
 					if (logger.isDebugEnabled()) {
 						logger.debug(String.format("Replacing bean definition '%s' existing class name '%s' " +
 								"with enhanced class name '%s'", entry.getKey(), configClass.getName(), enhancedClass.getName()));
 					}
+					// 使用增强后的类
 					beanDef.setBeanClass(enhancedClass);
 				}
 			}
