@@ -59,6 +59,9 @@ class ConfigurationClassEnhancer {
 
 	private static final Callback DISPOSABLE_BEAN_METHOD_INTERCEPTOR = new DisposableBeanMethodInterceptor();
 
+	/**
+	 * callback在生成Bean的时候会用、
+	 */
 	private static final Class<?>[] CALLBACK_TYPES =
 			{BeanMethodInterceptor.class, DisposableBeanMethodInterceptor.class, NoOp.class};
 
@@ -83,6 +86,7 @@ class ConfigurationClassEnhancer {
 	 * Loads the specified class and generates a CGLIB subclass of it equipped with
 	 * container-aware callbacks capable of respecting scoping and other bean semantics.
 	 * @return the enhanced subclass
+	 * 对类进行增强
 	 */
 	public Class<?> enhance(Class<?> configClass) {
 		if (EnhancedConfiguration.class.isAssignableFrom(configClass)) {
@@ -221,6 +225,7 @@ class ConfigurationClassEnhancer {
 	 * handling of bean semantics such as scoping and AOP proxying.
 	 * @see Bean
 	 * @see ConfigurationClassEnhancer
+	 * 拦截对@Bean注解的方法的调用，就是一个@Bean注解的方法调用另外一个@Bean注解的方法
 	 */
 	private static class BeanMethodInterceptor implements MethodInterceptor {
 
@@ -247,6 +252,7 @@ class ConfigurationClassEnhancer {
 		public Object intercept(Object enhancedConfigInstance, Method beanMethod, Object[] beanMethodArgs,
 					MethodProxy cglibMethodProxy) throws Throwable {
 
+			// 获取Bean名字，如果@Bean指定了name就是用指定的，如果没指定就是用默认的
 			String beanName = BeanAnnotationHelper.determineBeanNameFor(beanMethod);
 
 			// Determine whether this bean is a scoped-proxy
@@ -265,6 +271,11 @@ class ConfigurationClassEnhancer {
 			// proxy that intercepts calls to getObject() and returns any cached bean instance.
 			// This ensures that the semantics of calling a FactoryBean from within @Bean methods
 			// is the same as that of referring to a FactoryBean within XML. See SPR-6602.
+			/**
+			 * 检查容器中是否存在对应的FactoryBean，如果存在则创建一个增强类
+			 * 通过创建增强类来代理拦截getObject()的调用
+			 * 用以确保FactoryBean的语义
+			 */
 			if (factoryContainsBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName) && factoryContainsBean(beanName)) {
 				Object factoryBean = this.beanFactory.getBean(BeanFactory.FACTORY_BEAN_PREFIX + beanName);
 				if (factoryBean instanceof ScopedProxyFactoryBean) {
@@ -273,10 +284,15 @@ class ConfigurationClassEnhancer {
 				}
 				else {
 					// It is a candidate FactoryBean - go ahead with enhancement
+					// 创建增强类来代理getObject的调用
 					return enhanceFactoryBean(factoryBean.getClass(), beanName);
 				}
 			}
 
+			/**
+			 * 如果当前调用的方法是@Bean注解的方法本身，则直接调用该方法，不做增强拦截
+			 * 否则从容器中获取调用的Bean对象
+			 */
 			if (isCurrentlyInvokedFactoryMethod(beanMethod) && !this.beanFactory.containsSingleton(beanName)) {
 				// The factory is calling the bean method in order to instantiate and register the bean
 				// (i.e. via a getBean() call) -> invoke the super implementation of the method to actually
