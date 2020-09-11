@@ -203,9 +203,11 @@ class ConfigurationClassParser {
 		AnnotationAttributes componentScan = MetadataUtils.attributesFor(metadata, ComponentScan.class);
 		if (componentScan != null) {
 			// The config class is annotated with @ComponentScan -> perform the scan immediately
-			// 使用ComponentScanAnnotationParser解析@ComponentScan指定的包
-			// ComponentScanAnnotationParser和ComponentBeanDefinitionParser作用一样
-			// 解析完后得到解析的BeanDefinition
+			/**
+			 * 使用ComponentScanAnnotationParser解析@ComponentScan指定的包
+			 * ComponentScanAnnotationParser和ComponentBeanDefinitionParser作用一样
+			 * 解析完后得到解析的BeanDefinition
+			 */
 			Set<BeanDefinitionHolder> scannedBeanDefinitions =
 					this.componentScanParser.parse(componentScan, metadata.getClassName());
 
