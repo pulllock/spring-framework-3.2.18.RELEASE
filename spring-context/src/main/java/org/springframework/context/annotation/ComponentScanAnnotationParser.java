@@ -65,9 +65,21 @@ class ComponentScanAnnotationParser {
 	}
 
 
+	/**
+	 * 解析@ComponentScan指定的包下面的所有的组件，解析成BeanDefinition
+	 * @param componentScan
+	 * @param declaringClass
+	 * @return
+	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
-		// 和ComponentBeanDefinitionParser一样使用ClassPathBeanDefinitionScanner来扫描指定的包下面的类
-		// 往下面的步骤都是根据注解中配置的信息来设置scanner，最后进行解析，步骤都和ComponentBeanDefinitionParser一样
+		//
+		//
+		/**
+		 * 和ComponentBeanDefinitionParser一样使用ClassPathBeanDefinitionScanner来扫描指定的包下面的类
+		 * 往下面的步骤都是根据注解中配置的信息来设置scanner，最后进行解析，步骤都和ComponentBeanDefinitionParser一样
+		 * ClassPathBeanDefinitionScanner用来在classpath上扫描组件并解析成BeanDefinition注册到容器中，
+		 * 扫描的注解包括：@Component、@Repository、@Controller、@ManagedBean、@Named，或者使用自定义的type filters。
+		 */
 		ClassPathBeanDefinitionScanner scanner =
 				new ClassPathBeanDefinitionScanner(this.registry, componentScan.getBoolean("useDefaultFilters"));
 
@@ -93,11 +105,18 @@ class ComponentScanAnnotationParser {
 
 		scanner.setResourcePattern(componentScan.getString("resourcePattern"));
 
+		/**
+		 * 要扫描的过滤器
+		 */
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("includeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addIncludeFilter(typeFilter);
 			}
 		}
+
+		/**
+		 * 排除的过滤器
+		 */
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("excludeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addExcludeFilter(typeFilter);
@@ -129,6 +148,8 @@ class ComponentScanAnnotationParser {
 				return declaringClass.equals(className);
 			}
 		});
+
+		// 使用ClassPathBeanDefinitionScanner扫描basePackages下面的组件
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}
 
