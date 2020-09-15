@@ -34,10 +34,15 @@ import org.springframework.util.Assert;
  * @since 3.1
  * @see EnableAsync
  * @see AsyncConfigurationSelector
+ * 注册基于代理的异步方法执行的配置
  */
 @Configuration
 public class ProxyAsyncConfiguration extends AbstractAsyncConfiguration {
 
+	/**
+	 * 注册一个内部使用的bean，AsyncAnnotationBeanPostProcessor
+	 * @return
+	 */
 	@Bean(name = AnnotationConfigUtils.ASYNC_ANNOTATION_PROCESSOR_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public AsyncAnnotationBeanPostProcessor asyncAdvisor() {

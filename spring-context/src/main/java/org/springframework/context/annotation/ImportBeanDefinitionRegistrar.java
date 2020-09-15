@@ -56,6 +56,7 @@ public interface ImportBeanDefinitionRegistrar {
 	 * class processing.
 	 * @param importingClassMetadata annotation metadata of the importing class
 	 * @param registry current bean definition registry
+	 * 注册BeanDefinition
 	 */
 	public void registerBeanDefinitions(
 			AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry);

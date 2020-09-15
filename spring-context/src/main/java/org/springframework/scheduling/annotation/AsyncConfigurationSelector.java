@@ -28,6 +28,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
  * @since 3.1
  * @see EnableAsync
  * @see ProxyAsyncConfiguration
+ * 根据EnableAsync注解中的mode属性配置的值来决定导入哪个AbstractAsyncConfiguration的实现类
  */
 public class AsyncConfigurationSelector extends AdviceModeImportSelector<EnableAsync> {
 
@@ -38,9 +39,9 @@ public class AsyncConfigurationSelector extends AdviceModeImportSelector<EnableA
 	 */
 	public String[] selectImports(AdviceMode adviceMode) {
 		switch (adviceMode) {
-			case PROXY:
+			case PROXY: // PROXY模式
 				return new String[] { ProxyAsyncConfiguration.class.getName() };
-			case ASPECTJ:
+			case ASPECTJ: // ASPECTJ模式
 				return new String[] { AnnotationConfigUtils.ASYNC_EXECUTION_ASPECT_CONFIGURATION_CLASS_NAME };
 			default:
 				return null;

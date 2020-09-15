@@ -33,10 +33,15 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @see EnableAsync
  * @see org.springframework.scheduling.annotation.AsyncConfigurationSelector
  * @see org.springframework.scheduling.annotation.ProxyAsyncConfiguration
+ * 注册一个基于ASPECTJ的异步方法执行的Bean
  */
 @Configuration
 public class AspectJAsyncConfiguration extends AbstractAsyncConfiguration {
 
+	/**
+	 * 注册一个内部使用的Bean，AnnotationAsyncExecutionAspect
+	 * @return
+	 */
 	@Bean(name = AnnotationConfigUtils.ASYNC_EXECUTION_ASPECT_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public AnnotationAsyncExecutionAspect asyncAdvisor() {

@@ -31,6 +31,7 @@ import org.springframework.context.annotation.AutoProxyRegistrar;
  * @see EnableCaching
  * @see ProxyCachingConfiguration
  * @see AnnotationConfigUtils#CACHE_ASPECT_CONFIGURATION_CLASS_NAME
+ * 根据@EnableCaching的mode属性来决定要导入哪个AbstractCachingConfiguration的具体实现类
  */
 public class CachingConfigurationSelector extends AdviceModeImportSelector<EnableCaching> {
 
@@ -38,6 +39,7 @@ public class CachingConfigurationSelector extends AdviceModeImportSelector<Enabl
 	 * {@inheritDoc}
 	 * @return {@link ProxyCachingConfiguration} or {@code AspectJCacheConfiguration} for
 	 * {@code PROXY} and {@code ASPECTJ} values of {@link EnableCaching#mode()}, respectively
+	 * 基于mode属性选择导入的类
 	 */
 	public String[] selectImports(AdviceMode adviceMode) {
 		switch (adviceMode) {
