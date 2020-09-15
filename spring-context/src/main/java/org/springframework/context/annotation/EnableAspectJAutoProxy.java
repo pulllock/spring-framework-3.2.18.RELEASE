@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 /**
  * Enables support for handling components marked with AspectJ's {@code @Aspect} annotation,
  * similar to functionality found in Spring's {@code <aop:aspectj-autoproxy>} XML element.
+ * 启用对@Aspect注解了的组件的处理的支持，和<aop:aspectj-autoproxy>标签功能类似
  * To be used on @{@link Configuration} classes as follows:
  *
  * <pre class="code">
@@ -97,6 +98,10 @@ import java.lang.annotation.Target;
  * @author Chris Beams
  * @since 3.1
  * @see org.aspectj.lang.annotation.Aspect
+ * 启动自动代理，用来处理@Aspect
+ *
+ * 使用了@Import(AspectJAutoProxyRegistrar.class)来注册自动代理创建器到容器中，
+ * 注册的是AnnotationAwareAspectJAutoProxyCreator
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -107,6 +112,8 @@ public @interface EnableAspectJAutoProxy {
 	/**
 	 * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed
 	 * to standard Java interface-based proxies. The default is {@code false}.
+	 * 默认false，使用JDK动态代理
+	 * true 使用CGLIB代理
 	 */
 	boolean proxyTargetClass() default false;
 
