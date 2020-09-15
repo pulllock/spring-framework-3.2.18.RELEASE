@@ -29,6 +29,10 @@ package org.springframework.aop;
  * {@code TargetSources} directly: this is an AOP framework interface.
  *
  * @author Rod Johnson
+ * TargetSource用来封装被代理的对象，通常情况下一个代理对象只能代理一个target，
+ * 如果代理对象代理的是TargetSource，就可以使代理的target每次都不一样
+ *
+ * TargetSource实现有单例、原型、ThreadLocal、对象池、运行时目标对象热替换等
  */
 public interface TargetSource extends TargetClassAware {
 

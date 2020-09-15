@@ -30,6 +30,9 @@ import org.springframework.beans.BeansException;
  * @author Juergen Hoeller
  * @see #setBeanFactory
  * @see #setTargetBeanName
+ * 原型模式的TargetSource
+ * 每次从TargetSource获取目标对象，都将生成一个新的实例
+ * 目标对象必须是prototype类型的Bean
  */
 @SuppressWarnings("serial")
 public class PrototypeTargetSource extends AbstractPrototypeBasedTargetSource {
@@ -39,6 +42,7 @@ public class PrototypeTargetSource extends AbstractPrototypeBasedTargetSource {
 	 * @see #newPrototypeInstance()
 	 */
 	public Object getTarget() throws BeansException {
+		// 从容器中获取原型Bean实例
 		return newPrototypeInstance();
 	}
 

@@ -86,6 +86,8 @@ import org.springframework.util.ClassUtils;
  * @see #getAdvicesAndAdvisorsForBean
  * @see BeanNameAutoProxyCreator
  * @see DefaultAdvisorAutoProxyCreator
+ * 自动代理创建器的抽象实现
+ * 实现了SmartInstantiationAwareBeanPostProcessor接口，在Bean实例化的时候可以进行代理创建
  */
 @SuppressWarnings("serial")
 public abstract class AbstractAutoProxyCreator extends ProxyConfig
@@ -268,6 +270,15 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		return wrapIfNecessary(bean, beanName, cacheKey);
 	}
 
+	/**
+	 * Bean实例化之前可以在这里进行代理创建，如果这里创建了代理，Bean正常的实例化和初始化就会被打断了
+	 * 一般使用不到
+	 * 这里是针对自定的targetSource，自定义的targetSource不是Spring的Bean，所以不需要后续的实例化和初始化
+	 * @param beanClass the class of the bean to be instantiated
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
 		Object cacheKey = getCacheKey(beanClass, beanName);
 
