@@ -454,7 +454,7 @@ class ConfigurationClassParser {
 						// 使用反射实例化导入的类
 						ImportSelector selector = BeanUtils.instantiateClass(candidateClass, ImportSelector.class);
 						// 先执行实现的selectImports方法，这个方法会返回要进行导入的一些类
-						// 接着会执行processImport方法继续处理selectImports返回的要导入的类
+						// 接着会执行processImport方法递归继续处理selectImports返回的要导入的类
 						processImport(configClass, metadata, Arrays.asList(selector.selectImports(metadata)), false);
 					}
 					// 导入的类是ImportBeanDefinitionRegistrar接口的实现类

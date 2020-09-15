@@ -31,6 +31,7 @@ import org.springframework.transaction.config.TransactionManagementConfigUtils;
  * @see EnableTransactionManagement
  * @see ProxyTransactionManagementConfiguration
  * @see TransactionManagementConfigUtils#TRANSACTION_ASPECT_CONFIGURATION_CLASS_NAME
+ * 根据@EnableTransactionManagement注解的mode属性来确定要导入哪个AbstractTransactionManagementConfiguration的具体实现类
  */
 public class TransactionManagementConfigurationSelector extends AdviceModeImportSelector<EnableTransactionManagement> {
 
@@ -39,6 +40,7 @@ public class TransactionManagementConfigurationSelector extends AdviceModeImport
 	 * @return {@link ProxyTransactionManagementConfiguration} or
 	 * {@code AspectJTransactionManagementConfiguration} for {@code PROXY} and
 	 * {@code ASPECTJ} values of {@link EnableTransactionManagement#mode()}, respectively
+	 * 根据mode属性选择导入的类
 	 */
 	@Override
 	protected String[] selectImports(AdviceMode adviceMode) {

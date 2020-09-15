@@ -31,6 +31,7 @@ import static org.springframework.context.annotation.MetadataUtils.*;
  * @author Chris Beams
  * @see EnableAspectJAutoProxy
  * @since 3.1
+ * 注册AnnotationAwareAspectJAutoProxyCreator到容器中
  */
 class AspectJAutoProxyRegistrar implements ImportBeanDefinitionRegistrar {
 
