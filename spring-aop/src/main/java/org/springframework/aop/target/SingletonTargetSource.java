@@ -34,6 +34,8 @@ import org.springframework.util.ObjectUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see org.springframework.aop.framework.AdvisedSupport#setTarget(Object)
+ * 单例的TargetSource
+ * 每次从这个TargetSource中获取到的目标对象都是同一个
  */
 public class SingletonTargetSource implements TargetSource, Serializable {
 
@@ -41,7 +43,10 @@ public class SingletonTargetSource implements TargetSource, Serializable {
 	private static final long serialVersionUID = 9031246629662423738L;
 
 
-	/** Target cached and invoked using reflection */
+	/**
+	 * Target cached and invoked using reflection
+	 * 缓存目标对象
+	 */
 	private final Object target;
 
 
