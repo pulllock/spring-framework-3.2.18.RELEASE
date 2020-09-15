@@ -480,7 +480,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			/**
 			 * 给BeanPostProcessors一个机会来返回代理，来代替真正的实例
 			 * 实例化的前置处理
-			 * aop功能也是在这里面进行处理
+			 * aop功能可能会在这里面进行处理
 			 */
 			Object bean = resolveBeforeInstantiation(beanName, mbd);
 			/**
@@ -574,7 +574,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			addSingletonFactory(beanName, new ObjectFactory<Object>() {
 				public Object getObject() throws BeansException {
 					// 获取早期bean引用
-					// aop就是在这里将advice织入到bean中
+					// 这里可能会进行aop代理的设置
 					return getEarlyBeanReference(beanName, mbd, bean);
 				}
 			});
@@ -1026,8 +1026,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// 只处理InstantiationAwareBeanPostProcessor类型的后置处理器
 			if (bp instanceof InstantiationAwareBeanPostProcessor) {
 				InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
-				// 调用postProcessBeforeInstantiation方法
-				// AbstractAutoProxyCreator也实现了此方法，也会在此被调用
+				/**
+				 * 调用postProcessBeforeInstantiation方法
+				 * 如果这里返回了结果，则正常的Bean的实例化过程就会被打断
+				 *
+				 * AbstractAutoProxyCreator实现了此方法，也会在此被调用，如果在这一步创建了代理返回，
+				 * 后面的Bean实例化就不需要进行了，
+				 * 但是还会执行BeanPostProcessor#postProcessAfterInitialization方法
+				 */
 				Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);
 				if (result != null) {
 					return result;
@@ -1730,6 +1736,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			/**
 			 * 应用后处理器
 			 * BeanPostProcessor的postProcessAfterInitialization回调
+			 *
+			 * AbstractAutoProxyCreator#postProcessAfterInitialization可能会在这里进行AOP代理操作
 			 */
 
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);

@@ -82,12 +82,23 @@ public abstract class AopConfigUtils {
 		return registerOrEscalateApcAsRequired(AspectJAwareAdvisorAutoProxyCreator.class, registry, source);
 	}
 
+	/**
+	 * 注册一个注解的代理创建器
+	 * @param registry
+	 * @return
+	 */
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry) {
 		return registerAspectJAnnotationAutoProxyCreatorIfNecessary(registry, null);
 	}
 
-	// 注册或升级AutoProxyCreator，定义beanName为internalAutoProxyCreator的BeanDefinition
+	/**
+	 *  注册或升级自动代理创建器，定义beanName为internalAutoProxyCreator的BeanDefinition
+	 * @param registry
+	 * @param source
+	 * @return
+	 */
 	public static BeanDefinition registerAspectJAnnotationAutoProxyCreatorIfNecessary(BeanDefinitionRegistry registry, Object source) {
+		// 注册或升级自动代理创建器
 		return registerOrEscalateApcAsRequired(AnnotationAwareAspectJAutoProxyCreator.class, registry, source);
 	}
 
@@ -108,7 +119,13 @@ public abstract class AopConfigUtils {
 	}
 
 
-	// 注册或升级AutoProxyCreator，定义beanName为internalAutoProxyCreator的BeanDefinition
+	/**
+	 * 注册或升级AutoProxyCreator，定义beanName为internalAutoProxyCreator的BeanDefinition
+	 * @param cls AnnotationAwareAspectJAutoProxyCreator
+	 * @param registry
+	 * @param source
+	 * @return
+	 */
 	private static BeanDefinition registerOrEscalateApcAsRequired(Class cls, BeanDefinitionRegistry registry, Object source) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		// 如果已经包含了internalAutoProxyCreator
@@ -117,7 +134,14 @@ public abstract class AopConfigUtils {
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			// 已经注册的internalAutoProxyCreator与我们现在要注册的不一致，需要根据优先级来判断 到底使用哪个
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
-				// 找到已经注册的internalAutoProxyCreator的优先级
+				/**
+				 * 这个list中按照顺序添加了一下三个自动创建器，我们要指定的也必须是这三个中的一个
+				 * APC_PRIORITY_LIST.add(InfrastructureAdvisorAutoProxyCreator.class);
+				 * APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
+				 * APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
+				 *
+				 * 找到已经注册的internalAutoProxyCreator的优先级
+				 */
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
 				// 找到我们现在的要注册优先级
 				int requiredPriority = findPriorityForClass(cls);
@@ -129,10 +153,13 @@ public abstract class AopConfigUtils {
 			// 已经存在internalAutoProxyCreator，并且与我们现在要创建的一致，就不需要再创建
 			return null;
 		}
+		// 如果不存在已有的创建器，需要注册一个新的自动代理创建器并注册到容器中
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
 		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);
+		// 角色是基础设施，容器内部使用
 		beanDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+		// BeanDefinition的名字是org.springframework.aop.config.internalAutoProxyCreator
 		registry.registerBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME, beanDefinition);
 		return beanDefinition;
 	}

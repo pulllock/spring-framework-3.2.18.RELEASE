@@ -44,7 +44,12 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @since 2.0
  * @see org.springframework.aop.aspectj.annotation.AspectJAdvisorFactory
- * 实现了BeanPostProcessor接口，会在实例化之前调用postProcessAfterInitialization
+ * 基于注解的自动代理创建器
+ * 实现了SmartInstantiationAwareBeanPostProcessor接口，会在实例化之前调用postProcessBeforeInstantiation方法，
+ * 如果该方法返回了结果，说明被代理了，Bean的正常的实例化就会被打断，使用代理的类，
+ * 但是还是回执行BeanPostProcessor#postProcessAfterInitialization方法
+ *
+ * 实现了BeanPostProcessor接口，会在初始化之前调用postProcessAfterInitialization
  */
 @SuppressWarnings("serial")
 public class AnnotationAwareAspectJAutoProxyCreator extends AspectJAwareAdvisorAutoProxyCreator {
