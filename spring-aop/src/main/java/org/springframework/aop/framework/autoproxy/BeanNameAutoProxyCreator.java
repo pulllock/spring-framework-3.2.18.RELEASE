@@ -41,6 +41,7 @@ import org.springframework.util.StringUtils;
  * @see #isMatch
  * @see #setInterceptorNames
  * @see AbstractAutoProxyCreator
+ * 基于Bean名字的自动代理创建器
  * 可以指定一组容器内的目标对象对应的beanName，将指定的一组拦截器应用到这些目标对象上
  */
 @SuppressWarnings("serial")
@@ -75,9 +76,11 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 
 	/**
 	 * Identify as bean to proxy if the bean name is in the configured list of names.
+	 * 根据BeanName匹配决定是否进行代理
 	 */
 	@Override
 	protected Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource targetSource) {
+		// beanNames中保存着要进行代理的名字
 		if (this.beanNames != null) {
 			for (String mappedName : this.beanNames) {
 				if (FactoryBean.class.isAssignableFrom(beanClass)) {
@@ -86,6 +89,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 					}
 					mappedName = mappedName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 				}
+				// beanName如果匹配，也就是需要代理
 				if (isMatch(beanName, mappedName)) {
 					return PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS;
 				}
@@ -93,6 +97,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 				if (beanFactory != null) {
 					String[] aliases = beanFactory.getAliases(beanName);
 					for (String alias : aliases) {
+						// 用别名匹配
 						if (isMatch(alias, mappedName)) {
 							return PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS;
 						}
@@ -100,6 +105,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 				}
 			}
 		}
+		// 匹配不到，不需要代理
 		return DO_NOT_PROXY;
 	}
 
