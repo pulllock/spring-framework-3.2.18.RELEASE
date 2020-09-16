@@ -80,16 +80,22 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 	 */
 	@Override
 	protected Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource targetSource) {
-		// beanNames中保存着要进行代理的名字
+		// beanNames中保存着要进行代理的Bean名字
 		if (this.beanNames != null) {
 			for (String mappedName : this.beanNames) {
+				// 工厂Bean
 				if (FactoryBean.class.isAssignableFrom(beanClass)) {
 					if (!mappedName.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 						continue;
 					}
 					mappedName = mappedName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
 				}
-				// beanName如果匹配，也就是需要代理
+
+				/**
+				 * beanName如果匹配，也就是需要代理
+				 * isMatch中会有简单的通配符过滤
+				 * 能匹配到"xxx*", "*xxx", "*xxx*" and "xxx*yyy"
+				 */
 				if (isMatch(beanName, mappedName)) {
 					return PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS;
 				}
