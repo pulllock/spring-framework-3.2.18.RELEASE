@@ -43,6 +43,8 @@ import org.springframework.core.OrderComparator;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see #findCandidateAdvisors
+ * 会自动获取Spring容器中注册的所有的Advisor类，
+ * 给Spring容器中满足Advisor的pointCut创建代理
  */
 @SuppressWarnings("serial")
 public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyCreator {
