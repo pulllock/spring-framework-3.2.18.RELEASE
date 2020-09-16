@@ -262,6 +262,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		return null;
 	}
 
+	/**
+	 * 在解决循环依赖的时候会用到这个方法，这里也会提前进行代理的创建
+	 * @param bean the raw bean instance
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	public Object getEarlyBeanReference(Object bean, String beanName) throws BeansException {
 		Object cacheKey = getCacheKey(bean.getClass(), beanName);
 		if (!this.earlyProxyReferences.containsKey(cacheKey)) {
@@ -328,6 +335,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * identified as one to proxy by the subclass.
 	 * @see #getAdvicesAndAdvisorsForBean
 	 * 在这里创建了代理
+	 * 类初始化完成后，创建代理，一般是从这里创建代理的
 	 */
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (bean != null) {
@@ -360,7 +368,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	 * @return a proxy wrapping the bean, or the raw bean instance as-is
 	 */
 	protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
-		// 已经被处理过，直接返回
+		// 如果是TargetSource类型的Bean，已经被处理过，直接返回
 		if (beanName != null && this.targetSourcedBeans.containsKey(beanName)) {
 			return bean;
 		}
@@ -383,12 +391,14 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 		 * 返回匹配当前bean的所有的advisor、advice、interceptor
 		 *
 		 * TargetSource里面封装了真实实现类的信息
+		 *
+		 * getAdvicesAndAdvisorsForBean有两种实现，一种是基于Advisor匹配的自动代理，一种是基于BeanName机制的自动代理
 		 */
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		// 需要代理
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
-			// 创建代理
+			// 创建代理，使用ProxyFactory硬编码方式，我们也可以自己使用这种方式来创建代理
 			Object proxy = createProxy(bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
 			/**
@@ -484,7 +494,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 
 		ProxyFactory proxyFactory = new ProxyFactory();
 		// Copy our properties (proxyTargetClass etc) inherited from ProxyConfig.
-		// 当前类中的相关属性
+		// 复制当前类中的相关属性
 		proxyFactory.copyFrom(this);
 
 		/**
