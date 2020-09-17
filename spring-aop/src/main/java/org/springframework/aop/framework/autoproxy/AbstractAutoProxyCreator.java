@@ -492,6 +492,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 	protected Object createProxy(
 			Class<?> beanClass, String beanName, Object[] specificInterceptors, TargetSource targetSource) {
 
+		// 使用ProxyFactory硬编码方式，我们也可以自己使用这种方式来创建代理
 		ProxyFactory proxyFactory = new ProxyFactory();
 		// Copy our properties (proxyTargetClass etc) inherited from ProxyConfig.
 		// 复制当前类中的相关属性
@@ -531,7 +532,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyConfig
 			proxyFactory.setPreFiltered(true);
 		}
 
-		// 获取代理
+		// 获取代理返回
 		return proxyFactory.getProxy(this.proxyClassLoader);
 	}
 
