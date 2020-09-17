@@ -140,6 +140,10 @@ public abstract class AopConfigUtils {
 				 * APC_PRIORITY_LIST.add(AspectJAwareAdvisorAutoProxyCreator.class);
 				 * APC_PRIORITY_LIST.add(AnnotationAwareAspectJAutoProxyCreator.class);
 				 *
+				 * AnnotationAwareAspectJAutoProxyCreator的优先级最高，我们的项目中可能会存在注解的形式和xml配置共存，
+				 * AnnotationAwareAspectJAutoProxyCreator的逻辑中包含了对xml的处理，所以如果存在多个的话
+				 * AnnotationAwareAspectJAutoProxyCreator的优先级要变成最高的。
+				 *
 				 * 找到已经注册的internalAutoProxyCreator的优先级
 				 */
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
