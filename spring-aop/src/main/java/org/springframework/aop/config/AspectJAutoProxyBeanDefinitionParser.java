@@ -35,6 +35,8 @@ import org.springframework.beans.factory.xml.ParserContext;
  * @author Juergen Hoeller
  * @since 2.0
  * aspectj-autoproxy标签解析器
+ * 用来启用基于@AspectJ风格的自动代理
+ * 就是注册AnnotationAwareAspectJAutoProxyCreator到容器中去
  */
 class AspectJAutoProxyBeanDefinitionParser implements BeanDefinitionParser {
 
