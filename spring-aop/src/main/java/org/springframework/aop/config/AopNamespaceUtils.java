@@ -79,7 +79,11 @@ public abstract class AopNamespaceUtils {
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
-	// 注册AnnotationAwareAspectJAutoProxyCreator
+	/**
+	 * 注册AnnotationAwareAspectJAutoProxyCreator
+	 * @param parserContext
+	 * @param sourceElement
+	 */
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 		// 注册或升级AutoProxyCreator，定义beanName为internalAutoProxyCreator的BeanDefinition
