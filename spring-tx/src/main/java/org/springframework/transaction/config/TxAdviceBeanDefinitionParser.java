@@ -73,9 +73,12 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// 获取事务管理器名称，默认名称是：transactionManager
 		builder.addPropertyReference("transactionManager", TxNamespaceHandler.getTransactionManagerName(element));
 
+		// 获取<tx:advice>下面所有的<tx:attributes>
 		List<Element> txAttributes = DomUtils.getChildElementsByTagName(element, ATTRIBUTES_ELEMENT);
+		// 一个<tx:advice>下面<tx:attributes>只能有一个
 		if (txAttributes.size() > 1) {
 			parserContext.getReaderContext().error(
 					"Element <attributes> is allowed at most once inside element <advice>", element);
@@ -83,6 +86,7 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 		else if (txAttributes.size() == 1) {
 			// Using attributes source.
 			Element attributeSourceElement = txAttributes.get(0);
+			// 解析attributes下面的元素
 			RootBeanDefinition attributeSourceDefinition = parseAttributeSource(attributeSourceElement, parserContext);
 			builder.addPropertyValue("transactionAttributeSource", attributeSourceDefinition);
 		}
