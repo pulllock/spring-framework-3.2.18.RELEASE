@@ -105,6 +105,7 @@ public interface PlatformTransactionManager {
 	 * @throws IllegalTransactionStateException if the given transaction
 	 * is already completed (that is, committed or rolled back)
 	 * @see TransactionStatus#setRollbackOnly
+	 * 提交事务
 	 */
 	void commit(TransactionStatus status) throws TransactionException;
 
