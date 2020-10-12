@@ -83,7 +83,12 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		setTransactionAttributeSource(tas);
 	}
 
-
+	/**
+	 * aop执行的时候，会调用该方法
+	 * @param invocation
+	 * @return
+	 * @throws Throwable
+	 */
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 		// Work out the target class: may be {@code null}.
 		// The TransactionAttributeSource should be passed the target class

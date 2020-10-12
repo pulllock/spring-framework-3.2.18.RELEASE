@@ -246,7 +246,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 			throws Throwable {
 
 		// If the transaction attribute is null, the method is non-transactional.
-		// 获取对应事务属性
+		// 获取对应事务属性，包括propagationBehavior、isolationLevel、timeout、readOnly等等
 		final TransactionAttribute txAttr = getTransactionAttributeSource().getTransactionAttribute(method, targetClass);
 		// 获取事务管理器
 		final PlatformTransactionManager tm = determineTransactionManager(txAttr);
@@ -256,7 +256,9 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		// 声明式事务处理
 		if (txAttr == null || !(tm instanceof CallbackPreferringPlatformTransactionManager)) {
 			// Standard transaction demarcation with getTransaction and commit/rollback calls.
-			// 创建TransactionInfo
+			// 创建TransactionInfo，TransactionInfo持有事务信息，
+			// 包括：transactionManager、transactionAttribute、joinpointIdentification、transactionStatus、oldTransactionInfo
+			// 根据事务传播行为来创建事务
 			TransactionInfo txInfo = createTransactionIfNecessary(tm, txAttr, joinpointIdentification);
 			Object retVal = null;
 			try {
@@ -275,7 +277,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 				// 清除信息
 				cleanupTransactionInfo(txInfo);
 			}
-			// 提交事务
+			// 正常完成后，提交事务
 			commitTransactionAfterReturning(txInfo);
 			return retVal;
 		}
@@ -406,6 +408,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 	 * The {@code hasTransaction()} method on TransactionInfo can be used to
 	 * tell if there was a transaction created.
 	 * @see #getTransactionAttributeSource()
+	 * 根据需要创建事务
 	 */
 	@SuppressWarnings("serial")
 	protected TransactionInfo createTransactionIfNecessary(
@@ -424,7 +427,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		TransactionStatus status = null;
 		if (txAttr != null) {
 			if (tm != null) {
-			    // 获取TransactionStatus
+			    // 获取TransactionStatus事务状态，可以是个新的事务或者是已经存在的事务的状态
 				status = tm.getTransaction(txAttr);
 			}
 			else {

@@ -47,16 +47,25 @@ public interface PlatformTransactionManager {
 	/**
 	 * Return a currently active transaction or create a new one, according to
 	 * the specified propagation behavior.
+	 * 根据指定的传播行为，返回一个当前活跃的事务或者是创建一个新的事务
+	 *
 	 * <p>Note that parameters like isolation level or timeout will only be applied
 	 * to new transactions, and thus be ignored when participating in active ones.
+	 * 像isolation和timeout这样的参数只能在新建事务的时候使用，如果要加入已经有的事务的时候，是不能用的
+	 *
 	 * <p>Furthermore, not all transaction definition settings will be supported
 	 * by every transaction manager: A proper transaction manager implementation
 	 * should throw an exception when unsupported settings are encountered.
+	 * 事务设置不一定适用于每个事务管理器，如果一个事务管理器发现了不支持的设置，可以抛出异常
+	 *
 	 * <p>An exception to the above rule is the read-only flag, which should be
 	 * ignored if no explicit read-only mode is supported. Essentially, the
 	 * read-only flag is just a hint for potential optimization.
+	 * read-only属性是个例外，如果事务管理器不支持该属性，则可直接忽略，不需要抛异常
+	 *
 	 * @param definition TransactionDefinition instance (can be {@code null} for defaults),
 	 * describing propagation behavior, isolation level, timeout etc.
+	 *                   TransactionDefinition事务定义，包含propagation behavior, isolation level, timeout等属性
 	 * @return transaction status object representing the new or current transaction
 	 * @throws TransactionException in case of lookup, creation, or system errors
 	 * @throws IllegalTransactionStateException if the given transaction definition
@@ -66,6 +75,7 @@ public interface PlatformTransactionManager {
 	 * @see TransactionDefinition#getIsolationLevel
 	 * @see TransactionDefinition#getTimeout
 	 * @see TransactionDefinition#isReadOnly
+	 * 根据指定的事务定义，来返回一个新的事务状态或者是已经存在的一个事务状态
 	 */
 	TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException;
 
