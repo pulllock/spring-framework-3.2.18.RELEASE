@@ -117,7 +117,11 @@ public abstract class AopNamespaceUtils {
 	}
 
 
-	// 对Proxy-target-class以及expose-proxy属性的处理
+	/**
+	 * 对Proxy-target-class以及expose-proxy属性的处理
+	 * @param registry
+	 * @param sourceElement
+	 */
 	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, Element sourceElement) {
 		if (sourceElement != null) {
 			// 对proxy-target-class属性的处理
