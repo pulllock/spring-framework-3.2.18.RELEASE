@@ -66,6 +66,11 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	private static final String NO_ROLLBACK_FOR_ATTRIBUTE = "no-rollback-for";
 
 
+    /**
+     * TransactionInterceptor类型
+     * @param element the {@code Element} that is being parsed
+     * @return
+     */
 	@Override
 	protected Class<?> getBeanClass(Element element) {
 		return TransactionInterceptor.class;
@@ -98,20 +103,26 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 	}
 
 	private RootBeanDefinition parseAttributeSource(Element attrEle, ParserContext parserContext) {
+	    // <tx:method/>
 		List<Element> methods = DomUtils.getChildElementsByTagName(attrEle, METHOD_ELEMENT);
 		ManagedMap<TypedStringValue, RuleBasedTransactionAttribute> transactionAttributeMap =
 			new ManagedMap<TypedStringValue, RuleBasedTransactionAttribute>(methods.size());
 		transactionAttributeMap.setSource(parserContext.extractSource(attrEle));
 
 		for (Element methodEle : methods) {
+		    // name属性
 			String name = methodEle.getAttribute(METHOD_NAME_ATTRIBUTE);
 			TypedStringValue nameHolder = new TypedStringValue(name);
 			nameHolder.setSource(parserContext.extractSource(methodEle));
 
 			RuleBasedTransactionAttribute attribute = new RuleBasedTransactionAttribute();
+			// propagation
 			String propagation = methodEle.getAttribute(PROPAGATION_ATTRIBUTE);
+			// isolation
 			String isolation = methodEle.getAttribute(ISOLATION_ATTRIBUTE);
+			// timeout
 			String timeout = methodEle.getAttribute(TIMEOUT_ATTRIBUTE);
+			// read-only
 			String readOnly = methodEle.getAttribute(READ_ONLY_ATTRIBUTE);
 			if (StringUtils.hasText(propagation)) {
 				attribute.setPropagationBehaviorName(RuleBasedTransactionAttribute.PREFIX_PROPAGATION + propagation);
@@ -132,10 +143,12 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 			}
 
 			List<RollbackRuleAttribute> rollbackRules = new LinkedList<RollbackRuleAttribute>();
+			// rollback-for
 			if (methodEle.hasAttribute(ROLLBACK_FOR_ATTRIBUTE)) {
 				String rollbackForValue = methodEle.getAttribute(ROLLBACK_FOR_ATTRIBUTE);
 				addRollbackRuleAttributesTo(rollbackRules,rollbackForValue);
 			}
+			// no-rollback-for
 			if (methodEle.hasAttribute(NO_ROLLBACK_FOR_ATTRIBUTE)) {
 				String noRollbackForValue = methodEle.getAttribute(NO_ROLLBACK_FOR_ATTRIBUTE);
 				addNoRollbackRuleAttributesTo(rollbackRules,noRollbackForValue);
