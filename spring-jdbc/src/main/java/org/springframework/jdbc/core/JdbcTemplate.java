@@ -603,6 +603,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			psc = null;
 			JdbcUtils.closeStatement(ps);
 			ps = null;
+			// 释放连接
 			DataSourceUtils.releaseConnection(con, getDataSource());
 			con = null;
 			throw getExceptionTranslator().translate("PreparedStatementCallback", sql, ex);
@@ -1312,6 +1313,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	 * @param args object array with arguments
 	 * @param argTypes int array of SQLTypes for the associated arguments
 	 * @return the new PreparedStatementSetter to use
+	 * 对参数和参数类型进行封装
 	 */
 	protected PreparedStatementSetter newArgTypePreparedStatementSetter(Object[] args, int[] argTypes) {
 		return new ArgumentTypePreparedStatementSetter(args, argTypes);
