@@ -176,6 +176,14 @@ public abstract class CacheAspectSupport implements InitializingBean {
 		return new CacheOperationContext(operation, method, args, target, targetClass);
 	}
 
+	/**
+	 * 执行缓存相关方法
+	 * @param invoker
+	 * @param target 目标类
+	 * @param method 调用的目标方法
+	 * @param args 方法参数
+	 * @return
+	 */
 	protected Object execute(Invoker invoker, Object target, Method method, Object[] args) {
 		// check whether aspect is enabled
 		// to cope with cases where the AJ is pulled in automatically
@@ -184,38 +192,51 @@ public abstract class CacheAspectSupport implements InitializingBean {
 		}
 
 		// get backing class
+		// 目标类
 		Class<?> targetClass = AopProxyUtils.ultimateTargetClass(target);
 		if (targetClass == null && target != null) {
 			targetClass = target.getClass();
 		}
+		// cacheOperationSource在解析BeanDefinition的时候设置，是缓存操作方法的一些元数据
 		Collection<CacheOperation> cacheOp = getCacheOperationSource().getCacheOperations(method, targetClass);
 
 		// analyze caching information
 		if (!CollectionUtils.isEmpty(cacheOp)) {
+			// 创建缓存操作的上下文
 			Map<String, Collection<CacheOperationContext>> ops = createOperationContext(cacheOp, method, args, target, targetClass);
 			// start with evictions
+			// 清除缓存前的检查，在缓存操作前可能需要先清除缓存
 			inspectBeforeCacheEvicts(ops.get(EVICT));
 			// follow up with cacheable
+			// 可缓存的，会尝试从缓存中获取
 			CacheStatus status = inspectCacheables(ops.get(CACHEABLE));
 			Object retVal;
+			// 检查需要更新的
 			Map<CacheOperationContext, Object> updates = inspectCacheUpdates(ops.get(UPDATE));
+			// status不为null，表示命中了缓存或者是能匹配到设置的条件
 			if (status != null) {
+				// 匹配到条件，未命中缓存，需要更新缓存
 				if (status.updateRequired) {
 					updates.putAll(status.cacheUpdates);
 				}
 				// return cached object
 				else {
+					// 命中缓存，返回缓存中的值
 					return status.retVal;
 				}
 			}
+			// 能匹配到条件，但没命中缓存，需要执行真实方法逻辑
+			// 不能匹配到条件的，直接执行真实方法逻辑
 			retVal = invoker.invoke();
+			// 调用后可能也需要清除缓存
 			inspectAfterCacheEvicts(ops.get(EVICT), retVal);
 			if (!updates.isEmpty()) {
+				// 更新缓存
 				update(updates, retVal);
 			}
 			return retVal;
 		}
-
+		// 没有缓存操作，直接返回方法真实调用
 		return invoker.invoke();
 	}
 
@@ -232,6 +253,7 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			boolean log = logger.isTraceEnabled();
 			for (CacheOperationContext context : evictions) {
 				CacheEvictOperation evictOp = (CacheEvictOperation) context.operation;
+				// 调用前清除缓存或者调用后清除缓存
 				if (beforeInvocation == evictOp.isBeforeInvocation()) {
 					if (context.isConditionPassing(result)) {
 						// for each cache
@@ -239,7 +261,9 @@ public abstract class CacheAspectSupport implements InitializingBean {
 						Object key = null;
 						for (Cache cache : context.getCaches()) {
 							// cache-wide flush
+							// 整个缓存都要清除
 							if (evictOp.isCacheWide()) {
+								// 清除缓存中所有数据
 								cache.clear();
 								if (log) {
 									logger.trace("Invalidating entire cache for operation " + evictOp + " on method " + context.method);
@@ -253,6 +277,7 @@ public abstract class CacheAspectSupport implements InitializingBean {
 								if (log) {
 									logger.trace("Invalidating cache key " + key + " for operation " + evictOp + " on method " + context.method);
 								}
+								// 清除指定key对应的缓存
 								cache.evict(key);
 							}
 						}
@@ -291,7 +316,9 @@ public abstract class CacheAspectSupport implements InitializingBean {
 					// check whether the cache needs to be inspected or not (the method will be invoked anyway)
 					if (!cacheHit) {
 						for (Cache cache : context.getCaches()) {
+							// 从对应的缓存中获取缓存的结果
 							Cache.ValueWrapper wrapper = cache.get(key);
+							// 命中缓存，可以返回获取到的缓存值
 							if (wrapper != null) {
 								retVal = wrapper.get();
 								cacheHit = true;
@@ -308,6 +335,7 @@ public abstract class CacheAspectSupport implements InitializingBean {
 			}
 
 			// return a status only if at least one cacheable matched
+			// 至少有一个命中了缓存
 			if (atLeastOnePassed) {
 				return new CacheStatus(cacheUpdates, !cacheHit, retVal);
 			}
@@ -346,18 +374,30 @@ public abstract class CacheAspectSupport implements InitializingBean {
 	private void update(Map<CacheOperationContext, Object> updates, Object retVal) {
 		for (Map.Entry<CacheOperationContext, Object> entry : updates.entrySet()) {
 			CacheOperationContext operationContext = entry.getKey();
+			// 判断是否可以放进缓存里，根据配置的unless来判断
 			if (operationContext.canPutToCache(retVal)) {
 				for (Cache cache : operationContext.getCaches()) {
+					// 放到缓存里
 					cache.put(entry.getValue(), retVal);
 				}
 			}
 		}
 	}
 
+	/**
+	 * 创建缓存操作上线问
+	 * @param cacheOperations 方法对应的缓存操作集合
+	 * @param method 使用缓存的方法
+	 * @param args 方法的参数
+	 * @param target 目标对象
+	 * @param targetClass 目标类
+	 * @return
+	 */
 	private Map<String, Collection<CacheOperationContext>> createOperationContext(
 			Collection<CacheOperation> cacheOperations, Method method, Object[] args, Object target, Class<?> targetClass) {
 
 		Map<String, Collection<CacheOperationContext>> result = new LinkedHashMap<String, Collection<CacheOperationContext>>(3);
+		// 将缓存操作分类，分为cacheable、evict、update三类
 		Collection<CacheOperationContext> cacheables = new ArrayList<CacheOperationContext>();
 		Collection<CacheOperationContext> evicts = new ArrayList<CacheOperationContext>();
 		Collection<CacheOperationContext> updates = new ArrayList<CacheOperationContext>();

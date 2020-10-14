@@ -44,6 +44,7 @@ import org.springframework.context.annotation.AnnotationConfigUtils;
  *
  * @author Costin Leau
  * @since 3.1
+ * 解析<cache:annotation-driven/>
  */
 class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -60,6 +61,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 		}
 		else {
 			// mode="proxy"
+			// 基于自动代理
 			AopAutoProxyConfigurer.configureAutoProxyCreator(element, parserContext);
 		}
 
@@ -98,27 +100,33 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 	private static class AopAutoProxyConfigurer {
 
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
+			// 注册一个自动代理创建器：InfrastructureAdvisorAutoProxyCreator
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
 			if (!parserContext.getRegistry().containsBeanDefinition(AnnotationConfigUtils.CACHE_ADVISOR_BEAN_NAME)) {
 				Object eleSource = parserContext.extractSource(element);
 
 				// Create the CacheOperationSource definition.
+				// 创建一个CacheOperationSource
 				RootBeanDefinition sourceDef = new RootBeanDefinition("org.springframework.cache.annotation.AnnotationCacheOperationSource");
 				sourceDef.setSource(eleSource);
 				sourceDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
 
 				// Create the CacheInterceptor definition.
+				// 创建CacheInterceptor
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+				// 解析cacheManager
 				parseCacheManagerProperty(element, interceptorDef);
+				// keyGenerator
 				CacheNamespaceHandler.parseKeyGenerator(element, interceptorDef);
 				interceptorDef.getPropertyValues().add("cacheOperationSources", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
 				// Create the CacheAdvisor definition.
+				// 创建一个BeanFactoryCacheOperationSourceAdvisor
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryCacheOperationSourceAdvisor.class);
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);

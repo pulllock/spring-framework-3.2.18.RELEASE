@@ -37,6 +37,7 @@ import org.aopalliance.intercept.MethodInvocation;
  * @author Costin Leau
  * @author Juergen Hoeller
  * @since 3.1
+ * Spring Cache拦截器
  */
 @SuppressWarnings("serial")
 public class CacheInterceptor extends CacheAspectSupport implements MethodInterceptor, Serializable {
@@ -50,11 +51,13 @@ public class CacheInterceptor extends CacheAspectSupport implements MethodInterc
 	}
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
+		// 使用缓存的方法
 		Method method = invocation.getMethod();
 
 		Invoker aopAllianceInvoker = new Invoker() {
 			public Object invoke() {
 				try {
+					// 未命中缓存，或者不匹配条件的话，需要执行方法的真实逻辑
 					return invocation.proceed();
 				} catch (Throwable ex) {
 					throw new ThrowableWrapper(ex);
@@ -63,6 +66,7 @@ public class CacheInterceptor extends CacheAspectSupport implements MethodInterc
 		};
 
 		try {
+			// 执行缓存相关操作
 			return execute(aopAllianceInvoker, invocation.getThis(), method, invocation.getArguments());
 		} catch (ThrowableWrapper th) {
 			throw th.original;
