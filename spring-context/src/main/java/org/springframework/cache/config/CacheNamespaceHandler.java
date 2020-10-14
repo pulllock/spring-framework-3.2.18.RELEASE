@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
  *
  * @author Costin Leau
  * @since 3.1
+ * 注册<cache:annotation-driven/>和<cache:advice/>的解析器
  */
 public class CacheNamespaceHandler extends NamespaceHandlerSupport {
 

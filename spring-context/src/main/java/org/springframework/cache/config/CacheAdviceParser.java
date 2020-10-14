@@ -45,6 +45,7 @@ import org.w3c.dom.Element;
  *
  * @author Costin Leau
  * @author Phillip Webb
+ * 解析<cache:advice/>
  */
 class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 
@@ -118,12 +119,16 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		// cacheManager解析，默认名字是cacheManager
 		builder.addPropertyReference("cacheManager", CacheNamespaceHandler.extractCacheManager(element));
+		// 解析key-generator
 		CacheNamespaceHandler.parseKeyGenerator(element, builder.getBeanDefinition());
 
+		// 解析<cache:caching/>
 		List<Element> cacheDefs = DomUtils.getChildElementsByTagName(element, DEFS_ELEMENT);
 		if (cacheDefs.size() >= 1) {
 			// Using attributes source.
+			// 下面会挨个<cache:caching/>进行解析
 			List<RootBeanDefinition> attributeSourceDefinitions = parseDefinitionsSources(cacheDefs, parserContext);
 			builder.addPropertyValue("cacheOperationSources", attributeSourceDefinitions);
 		} else {
@@ -137,6 +142,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 		ManagedList<RootBeanDefinition> defs = new ManagedList<RootBeanDefinition>(definitions.size());
 
 		// extract default param for the definition
+		// 遍历<cache:caching/>解析
 		for (Element element : definitions) {
 			defs.add(parseDefinitionSource(element, parserContext));
 		}
@@ -148,18 +154,24 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 		Props prop = new Props(definition);
 		// add cacheable first
 
+		// 用来存储缓存操作，比如：cacheable、cache-evict、cache-put等操作
 		ManagedMap<TypedStringValue, Collection<CacheOperation>> cacheOpMap = new ManagedMap<TypedStringValue, Collection<CacheOperation>>();
 		cacheOpMap.setSource(parserContext.extractSource(definition));
 
+		// 解析<cache:cacheable/>
 		List<Element> cacheableCacheMethods = DomUtils.getChildElementsByTagName(definition, CACHEABLE_ELEMENT);
 
 		for (Element opElement : cacheableCacheMethods) {
+			// method属性
 			String name = prop.merge(opElement, parserContext.getReaderContext());
 			TypedStringValue nameHolder = new TypedStringValue(name);
 			nameHolder.setSource(parserContext.extractSource(opElement));
+			// cache, key, condition属性
 			CacheableOperation op = prop.merge(opElement, parserContext.getReaderContext(), new CacheableOperation());
+			// unless属性
 			op.setUnless(getAttributeValue(opElement, "unless", ""));
 
+			// map中不存在就加进去
 			Collection<CacheOperation> col = cacheOpMap.get(nameHolder);
 			if (col == null) {
 				col = new ArrayList<CacheOperation>(2);
@@ -168,6 +180,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 			col.add(op);
 		}
 
+		// 解析<cache:cache-evict/>
 		List<Element> evictCacheMethods = DomUtils.getChildElementsByTagName(definition, CACHE_EVICT_ELEMENT);
 
 		for (Element opElement : evictCacheMethods) {
@@ -194,6 +207,7 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 			col.add(op);
 		}
 
+		// 解析<cache:cache-put/>
 		List<Element> putCacheMethods = DomUtils.getChildElementsByTagName(definition, CACHE_PUT_ELEMENT);
 
 		for (Element opElement : putCacheMethods) {
@@ -211,8 +225,10 @@ class CacheAdviceParser extends AbstractSingleBeanDefinitionParser {
 			col.add(op);
 		}
 
+		// NameMatchCacheOperationSource类型的Bean定义
 		RootBeanDefinition attributeSourceDefinition = new RootBeanDefinition(NameMatchCacheOperationSource.class);
 		attributeSourceDefinition.setSource(parserContext.extractSource(definition));
+		// 所有缓存操作放到nameMap中
 		attributeSourceDefinition.getPropertyValues().add("nameMap", cacheOpMap);
 		return attributeSourceDefinition;
 	}

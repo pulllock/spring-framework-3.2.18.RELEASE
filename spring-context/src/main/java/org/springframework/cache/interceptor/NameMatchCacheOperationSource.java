@@ -42,7 +42,11 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 	 */
 	protected static final Log logger = LogFactory.getLog(NameMatchCacheOperationSource.class);
 
-	/** Keys are method names; values are TransactionAttributes */
+	/**
+	 *  Keys are method names; values are TransactionAttributes
+	 * 缓存操作方法的元数据，在BeanDefinition解析的时候设置到这里
+	 * key是方法名字
+	 */
 	private Map<String, Collection<CacheOperation>> nameMap = new LinkedHashMap<String, Collection<CacheOperation>>();
 
 	/**
@@ -73,7 +77,9 @@ public class NameMatchCacheOperationSource implements CacheOperationSource, Seri
 
 	public Collection<CacheOperation> getCacheOperations(Method method, Class<?> targetClass) {
 		// look for direct name match
+		// 操作缓存的方法名
 		String methodName = method.getName();
+		// 从缓存中根据方法名字获取该方法对应的缓存操作
 		Collection<CacheOperation> ops = this.nameMap.get(methodName);
 
 		if (ops == null) {
