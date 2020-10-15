@@ -37,12 +37,20 @@ import org.springframework.context.annotation.Role;
 @Configuration
 public class ProxyCachingConfiguration extends AbstractCachingConfiguration {
 
+	/**
+	 * 注册一个Advisor到容器中，BeanFactoryCacheOperationSourceAdvisor，缓存操作对应的Advisor
+	 * 在Spring AOP创建代理的时候，会解析该Advisor，该Advisor中有个PointCut：CacheOperationSourcePointcut
+	 * 如果对应方法匹配到这个PointCut（同时也会解析缓存相关注解），则进行缓存相关代理创建
+	 * @return
+	 */
 	@Bean(name = AnnotationConfigUtils.CACHE_ADVISOR_BEAN_NAME)
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	public BeanFactoryCacheOperationSourceAdvisor cacheAdvisor() {
 		BeanFactoryCacheOperationSourceAdvisor advisor =
 				new BeanFactoryCacheOperationSourceAdvisor();
+		// AnnotationCacheOperationSource
 		advisor.setCacheOperationSource(cacheOperationSource());
+		// CacheInterceptor
 		advisor.setAdvice(cacheInterceptor());
 		advisor.setOrder(this.enableCaching.<Integer>getNumber("order"));
 		return advisor;
@@ -59,9 +67,11 @@ public class ProxyCachingConfiguration extends AbstractCachingConfiguration {
 	public CacheInterceptor cacheInterceptor() {
 		CacheInterceptor interceptor = new CacheInterceptor();
 		interceptor.setCacheOperationSources(cacheOperationSource());
+		// 缓存管理器
 		if (this.cacheManager != null) {
 			interceptor.setCacheManager(this.cacheManager);
 		}
+		// key生成器
 		if (this.keyGenerator != null) {
 			interceptor.setKeyGenerator(this.keyGenerator);
 		}
