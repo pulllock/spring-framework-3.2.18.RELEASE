@@ -223,6 +223,7 @@ public abstract class AopUtils {
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {
 			    // 使用methodMatcher匹配方法
+				// 缓存相关的是CacheOperationSourcePointcut
 				if ((introductionAwareMethodMatcher != null &&
 						introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions)) ||
 						methodMatcher.matches(method, targetClass)) {
@@ -267,6 +268,11 @@ public abstract class AopUtils {
 		else if (advisor instanceof PointcutAdvisor) {
 			// 普通类型的通知器
 			PointcutAdvisor pca = (PointcutAdvisor) advisor;
+			/**
+			 * 缓存相关的注解是在这里进行解析的
+			 * 缓存对应的Advisor是BeanFactoryCacheOperationSourceAdvisor
+			 * pointCut是CacheOperationSourcePointcut，对应的CacheOperationSource实现是AnnotationCacheOperationSource
+			 */
 			return canApply(pca.getPointcut(), targetClass, hasIntroductions);
 		}
 		else {

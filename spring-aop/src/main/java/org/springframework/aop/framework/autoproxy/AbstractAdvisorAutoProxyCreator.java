@@ -89,11 +89,15 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class beanClass, String beanName) {
 		// 获取所有的候选增强器，也就是从容器中查找所有类型是Advisor的Bean
+		// 缓存有关的BeanFactoryCacheOperationSourceAdvisor也会被查找到
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		/**
 		 * 上面找到了所有的Advisor类型的Bean，下面需要找适合当前bean的Advisor
 		 * 获取适用于beanClass的增强器Advisor，并应用
 		 * 通过ClassFilter和MethodMatcher对目标类和方法进行匹配
+		 *
+		 * 缓存相关的注解是在这一步进行解析的，缓存相关的Advisor是BeanFactoryCacheOperationSourceAdvisor
+		 *
 		 */
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		// 留给子类实现，筛选出通知器列表

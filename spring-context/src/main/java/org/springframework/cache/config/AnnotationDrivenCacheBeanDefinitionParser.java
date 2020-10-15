@@ -100,21 +100,26 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 	private static class AopAutoProxyConfigurer {
 
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
-			// 注册一个自动代理创建器：InfrastructureAdvisorAutoProxyCreator
+			// 注册一个自动代理创建器：InfrastructureAdvisorAutoProxyCreator，
+			// 这个自动代理创建器用来创建Spring内部的一些自动代理，比如缓存的代理
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
 			if (!parserContext.getRegistry().containsBeanDefinition(AnnotationConfigUtils.CACHE_ADVISOR_BEAN_NAME)) {
 				Object eleSource = parserContext.extractSource(element);
 
 				// Create the CacheOperationSource definition.
-				// 创建一个CacheOperationSource
+				/**
+				 * 创建一个CacheOperationSource，类型是AnnotationCacheOperationSource
+				 * AnnotationCacheOperationSource在实例化的时候会添加一个SpringCacheAnnotationParser到annotationParsers集合中去
+				 * SpringCacheAnnotationParser用来解析缓存相关注解
+				 */
 				RootBeanDefinition sourceDef = new RootBeanDefinition("org.springframework.cache.annotation.AnnotationCacheOperationSource");
 				sourceDef.setSource(eleSource);
 				sourceDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
 
 				// Create the CacheInterceptor definition.
-				// 创建CacheInterceptor
+				// 创建CacheInterceptor，缓存方法执行的时候，会被该拦截器拦截，这里面做缓存相关操作
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -126,7 +131,7 @@ class AnnotationDrivenCacheBeanDefinitionParser implements BeanDefinitionParser 
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
 				// Create the CacheAdvisor definition.
-				// 创建一个BeanFactoryCacheOperationSourceAdvisor
+				// 创建一个BeanFactoryCacheOperationSourceAdvisor，Advisor会在aop查找advisor的时候被用到
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryCacheOperationSourceAdvisor.class);
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
