@@ -45,31 +45,39 @@ public class SpringCacheAnnotationParser implements CacheAnnotationParser, Seria
 	public Collection<CacheOperation> parseCacheAnnotations(AnnotatedElement ae) {
 		Collection<CacheOperation> ops = null;
 
+		// Cacheable注解
 		Collection<Cacheable> cacheables = getAnnotations(ae, Cacheable.class);
 		if (cacheables != null) {
 			ops = lazyInit(ops);
 			for (Cacheable cacheable : cacheables) {
+				// 封装成CacheableOperation
 				ops.add(parseCacheableAnnotation(ae, cacheable));
 			}
 		}
+		// CacheEvict注解
 		Collection<CacheEvict> evicts = getAnnotations(ae, CacheEvict.class);
 		if (evicts != null) {
 			ops = lazyInit(ops);
 			for (CacheEvict evict : evicts) {
+				// 封装成CacheableOperation
 				ops.add(parseEvictAnnotation(ae, evict));
 			}
 		}
+		// CachePut注解
 		Collection<CachePut> puts = getAnnotations(ae, CachePut.class);
 		if (puts != null) {
 			ops = lazyInit(ops);
 			for (CachePut put : puts) {
+				// 封装成CacheableOperation
 				ops.add(parsePutAnnotation(ae, put));
 			}
 		}
+		// Caching注解
 		Collection<Caching> cachings = getAnnotations(ae, Caching.class);
 		if (cachings != null) {
 			ops = lazyInit(ops);
 			for (Caching caching : cachings) {
+				// 将Caching注解中的Cacheable、CacheEvict、CachePut分别封装成CacheableOperation
 				Collection<CacheOperation> cachingOps = parseCachingAnnotation(ae, caching);
 				if (cachingOps != null) {
 					ops.addAll(cachingOps);

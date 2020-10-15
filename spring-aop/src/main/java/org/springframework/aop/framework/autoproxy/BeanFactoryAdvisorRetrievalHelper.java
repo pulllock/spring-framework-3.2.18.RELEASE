@@ -84,6 +84,12 @@ public class BeanFactoryAdvisorRetrievalHelper {
 
 		List<Advisor> advisors = new LinkedList<Advisor>();
 		for (String name : advisorNames) {
+			/**
+			 * 判断是否是需要的Bean
+			 * InfrastructureAdvisorAutoProxyCreator会判断Bean在容器中存在，
+			 * 并且角色是内部使用：ROLE_INFRASTRUCTURE
+			 * 缓存相关的Bean是内部使用
+			 */
 			if (isEligibleBean(name)) {
 				// 忽略正在创建中的bean
 				if (this.beanFactory.isCurrentlyInCreation(name)) {

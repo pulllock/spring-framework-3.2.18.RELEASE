@@ -29,12 +29,16 @@ import org.springframework.util.ObjectUtils;
  *
  * @author Costin Leau
  * @since 3.1
+ * 缓存操作相关的Pointcut
  */
 @SuppressWarnings("serial")
 abstract class CacheOperationSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 	public boolean matches(Method method, Class<?> targetClass) {
+		// 获取CacheOperationSource，一个实现是AnnotationCacheOperationSource，
+		// 在AnnotationDrivenCacheBeanDefinitionParser中注册的
 		CacheOperationSource cas = getCacheOperationSource();
+		// 对应方法上获取缓存相关的注解，如果获取到了，返回true，表示匹配到了
 		return (cas != null && !CollectionUtils.isEmpty(cas.getCacheOperations(method, targetClass)));
 	}
 

@@ -48,6 +48,9 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 
 	private final boolean publicMethodsOnly;
 
+	/**
+	 * AnnotationCacheOperationSource在实例化的时候会添加一个SpringCacheAnnotationParser到annotationParsers集合中去
+	 */
 	private final Set<CacheAnnotationParser> annotationParsers;
 
 
@@ -127,7 +130,9 @@ public class AnnotationCacheOperationSource extends AbstractFallbackCacheOperati
 	 */
 	protected Collection<CacheOperation> determineCacheOperations(AnnotatedElement ae) {
 		Collection<CacheOperation> ops = null;
+		// AnnotationCacheOperationSource在实例化的时候会添加一个SpringCacheAnnotationParser到annotationParsers集合中去
 		for (CacheAnnotationParser annotationParser : this.annotationParsers) {
+			// SpringCacheAnnotationParser来解析缓存相关的注解
 			Collection<CacheOperation> annOps = annotationParser.parseCacheAnnotations(ae);
 			if (annOps != null) {
 				if (ops == null) {
