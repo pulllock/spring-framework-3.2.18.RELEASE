@@ -23,13 +23,14 @@ package org.springframework.beans;
  * @author Juergen Hoeller
  * @since 2.0
  *
- * Bean元对象持有的配置元素可以通过getSource方法获取
+ * Bean元数据
  */
 public interface BeanMetadataElement {
 
 	/**
 	 * Return the configuration source {@code Object} for this metadata element
 	 * (may be {@code null}).
+	 * 返回Bean的配置源，比如Bean是User类，则返回User.class全路径
 	 */
 	Object getSource();
 

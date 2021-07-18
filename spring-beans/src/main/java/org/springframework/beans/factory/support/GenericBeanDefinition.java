@@ -34,6 +34,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
  * @see #setParentName
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
+ * 可替换掉RootBeanDefinition和ChildBeanDefinition。
+ * RootBeanDefinition和ChildBeanDefinition定义了层级关系，使用不够灵活，如果定义了一个BeanDefinition为
+ * RootBeanDefinition，则后续再也不能设置它的parent。
+ *
+ * 如果将一个Bean设置为GenericBeanDefinition则可以任意设置parent。
  */
 @SuppressWarnings("serial")
 public class GenericBeanDefinition extends AbstractBeanDefinition {
