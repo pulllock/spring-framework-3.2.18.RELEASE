@@ -44,7 +44,9 @@ import org.springframework.util.Assert;
  * @author Juergen Hoeller
  * @see GenericBeanDefinition
  * @see ChildBeanDefinition
- * 如果配置文件中定义了父bean和子bean，则父bean用RootBeanDefinition表示，子bean用ChildBeanDefinition表示，没有父bean的话使用RootBeanDefinition表示
+ * 如果配置文件中定义了父bean和子bean，则父bean用RootBeanDefinition表示，子bean用ChildBeanDefinition表示，
+ * 没有父bean的话使用RootBeanDefinition表示。
+ * 后续使用GenericBeanDefinition替代。
  */
 @SuppressWarnings("serial")
 public class RootBeanDefinition extends AbstractBeanDefinition {

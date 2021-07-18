@@ -28,6 +28,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * @since 2.5
  * @see AnnotatedGenericBeanDefinition
  * @see org.springframework.core.type.AnnotationMetadata
+ * 注解类型的BeanDefinition，拥有获取注解元数据的能力
  */
 public interface AnnotatedBeanDefinition extends BeanDefinition {
 

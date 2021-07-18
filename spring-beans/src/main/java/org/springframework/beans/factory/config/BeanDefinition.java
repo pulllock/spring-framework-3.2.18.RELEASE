@@ -35,11 +35,8 @@ import org.springframework.core.AttributeAccessor;
  * @see ConfigurableListableBeanFactory#getBeanDefinition
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
- * BeanDefinition中保存了我们的Bean信息，比如：
- * 这个Bean指向的是哪个类
- * 是否是单例的
- * 是否懒加载
- * 这个Bean依赖了哪些Bean等等。
+ * BeanDefinition，Bean的定义，存储一个Bean最原始的数据。可理解为从XML（或其它）配置文件中
+ * 读取到的元数据。
  */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
@@ -53,6 +50,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Scope identifier for the standard singleton scope: "singleton".
 	 * <p>Note that extended bean factories might support further scopes.
 	 * @see #setScope
+	 * 单例模式
 	 */
 	String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
 
@@ -60,6 +58,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Scope identifier for the standard prototype scope: "prototype".
 	 * <p>Note that extended bean factories might support further scopes.
 	 * @see #setScope
+	 * 原型模式
 	 */
 	String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
@@ -67,6 +66,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Role hint indicating that a {@code BeanDefinition} is a major part
 	 * of the application. Typically corresponds to a user-defined bean.
+	 * 表示这个Bean是用户自定义的Bean
 	 */
 	int ROLE_APPLICATION = 0;
 
@@ -78,6 +78,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * of when looking more closely at a particular
 	 * {@link org.springframework.beans.factory.parsing.ComponentDefinition},
 	 * but not when looking at the overall configuration of an application.
+	 * 表示这个Bean是某些复杂配置的支撑部分
 	 */
 	int ROLE_SUPPORT = 1;
 
@@ -86,6 +87,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * entirely background role and has no relevance to the end-user. This hint is
 	 * used when registering beans that are completely part of the internal workings
 	 * of a {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
+	 * 表示一个Bean是Spring内部的Bean
 	 */
 	int ROLE_INFRASTRUCTURE = 2;
 
@@ -99,6 +101,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Set the name of the parent definition of this bean definition, if any.
 	 * 设置父Bean
 	 * 涉及到Bean的继承，继承父Bean的配置信息
+	 * 对应xml中的<bean parent=""></bean>
 	 */
 	void setParentName(String parentName);
 
@@ -116,6 +119,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * <p>The class name can be modified during bean factory post-processing,
 	 * typically replacing the original class name with a parsed variant of it.
 	 * 设置Bean的类名称，将来要通过反射来生成实例
+	 * 对应xml中的<bean class=""></bean>
 	 */
 	void setBeanClassName(String beanClassName);
 
@@ -128,6 +132,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Specify the factory bean to use, if any.
 	 * 如果该Bean采用工厂方法生成，指定工厂名称。
 	 * 有些实例不是用反射生成的，而是用工厂模式生成的、
+	 * 对应xml中的<bean factory-bean=""></bean>
 	 */
 	void setFactoryBeanName(String factoryBeanName);
 
@@ -145,6 +150,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * or {@code null} if normal constructor creation should be used
 	 * @see #getBeanClassName()
 	 * 指定工厂类中年的 工厂方法名称
+	 * 对应xml中的<bean factory-method=""></bean>
 	 */
 	void setFactoryMethodName(String factoryMethodName);
 
