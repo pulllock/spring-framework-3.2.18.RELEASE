@@ -52,6 +52,7 @@ import org.springframework.beans.BeansException;
  * @since 16 April 2001
  * @see HierarchicalBeanFactory
  * @see BeanFactoryUtils
+ * 支持迭代容器中的Bean对象
  */
 public interface ListableBeanFactory extends BeanFactory {
 
