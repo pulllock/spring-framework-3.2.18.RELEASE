@@ -54,10 +54,14 @@ import org.springframework.util.StringUtils;
  * @author Juergen Hoeller
  * @since 06.01.2003
  * @see DefaultListableBeanFactory
+ * 只支持单例的Bean，不支持原型Bean
  */
 public class StaticListableBeanFactory implements ListableBeanFactory {
 
-	/** Map from bean name to bean instance */
+	/**
+	 * Map from bean name to bean instance
+	 * bean名字和bean实例映射关系
+	 */
 	private final Map<String, Object> beans = new HashMap<String, Object>();
 
 
@@ -78,6 +82,7 @@ public class StaticListableBeanFactory implements ListableBeanFactory {
 
 	public Object getBean(String name) throws BeansException {
 		String beanName = BeanFactoryUtils.transformedBeanName(name);
+		// 从保存Bean实例的map中获取
 		Object bean = this.beans.get(beanName);
 
 		if (bean == null) {
@@ -91,6 +96,7 @@ public class StaticListableBeanFactory implements ListableBeanFactory {
 			throw new BeanIsNotAFactoryException(beanName, bean.getClass());
 		}
 
+		// FactoryBean类型的Bean需要通过getObject来获取具体的Bean实例
 		if (bean instanceof FactoryBean && !BeanFactoryUtils.isFactoryDereference(name)) {
 			try {
 				return ((FactoryBean<?>) bean).getObject();
@@ -200,6 +206,7 @@ public class StaticListableBeanFactory implements ListableBeanFactory {
 	public String[] getBeanNamesForType(Class<?> type, boolean includeNonSingletons, boolean includeFactoryBeans) {
 		boolean isFactoryType = (type != null && FactoryBean.class.isAssignableFrom(type));
 		List<String> matches = new ArrayList<String>();
+		// 遍历beans这个map，找匹配类型的Bean实例的名字
 		for (String name : this.beans.keySet()) {
 			Object beanInstance = this.beans.get(name);
 			if (beanInstance instanceof FactoryBean && !isFactoryType) {

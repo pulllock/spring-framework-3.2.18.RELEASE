@@ -29,7 +29,7 @@ package org.springframework.beans.factory.config;
  * @see ConfigurableBeanFactory
  * @see org.springframework.beans.factory.support.DefaultSingletonBeanRegistry
  * @see org.springframework.beans.factory.support.AbstractBeanFactory
- * 单例类注册
+ * 单例Bean注册
  */
 public interface SingletonBeanRegistry {
 

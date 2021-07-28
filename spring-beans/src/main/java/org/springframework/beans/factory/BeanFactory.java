@@ -107,6 +107,7 @@ import org.springframework.beans.BeansException;
  * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessAfterInitialization
  * @see DisposableBean#destroy
  * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
+ * Bean工厂，Bean的容器
  */
 public interface BeanFactory {
 
