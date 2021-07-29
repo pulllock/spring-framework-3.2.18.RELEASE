@@ -185,9 +185,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/** Security context used when running with a SecurityManager */
 	private SecurityContextProvider securityContextProvider;
 
-	/** Map from bean name to merged RootBeanDefinition
+	/**
+	 * Map from bean name to merged RootBeanDefinition
 	 * 合并的RootBeanDefinition的缓存，key是beanName
-	 * */
+	 */
 	private final Map<String, RootBeanDefinition> mergedBeanDefinitions =
 			new ConcurrentHashMap<String, RootBeanDefinition>(64);
 
