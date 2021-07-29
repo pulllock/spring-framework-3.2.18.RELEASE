@@ -88,7 +88,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
 	public boolean isAlias(String name) {
-		//返回是否有包含指定名字的key
+		// 返回是否有包含指定名字的key
 		return this.aliasMap.containsKey(name);
 	}
 

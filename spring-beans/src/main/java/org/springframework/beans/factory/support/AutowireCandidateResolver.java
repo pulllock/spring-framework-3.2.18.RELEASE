@@ -26,6 +26,7 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 2.5
+ * 参考：https://www.cnblogs.com/binarylei/p/10428999.html
  */
 public interface AutowireCandidateResolver {
 

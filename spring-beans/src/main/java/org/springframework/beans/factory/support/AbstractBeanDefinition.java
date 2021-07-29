@@ -153,6 +153,17 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private String[] dependsOn;
 
+	/**
+	 * 如果一个接口定义AService有两个或者多个实现AServiceImpl1、AServiceImpl2、...，
+	 * 另外一个Bean的注入类型autoWire=byType，当这个Bean依赖AService的时候，就
+	 * 不知道该使用AService的哪个实现了，会抛异常出来。
+	 *
+	 * 如果想要不抛异常正常使用，则需要给AService的某些实现设置autowire-candidate=false，
+	 * 只保留一个实现的autowire-candidate=true，这样才能正常的将AService的实现按照
+	 * byType注入给需要的Bean。autowire-candidate默认为true。
+	 *
+	 * 如果有多个autowire-candidate=true，需要将其中一个的primary设置为true也可以。
+	 */
 	private boolean autowireCandidate = true;
 
 	private boolean primary = false;
