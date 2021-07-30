@@ -65,15 +65,20 @@ import org.springframework.context.ApplicationContextException;
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
-	// 是否允许同名bean定义覆盖
+	/**
+	 * 是否允许同名bean定义覆盖
+	 */
 	private Boolean allowBeanDefinitionOverriding;
 
-	// 是否允许循环依赖
+	/**
+	 * 是否允许循环依赖
+	 */
 	private Boolean allowCircularReferences;
 
-	/** Bean factory for this context
+	/**
+	 * Bean factory for this context
 	 * 当前上下文的BeanFactory
-	 * */
+	 */
 	private DefaultListableBeanFactory beanFactory;
 
 	/** Synchronization monitor for the internal BeanFactory */
@@ -134,19 +139,26 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			closeBeanFactory();
 		}
 		try {
-			// 初始化一个DefaultListableBeanFactory
+			/**
+			 * 初始化一个DefaultListableBeanFactory
+			 * 初始化的时候设置了几个要忽略自动注入依赖的接口：
+			 * ignoreDependencyInterface(BeanNameAware.class);
+			 * ignoreDependencyInterface(BeanFactoryAware.class);
+			 * ignoreDependencyInterface(BeanClassLoaderAware.class);
+			 */
+
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			// 设置序列化id，用于BeanFactory的序列化
 			beanFactory.setSerializationId(getId());
 			/**
 			 * 设置BeanFactory的两个配置属性：是否允许Bean覆盖；是否允许循环引用。
-			 * 设置@Autowire和@Qualifier注解解析器:QualifierAnnotationAutowireCandidateResolver
+			 * 设置一个自动候选解析器，当要注入一个依赖时，如果这个依赖有多个实现，需要解析出来哪个实现是可以注入的：QualifierAnnotationAutowireCandidateResolver
 			 */
 			customizeBeanFactory(beanFactory);
 
 			/**
-			 * 加载Bean到BeanFactory中
-			 * 初始化DocumentLoader，进行xml文件的读取和解析
+			 * 加载BeanDefinition到BeanFactory中
+			 * 初始化DocumentLoader，进行xml文件的读取和解析，解析成BeanDefinition添加到容器中
 			 * 经过此步骤之后，DefaultListableBeanFactory中已经包含了所有解析好的配置
 			 */
 			loadBeanDefinitions(beanFactory);
@@ -243,7 +255,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
-		// 设置@Autowire和@Qualifier注解解析器
+		// 设置一个自动候选解析器，当要注入一个依赖时，如果这个依赖有多个实现，需要解析出来哪个实现是可以注入的
 		beanFactory.setAutowireCandidateResolver(new QualifierAnnotationAutowireCandidateResolver());
 	}
 
