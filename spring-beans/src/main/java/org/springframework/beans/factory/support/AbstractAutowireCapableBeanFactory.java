@@ -170,7 +170,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Create a new AbstractAutowireCapableBeanFactory.
-	 * 这里忽略了三个依赖检查时的接口类型
+	 * 这里忽略了三个不需要自动注入依赖的接口，具体分析见注释：
+	 * org.springframework.beans.factory.config.ConfigurableListableBeanFactory#ignoreDependencyInterface(java.lang.Class)
 	 */
 	public AbstractAutowireCapableBeanFactory() {
 		super();
