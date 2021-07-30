@@ -36,37 +36,65 @@ import org.springframework.util.Assert;
  *
  * @author Juergen Hoeller
  * @since 2.5
- * 用来表示一个要被注入的依赖
+ * 用来表示一个要被注入的依赖，
+ * 用来包装一个构造方法参数的依赖、方法参数的依赖、字段的依赖
  */
 @SuppressWarnings("serial")
 public class DependencyDescriptor implements Serializable {
 
+	/**
+	 * 表示要被注入的方法参数
+	 */
 	private transient MethodParameter methodParameter;
 
 	/**
-	 * 要被注入的字段
+	 * 表示要被注入的字段
 	 */
 	private transient Field field;
 
 	/**
-	 * 被注入字段的类型
+	 * 表示要被注入的依赖所在的类
 	 */
 	private Class<?> declaringClass;
 
+	/**
+	 * 如果要被注入的依赖是一个方法的参数，这里是用来记录方法名称
+	 */
 	private String methodName;
 
+	/**
+	 * 如果要被注入的依赖是一个方法的参数，这里记录的是方法的参数类型
+	 */
 	private Class[] parameterTypes;
 
+	/**
+	 * 记录方法参数在方法参数类表中的索引
+	 */
 	private int parameterIndex;
 
+	/**
+	 * 如果要被注入的是一个字段，这里记录字段的名称
+	 */
 	private String fieldName;
 
+	/**
+	 * 依赖是否是必要的
+	 */
 	private final boolean required;
 
+	/**
+	 * 是否饥饿加载
+	 */
 	private final boolean eager;
 
+	/**
+	 * 嵌套级别
+	 */
 	private int nestingLevel = 1;
 
+	/**
+	 * 要被注入的字段上的注解信息
+	 */
 	private transient Annotation[] fieldAnnotations;
 
 

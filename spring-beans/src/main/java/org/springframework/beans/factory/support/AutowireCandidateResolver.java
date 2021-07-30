@@ -26,7 +26,11 @@ import org.springframework.beans.factory.config.DependencyDescriptor;
  * @author Mark Fisher
  * @author Juergen Hoeller
  * @since 2.5
- * 参考：https://www.cnblogs.com/binarylei/p/10428999.html
+ * 参考：
+ * - https://www.cnblogs.com/binarylei/p/10428999.html
+ * - https://www.codeleading.com/article/63212168577/
+ *
+ * 用来判断一个特定的BeanDefinition是否可以作为一个指定依赖的候选项
  */
 public interface AutowireCandidateResolver {
 
@@ -36,6 +40,8 @@ public interface AutowireCandidateResolver {
 	 * @param bdHolder the bean definition including bean name and aliases
 	 * @param descriptor the descriptor for the target method parameter or field
 	 * @return whether the bean definition qualifies as autowire candidate
+	 * 判断bdHolder是否可以作为descriptor依赖的候选项
+	 * DependencyDescriptor用来表示一个要被注入的依赖，对字段、方法、参数的封装。
 	 */
 	boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor);
 

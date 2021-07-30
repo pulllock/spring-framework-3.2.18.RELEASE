@@ -54,6 +54,7 @@ import org.springframework.util.StringUtils;
  * @see AutowireCandidateQualifier
  * @see Qualifier
  * @see Value
+ * 用来解析使用@Qualifier注解标注的自动注入候选依赖
  */
 public class QualifierAnnotationAutowireCandidateResolver implements AutowireCandidateResolver, BeanFactoryAware {
 
@@ -147,6 +148,7 @@ public class QualifierAnnotationAutowireCandidateResolver implements AutowireCan
 	 * @see Qualifier
 	 */
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
+		// 如果一个Bean设置了autowire-candidate=false，则这个Bean就不需要参与自动注入了
 		if (!bdHolder.getBeanDefinition().isAutowireCandidate()) {
 			// if explicitly false, do not proceed with qualifier check
 			return false;
