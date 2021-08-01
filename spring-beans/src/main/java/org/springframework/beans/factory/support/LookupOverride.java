@@ -29,6 +29,7 @@ import org.springframework.util.ObjectUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 1.1
+ * 一个单例Bean中调用一个原型Bean，会使用到lookup-method
  */
 public class LookupOverride extends MethodOverride {
 

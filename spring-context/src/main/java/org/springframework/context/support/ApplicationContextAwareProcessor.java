@@ -68,7 +68,14 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 		this.applicationContext = applicationContext;
 	}
 
-	// Bean实例化之前调用
+	/**
+	 * Bean实例化之前调用
+	 * 这里用来调用几个Aware接口实现
+	 * @param bean the new bean instance 已经实例化了的bean
+	 * @param beanName the name of the bean bean名字
+	 * @return
+	 * @throws BeansException
+	 */
 	public Object postProcessBeforeInitialization(final Object bean, String beanName) throws BeansException {
 		AccessControlContext acc = null;
 
@@ -88,7 +95,7 @@ class ApplicationContextAwareProcessor implements BeanPostProcessor {
 			}, acc);
 		}
 		else {
-			// 调动Aware相关接口
+			// 调用Aware相关接口
 			invokeAwareInterfaces(bean);
 		}
 

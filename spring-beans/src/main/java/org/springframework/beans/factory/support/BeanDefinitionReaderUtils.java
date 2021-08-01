@@ -98,7 +98,7 @@ public class BeanDefinitionReaderUtils {
 				generatedBeanName = definition.getParentName() + "$child";
 			}
 			else if (definition.getFactoryBeanName() != null) {
-				// FactorynBeanName$created
+				// FactoryBeanName$created
 				generatedBeanName = definition.getFactoryBeanName() + "$created";
 			}
 		}

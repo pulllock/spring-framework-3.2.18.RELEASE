@@ -33,6 +33,7 @@ import org.springframework.util.ObjectUtils;
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @since 1.1
+ * replace-method可以替换掉一个方法的逻辑
  */
 public class ReplaceOverride extends MethodOverride {
 
