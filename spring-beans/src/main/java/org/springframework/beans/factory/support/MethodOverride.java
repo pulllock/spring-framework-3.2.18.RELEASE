@@ -33,9 +33,14 @@ import org.springframework.util.ObjectUtils;
  * @author Juergen Hoeller
  * @author Sam Brannen
  * @since 1.1
+ * 表示一个要被替换的方法
+ * lookup-method和replace-method使用
  */
 public abstract class MethodOverride implements BeanMetadataElement {
 
+	/**
+	 * 要被替换的方法
+	 */
 	private final String methodName;
 
 	private boolean overloaded = true;

@@ -505,7 +505,7 @@ public class BeanDefinitionParserDelegate {
 								beanDefinition, this.readerContext.getRegistry(), true);
 					}
 					else {
-						// 生成唯一的beanname
+						// 生成唯一的beanName
 						beanName = this.readerContext.generateBeanName(beanDefinition);
 						// Register an alias for the plain bean class name, if still possible,
 						// if the generator returned the class name plus a suffix.
@@ -603,7 +603,7 @@ public class BeanDefinitionParserDelegate {
 			/**
 			 * 解析lookup-override子元素<lookup-method/>
 			 * 把一个方法声明为返回某种类型的Bean，但实际上要返回的Bean是在配置文件里配置的。
-			 * 可以用于设计一些可插拔的功能上，接触程序依赖
+			 * 可以用于设计一些可插拔的功能上，解除程序依赖
 			 */
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
 
@@ -700,7 +700,7 @@ public class BeanDefinitionParserDelegate {
 		String dependencyCheck = ele.getAttribute(DEPENDENCY_CHECK_ATTRIBUTE);
 		bd.setDependencyCheck(getDependencyCheck(dependencyCheck));
 
-		//depends-on属性
+		// depends-on属性
 		if (ele.hasAttribute(DEPENDS_ON_ATTRIBUTE)) {
 			String dependsOn = ele.getAttribute(DEPENDS_ON_ATTRIBUTE);
 			bd.setDependsOn(StringUtils.tokenizeToStringArray(dependsOn, MULTI_VALUE_ATTRIBUTE_DELIMITERS));
@@ -738,7 +738,7 @@ public class BeanDefinitionParserDelegate {
 			}
 		}
 
-		//destroy-method属性
+		// destroy-method属性
 		if (ele.hasAttribute(DESTROY_METHOD_ATTRIBUTE)) {
 			String destroyMethodName = ele.getAttribute(DESTROY_METHOD_ATTRIBUTE);
 			if (!"".equals(destroyMethodName)) {
@@ -797,7 +797,7 @@ public class BeanDefinitionParserDelegate {
 				/**
 				 * 添加到BeanMetadataAttributeAccessor中，BeanDefinition继承了AttributeAccessor, BeanMetadataElement
 				 * AbstractBeanDefinition继承了BeanMetadataAttributeAccessor
-				 * BeanMetadataAtrributeAccessor继承了AttributeAccessorSupport
+				 * BeanMetadataAttributeAccessor继承了AttributeAccessorSupport
 				 */
 				attributeAccessor.addMetadataAttribute(attribute);
 			}
@@ -945,7 +945,7 @@ public class BeanDefinitionParserDelegate {
 					}
 				}
 				replaceOverride.setSource(extractSource(replacedMethodEle));
-				// 添加到MehodOverrides属性中
+				// 添加到MethodOverrides属性中
 				overrides.addOverride(replaceOverride);
 			}
 		}
@@ -1614,7 +1614,12 @@ public class BeanDefinitionParserDelegate {
 		return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 	}
 
-	// 默认标签下的子节点有自定义属性，还需要再次对自定义标签进行解析
+	/**
+	 * 默认标签下的子节点有自定义属性，还需要再次对自定义标签进行解析
+	 * @param ele
+	 * @param definitionHolder
+	 * @return
+	 */
 	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele, BeanDefinitionHolder definitionHolder) {
 		return decorateBeanDefinitionIfRequired(ele, definitionHolder, null);
 	}

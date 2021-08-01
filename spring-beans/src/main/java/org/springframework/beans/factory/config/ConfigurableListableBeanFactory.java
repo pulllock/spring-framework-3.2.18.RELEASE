@@ -139,7 +139,11 @@ public interface ConfigurableListableBeanFactory
 	 * @param autowiredValue the corresponding autowired value. This may also be an
 	 * implementation of the {@link org.springframework.beans.factory.ObjectFactory}
 	 * interface, which allows for lazy resolution of the actual target value.
-	 * 注册一个特殊的依赖类型，同时指定注入的值
+	 *
+	 * 往容器中配置一些特殊的依赖注入规则，当需要依赖dependencyType这些类型的Bean时，就可以
+	 * 注入指定的autowiredValue对应的Bean。
+	 * 比如容器中有很多BeanFactory的实现，当容器需要注入一个BeanFactory类型的Bean时，需要选择哪个？
+	 * 容器就会选择使用通过registerResolvableDependency方法注册的autowiredValue这个Bean
 	 */
 	void registerResolvableDependency(Class<?> dependencyType, Object autowiredValue);
 

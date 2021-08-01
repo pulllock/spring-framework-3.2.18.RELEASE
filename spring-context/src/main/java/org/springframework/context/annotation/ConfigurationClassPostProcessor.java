@@ -88,7 +88,7 @@ import static org.springframework.context.annotation.AnnotationConfigUtils.*;
  * 用ConfigurationClassParser去解析
  *
  * ConfigurationClass 内部存储了配置类的注解信息、被@Bean注解的方法
- * 、@ImportResource注解的信息、ImportBeanDefinitionRegistar等
+ * 、@ImportResource注解的信息、ImportBeanDefinitionRegistrar等
  */
 public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPostProcessor,
 		Ordered, ResourceLoaderAware, BeanClassLoaderAware, EnvironmentAware {

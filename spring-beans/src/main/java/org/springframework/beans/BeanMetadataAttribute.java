@@ -25,6 +25,7 @@ import org.springframework.util.ObjectUtils;
  *
  * @author Juergen Hoeller
  * @since 2.5
+ * Bean的meta标签的表示，kv结构
  */
 public class BeanMetadataAttribute implements BeanMetadataElement {
 
