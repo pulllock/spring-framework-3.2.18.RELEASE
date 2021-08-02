@@ -41,6 +41,7 @@ import org.springframework.util.ClassUtils;
  * @author Rick Evans
  * @since 2.0
  * @see ConfigurableBeanFactory#registerScope
+ * 用来自定义scope
  */
 public class CustomScopeConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 

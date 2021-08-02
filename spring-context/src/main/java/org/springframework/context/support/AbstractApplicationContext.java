@@ -536,12 +536,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Invoke factory processors registered as beans in the context.
 				/**
 				 * 调用实现了BeanFactoryPostProcessor接口的各个实现类的
-				 * postProcessBeanFactory方法
+				 * postProcessBeanFactory方法。
 				 *
-				 * 这里调用ConfigurationClassPostProcessor的方法来解析@Configuration
-				 * 注解的类，就是解析注解方式的配置类
+				 * BeanDefinitionRegistryPostProcessor比BeanFactoryPostProcessor的执行时机要更早，
+				 * BeanDefinitionRegistryPostProcessor的实现是ConfigurationClassPostProcessor。
 				 *
-				 * PropertyPlaceholderConfigurer也是在这里被调用
+				 * ConfigurationClassPostProcessor来解析@Configuration注解的类，就是解析注解方式的配置类。
+				 *
+				 * PropertyPlaceholderConfigurer也是在这里被调用，用来处理${}占位符。
 				 */
 				invokeBeanFactoryPostProcessors(beanFactory);
 

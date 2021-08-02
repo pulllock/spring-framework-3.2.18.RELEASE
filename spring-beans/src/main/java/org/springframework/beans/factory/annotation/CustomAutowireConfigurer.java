@@ -45,6 +45,7 @@ import org.springframework.util.ClassUtils;
  * @author Juergen Hoeller
  * @since 2.5
  * @see org.springframework.beans.factory.annotation.Qualifier
+ * 允许自定义限定符注解类型，
  */
 public class CustomAutowireConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 

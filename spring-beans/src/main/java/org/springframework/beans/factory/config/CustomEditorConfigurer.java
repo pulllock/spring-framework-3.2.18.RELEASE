@@ -99,6 +99,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.validation.DataBinder#registerCustomEditor
  * @see org.springframework.web.servlet.mvc.BaseCommandController#setPropertyEditorRegistrars
  * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder
+ * 用来注册自定义的PropertyEditor
  */
 public class CustomEditorConfigurer implements BeanFactoryPostProcessor, BeanClassLoaderAware, Ordered {
 

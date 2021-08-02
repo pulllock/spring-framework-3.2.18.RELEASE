@@ -62,7 +62,10 @@ import org.springframework.util.StringValueResolver;
  * @see PropertyOverrideConfigurer
  * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
  * 3.1后可以用PropertySourcesPlaceholderConfigurer来替换这个类
- * 允许在XML配置文件中使用占位符并将这些占位符所代表的资源单独配置到简单的properties文件中来加载
+ *
+ * 允许在XML配置文件中使用${}占位符，这些占位符对应的值配置到properties文件中。
+ * PropertyPlaceholderConfigurer解析这些占位符并替换。
+ *
  */
 public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport {
 
