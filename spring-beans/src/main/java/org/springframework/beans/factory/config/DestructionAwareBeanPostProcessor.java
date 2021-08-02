@@ -26,6 +26,7 @@ import org.springframework.beans.BeansException;
  *
  * @author Juergen Hoeller
  * @since 1.0.1
+ * 在Spring容器销毁之前调用
  */
 public interface DestructionAwareBeanPostProcessor extends BeanPostProcessor {
 

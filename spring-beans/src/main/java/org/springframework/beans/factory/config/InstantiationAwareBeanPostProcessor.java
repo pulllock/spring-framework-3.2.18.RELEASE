@@ -42,10 +42,8 @@ import org.springframework.beans.PropertyValues;
  * @since 1.2
  * @see org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator#setCustomTargetSourceCreators
  * @see org.springframework.aop.framework.autoproxy.target.LazyInitTargetSourceCreator
- * 对bean的实例化做一些操作
- * 先执行自身的两个实例方法，再执行父接口的初始化方法
  *
- * 先实例化（本接口的方法），再初始化（父类接口的方法）
+ * 在Bean的实例化前后做一些操作，以及属性设置
  */
 public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 
@@ -69,16 +67,10 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#hasBeanClass
 	 * @see org.springframework.beans.factory.support.AbstractBeanDefinition#getFactoryMethodName
-	 * Bean实例化前调用
-	 * 返回的可能是一个代理，用来替换目标bean
+	 * Bean实例化前调用，这个时候目标对象还没有实例化，所以可以利用该方法的返回值来替换原来应该生成的目标对象的实例。
 	 *
-	 * 如果该方法返回一个不为null的对象，bean的创建过程就会断路，之后就只有BeanPostProcessor的
-	 * postProcessorAfterInitialization方法会被调用
-	 *
-	 * 在调用doCreateBean之前调用
-	 *
-	 * 该方法在对象实例化之前调用，可以在这里应用代理，来代替原来的Bean，
-	 * 如果这里bean被代替了，就只剩postProcessorAfterInitialization方法会被调用
+	 * 如果该方法返回一个不为null的对象，说明返回的对象代替了原本该生成的目标对象，之后的操作就只有BeanPostProcessor的
+	 * postProcessorAfterInitialization方法会被调用，其他的操作都不在被调用。
 	 */
 	Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
 
@@ -95,8 +87,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * Returning {@code false} will also prevent any subsequent InstantiationAwareBeanPostProcessor
 	 * instances being invoked on this bean instance.
 	 * @throws org.springframework.beans.BeansException in case of errors
-	 * Bean实例化之后调用
-	 * 这时候Bean已经被实例化，但是属性都还没被设置
+	 * Bean实例化之后调用，这时候Bean已经被实例化，但是属性都还没被设置，属性都是null。
+	 * 如果该方法返回false，则代表忽略属性值的设置；如果返回true，则表示正常进行属性设置
 	 */
 	boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
 
@@ -117,7 +109,9 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * to skip property population
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.MutablePropertyValues
-	 * 该方法可以对属性值进行修改，这个时候属性值还未被设置
+	 * 该方法可以对属性值进行修改，这个时候属性值还未被设置。如果postProcessAfterInstantiation返回false，则
+	 * 该方法不会被调用。
+	 *
 	 * 在AutowiredAnnotationBeanPostProcessor中用来注入被@Autowired等注解标注的元数据
 	 */
 	PropertyValues postProcessPropertyValues(
