@@ -60,9 +60,7 @@ import org.springframework.beans.factory.BeanInitializationException;
  * @since 12.03.2003
  * @see #convertPropertyValue
  * @see PropertyPlaceholderConfigurer
- * 允许我们使用占位符来明确表明bean定义中的property与properties文件中的各配置项之间的对应关系
- *
- * 可以覆盖任何bena中的任何属性
+ * 允许我们对容器中的Bean定义的属性进行覆盖替换
  */
 public class PropertyOverrideConfigurer extends PropertyResourceConfigurer {
 

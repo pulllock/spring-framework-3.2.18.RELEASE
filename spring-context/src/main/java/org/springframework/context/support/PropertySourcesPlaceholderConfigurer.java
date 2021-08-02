@@ -60,6 +60,7 @@ import org.springframework.util.StringValueResolver;
  * @see org.springframework.core.env.ConfigurableEnvironment
  * @see org.springframework.beans.factory.config.PlaceholderConfigurerSupport
  * @see org.springframework.beans.factory.config.PropertyPlaceholderConfigurer
+ * 用来解析${}占位符，Spring3.1之后建议使用PropertySourcesPlaceholderConfigurer
  */
 public class PropertySourcesPlaceholderConfigurer extends PlaceholderConfigurerSupport
 		implements EnvironmentAware {

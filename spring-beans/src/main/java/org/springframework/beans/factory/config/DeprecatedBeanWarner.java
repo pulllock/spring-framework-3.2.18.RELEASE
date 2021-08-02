@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Arjen Poutsma
  * @since 3.0.3
+ * 用来打印Deprecated注解的Bean
  */
 public class DeprecatedBeanWarner implements BeanFactoryPostProcessor {
 
