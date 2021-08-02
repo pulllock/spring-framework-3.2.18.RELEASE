@@ -39,8 +39,10 @@ import org.springframework.beans.BeansException;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  *
- * 可以在bean初始化前后做操作
- * bean后置处理器
+ * 在Bean实例化之后，并且属性设置之后，可在Bean的初始化之前和之后做一些操作。
+ * Bean已经被实例化，所有属性都已经注入。
+ *
+ * 这个接口中的两个方法的返回值可以是原先生成的实例Bean，或者是包装过的实例
  */
 public interface BeanPostProcessor {
 
@@ -55,7 +57,8 @@ public interface BeanPostProcessor {
 	 * {@code null}, no subsequent BeanPostProcessors will be invoked
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
-	 * bean初始化之前
+	 * bean初始化之前做一些操作，此时Bean已经实例化，对象已经生成，属性也已经设置过。
+	 * 该方法在afterPropertiesSet和init-method之前执行。
 	 */
 	Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
@@ -78,7 +81,8 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
-	 * bean初始化之后
+	 * bean初始化之后做一些操作，此时Bean已经实例化，对象已经生成，属性也已经设置过。
+	 * 该方法在afterPropertiesSet和init-method之后执行。
 	 */
 	Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException;
 
