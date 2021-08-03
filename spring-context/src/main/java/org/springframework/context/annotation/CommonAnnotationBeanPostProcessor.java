@@ -142,6 +142,8 @@ import org.springframework.util.StringUtils;
  * @see #setResourceFactory
  * @see org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
+ *
+ * 用来处理@Resource、@PostConstruct、@PreDestry等注解的实现
  */
 @SuppressWarnings("serial")
 public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBeanPostProcessor
@@ -175,6 +177,9 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 	private final Set<String> ignoredResourceTypes = new HashSet<String>(1);
 
+	/**
+	 * 如果不能根据name匹配，则默认退化到使用类型匹配
+	 */
 	private boolean fallbackToDefaultTypeMatch = true;
 
 	private boolean alwaysUseJndiLookup = false;
@@ -307,19 +312,49 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		}
 	}
 
+	/**
+	 * Bean实例化之前不做任何操作
+	 * @param beanClass the class of the bean to be instantiated
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
 		return null;
 	}
 
+	/**
+	 * Bean实例化之后不做任何操作
+	 * @param bean the bean instance created, with properties not having been set yet
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
 		return true;
 	}
 
+	/**
+	 * 该方法可以对属性值进行修改，这个时候属性值还未被设置，在实例化后的postProcessAfterInstantiation方法之后被调用。
+	 * 如果postProcessAfterInstantiation返回false，则该方法不会被调用。
+	 *
+	 * 会找出Bean中被@Resource注解标注的属性和方法，找到后注入到该Bean中去。
+	 *
+	 * @param pvs the property values that the factory is about to apply (never {@code null})
+	 * @param pds the relevant property descriptors for the target bean (with ignored
+	 * dependency types - which the factory handles specifically - already filtered out)
+	 * @param bean the bean instance created, but whose properties have not yet been set
+	 * @param beanName the name of the bean
+	 * @return
+	 * @throws BeansException
+	 */
 	public PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
 
+		// 从当前Bean中找到被@Resource注解标注的属性和方法
 		InjectionMetadata metadata = findResourceMetadata(beanName, bean.getClass(), pvs);
 		try {
+			// 将被@Resource注解标注的属性和方法注入到Bean中去
 			metadata.inject(bean, beanName, pvs);
 		}
 		catch (Throwable ex) {
@@ -342,11 +377,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 						metadata.clear(pvs);
 					}
 
+					// elements中包含了目标Bean所需要注入的字段和方法
 					LinkedList<InjectionMetadata.InjectedElement> elements = new LinkedList<InjectionMetadata.InjectedElement>();
 					Class<?> targetClass = clazz;
 
 					do {
 						LinkedList<InjectionMetadata.InjectedElement> currElements = new LinkedList<InjectionMetadata.InjectedElement>();
+						// 查找目标Bean中的每个属性
 						for (Field field : targetClass.getDeclaredFields()) {
 							if (webServiceRefClass != null && field.isAnnotationPresent(webServiceRefClass)) {
 								if (Modifier.isStatic(field.getModifiers())) {
@@ -360,15 +397,19 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 								}
 								currElements.add(new EjbRefElement(field, null));
 							}
+							// 如果字段是被@Resource注解的
 							else if (field.isAnnotationPresent(Resource.class)) {
+								// @Resource注解的字段不能是static类型的
 								if (Modifier.isStatic(field.getModifiers())) {
 									throw new IllegalStateException("@Resource annotation is not supported on static fields");
 								}
 								if (!ignoredResourceTypes.contains(field.getType().getName())) {
+									// 将被@Resource注解的字段封装成ResourceElement并加入到List中
 									currElements.add(new ResourceElement(field, null));
 								}
 							}
 						}
+						// 查找目标Bean中的每个方法
 						for (Method method : targetClass.getDeclaredMethods()) {
 							method = BridgeMethodResolver.findBridgedMethod(method);
 							Method mostSpecificMethod = BridgeMethodResolver.findBridgedMethod(ClassUtils.getMostSpecificMethod(method, clazz));
@@ -393,26 +434,34 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 									PropertyDescriptor pd = BeanUtils.findPropertyForMethod(method, clazz);
 									currElements.add(new EjbRefElement(method, pd));
 								}
+								// 如果方法被@Resource注解标注
 								else if (method.isAnnotationPresent(Resource.class)) {
+									// 被@Resource注解的方法不能是static类型
 									if (Modifier.isStatic(method.getModifiers())) {
 										throw new IllegalStateException("@Resource annotation is not supported on static methods");
 									}
+									// 被@Resource注解的方法的参数类型
 									Class<?>[] paramTypes = method.getParameterTypes();
+									// @Resource添加到方法的时候，方法参数只能有1个
 									if (paramTypes.length != 1) {
 										throw new IllegalStateException("@Resource annotation requires a single-arg method: " + method);
 									}
 									if (!ignoredResourceTypes.contains(paramTypes[0].getName())) {
+										// 找到方法对应的属性名，比如setAbc()就可以找到abc这个属性
 										PropertyDescriptor pd = BeanUtils.findPropertyForMethod(method, clazz);
+										// 将被@Resource注解的方法封装成ResourceElement并加入到List中
 										currElements.add(new ResourceElement(method, pd));
 									}
 								}
 							}
 						}
 						elements.addAll(0, currElements);
+						// 继续遍历目标Bean的父类
 						targetClass = targetClass.getSuperclass();
 					}
 					while (targetClass != null && targetClass != Object.class);
 
+					// 将目标Bean和需要注入的方法、属性封装成InjectionMetadata对象
 					metadata = new InjectionMetadata(clazz, elements);
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
@@ -423,10 +472,11 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 	/**
 	 * Obtain the resource object for the given name and type.
-	 * @param element the descriptor for the annotated field/method
+	 * @param element the descriptor for the annotated field/method 被@Resource注解的方法或者字段的描述
 	 * @param requestingBeanName the name of the requesting bean
 	 * @return the resource object (never {@code null})
 	 * @throws BeansException if we failed to obtain the target resource
+	 * 查找要被注入的对象
 	 */
 	protected Object getResource(LookupElement element, String requestingBeanName) throws BeansException {
 		if (StringUtils.hasLength(element.mappedName)) {
@@ -439,6 +489,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			throw new NoSuchBeanDefinitionException(element.lookupType,
 					"No resource factory configured - specify the 'resourceFactory' property");
 		}
+		// 从容器中查找要被注入的Bean对象
 		return autowireResource(this.resourceFactory, element, requestingBeanName);
 	}
 
@@ -450,6 +501,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	 * @param requestingBeanName the name of the requesting bean
 	 * @return the resource object (never {@code null})
 	 * @throws BeansException if we failed to obtain the target resource
+	 * 从容器中获取需要被注入的Bean
 	 */
 	protected Object autowireResource(BeanFactory factory, LookupElement element, String requestingBeanName)
 			throws BeansException {
@@ -458,14 +510,19 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		Set<String> autowiredBeanNames;
 		String name = element.name;
 
+		/**
+		 * 如果根据name找不到Bean，退化到使用autowire方式查找Bean
+		 */
 		if (this.fallbackToDefaultTypeMatch && element.isDefaultName &&
 				factory instanceof AutowireCapableBeanFactory && !factory.containsBean(name)) {
 			autowiredBeanNames = new LinkedHashSet<String>();
 			resource = ((AutowireCapableBeanFactory) factory).resolveDependency(
 					element.getDependencyDescriptor(), requestingBeanName, autowiredBeanNames, null);
 		}
+		// 可直接根据名字查找Bean
 		else {
 			resource = factory.getBean(name, element.lookupType);
+			// 自动注入的Bean名字
 			autowiredBeanNames = Collections.singleton(name);
 		}
 
@@ -473,6 +530,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			ConfigurableBeanFactory beanFactory = (ConfigurableBeanFactory) factory;
 			for (String autowiredBeanName : autowiredBeanNames) {
 				if (beanFactory.containsBean(autowiredBeanName)) {
+					// 注册依赖关系：requestingBeanName依赖autowiredBeanName
 					beanFactory.registerDependentBean(autowiredBeanName, requestingBeanName);
 				}
 			}

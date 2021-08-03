@@ -83,15 +83,24 @@ public class InjectionMetadata {
 		this.checkedElements = checkedElements;
 	}
 
+	/**
+	 * 将@Resource注解的方法和属性注入到目标Bean中
+	 * @param target
+	 * @param beanName
+	 * @param pvs
+	 * @throws Throwable
+	 */
 	public void inject(Object target, String beanName, PropertyValues pvs) throws Throwable {
 		Collection<InjectedElement> elementsToIterate =
 				(this.checkedElements != null ? this.checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
 			boolean debug = logger.isDebugEnabled();
+			// 遍历要进行注入的方法和属性
 			for (InjectedElement element : elementsToIterate) {
 				if (debug) {
 					logger.debug("Processing injected element of bean '" + beanName + "': " + element);
 				}
+				// 注入到目标Bean中
 				element.inject(target, beanName, pvs);
 			}
 		}
@@ -179,11 +188,14 @@ public class InjectionMetadata {
 		 * Either this or {@link #getResourceToInject} needs to be overridden.
 		 */
 		protected void inject(Object target, String requestingBeanName, PropertyValues pvs) throws Throwable {
+			// 字段注入
 			if (this.isField) {
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
+				// getResourceToInject方法获取要注入的对象，使用反射注入
 				field.set(target, getResourceToInject(target, requestingBeanName));
 			}
+			// 方法注入
 			else {
 				if (checkPropertySkipping(pvs)) {
 					return;
@@ -191,6 +203,7 @@ public class InjectionMetadata {
 				try {
 					Method method = (Method) this.member;
 					ReflectionUtils.makeAccessible(method);
+					// getResourceToInject方法获取要注入的对象，使用反射注入
 					method.invoke(target, getResourceToInject(target, requestingBeanName));
 				}
 				catch (InvocationTargetException ex) {
