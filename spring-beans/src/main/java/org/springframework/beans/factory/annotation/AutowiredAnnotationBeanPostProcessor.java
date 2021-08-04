@@ -107,6 +107,7 @@ import org.springframework.util.StringUtils;
  * @see #setAutowiredAnnotationType
  * @see Autowired
  * @see Value
+ * 用来处理@Autowired、@Value、@Inject注解
  */
 public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
 		implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
@@ -238,16 +239,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	 * @param beanType the actual type of the managed bean instance
 	 * @param beanName the name of the bean
 	 *
-	 * 这里用来查找自动注入的元数据
+	 * 查找被@Autowired、@Value以及@Inject注解修饰的属性和方法，并进行检查
 	 */
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		if (beanType != null) {
-			/**
-			 * 查找注入的元数据
-			 * InjectionMetadata 注入元数据，用来表示注入的元数据信息，里面包括了目标类和注入的元素等
-			 */
+			// 查找被@Autowired、@Value以及@Inject注解修饰的属性和方法
 			InjectionMetadata metadata = findAutowiringMetadata(beanName, beanType, null);
-			// TODO 检查一些啥啥啥。。。
 			metadata.checkConfigMembers(beanDefinition);
 		}
 	}
@@ -358,6 +355,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 	/**
 	 * 在Bean的属性被设置之前调用，可以用来将数据注入到属性中
+	 * 查找被@Autowired、@Value以及@Inject注解修饰的属性和方法，并注入
 	 * @param pvs
 	 * @param pds
 	 * @param bean
@@ -369,8 +367,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 	public PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
 
-		// 查找要注入的元数据，从缓存中或者新构造元数据
-		// 在上一步Bean实例化后的postProcessMergedBeanDefinition方法中会有构造注入元数据到缓存的步骤
+		// 查找被@Autowired、@Value以及@Inject注解修饰的属性和方法
 		InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
 		try {
 			// 注入元数据，有AutowiredFieldElement和AutowiredMethodElement两种注入
@@ -449,25 +446,25 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			LinkedList<InjectionMetadata.InjectedElement> currElements = new LinkedList<InjectionMetadata.InjectedElement>();
 			// 先遍历当前类的字段
 			for (Field field : targetClass.getDeclaredFields()) {
-				// 看这个字段有没有被@Autowired等注解标注
+				// 看这个字段有没有被@Autowired、@Value、@Inject注解标注
 				Annotation ann = findAutowiredAnnotation(field);
 				// 有被注解
 				if (ann != null) {
-					// 如果字段是静态字段，则注解@Autowired等没有效果，直接跳过不处理
+					// 如果字段是静态字段，则注解@Autowired、@Value、@Inject等没有效果，直接跳过不处理
 					if (Modifier.isStatic(field.getModifiers())) {
 						if (logger.isWarnEnabled()) {
 							logger.warn("Autowired annotation is not supported on static fields: " + field);
 						}
 						continue;
 					}
-					// 查找required属性的值
+					// 查找注解中是否与required属性的值
 					boolean required = determineRequiredStatus(ann);
 					// 构造一个AutowiredFieldElement对象，添加到列表中，AutowiredFieldElement对象用来存储注入的元素的一些元数据信息
 					currElements.add(new AutowiredFieldElement(field, required));
 				}
 			}
 
-			// 遍历当前类的方法，看有没有被@Autowired等注解标注
+			// 遍历当前类的方法，看有没有被@Autowired、@Value、@Inject等注解标注
 			for (Method method : targetClass.getDeclaredMethods()) {
 				Annotation ann = null;
 				// 如果是桥接方法，则要找到原始方法；如果不是原始方法，则直接返回
@@ -477,7 +474,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					// 查找看该方法上面有没有被@Autowired注解标注
 					ann = findAutowiredAnnotation(bridgedMethod);
 				}
-				// 方法有被@Autowired注解标注
+				// 方法有被@Autowired、@Value、@Inject注解标注
 				if (ann != null && method.equals(ClassUtils.getMostSpecificMethod(method, clazz))) {
 					// 方法是静态方法，注解无效，直接跳过
 					if (Modifier.isStatic(method.getModifiers())) {
@@ -494,7 +491,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					}
 					// 获取required属性值
 					boolean required = determineRequiredStatus(ann);
-					// 获取PropertyDescriptor TODO
+					// 获取PropertyDescriptor
 					PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, clazz);
 					// 构建AutowiredMethodElement对象，放到列表中，AutowiredMethodElement表示的是注解的方法的元数据
 					currElements.add(new AutowiredMethodElement(method, required, pd));
@@ -556,10 +553,12 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 		try {
 			Method method = ReflectionUtils.findMethod(ann.annotationType(), this.requiredParameterName);
 			if (method == null) {
+				// @Value、@Inject没有required属性，直接默认返回true
 				// Annotations like @Inject and @Value don't have a method (attribute) named "required"
 				// -> default to required status
 				return true;
 			}
+			// @Autowired注解中required属性指定的值
 			return (this.requiredParameterValue == (Boolean) ReflectionUtils.invokeMethod(method, ann));
 		}
 		catch (Exception ex) {
