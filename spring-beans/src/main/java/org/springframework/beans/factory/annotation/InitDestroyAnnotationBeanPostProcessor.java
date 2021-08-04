@@ -73,6 +73,8 @@ import org.springframework.util.ReflectionUtils;
  * @since 2.5
  * @see #setInitAnnotationType
  * @see #setDestroyAnnotationType
+ *
+ * 处理@PostConstruct和@PreDestroy
  */
 @SuppressWarnings("serial")
 public class InitDestroyAnnotationBeanPostProcessor
@@ -121,14 +123,29 @@ public class InitDestroyAnnotationBeanPostProcessor
 	}
 
 
+	/**
+	 * 这里会查找@PostConstruct和@PreDestroy注解的方法
+	 * @param beanDefinition the merged bean definition for the bean
+	 * @param beanType the actual type of the managed bean instance
+	 * @param beanName the name of the bean
+	 */
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		if (beanType != null) {
+			// 查找@PostConstruct和@PreDestroy注解的方法
 			LifecycleMetadata metadata = findLifecycleMetadata(beanType);
 			metadata.checkConfigMembers(beanDefinition);
 		}
 	}
 
+	/**
+	 * Bean初始化前调用，用来调用@PostConstruct注解的方法
+	 * @param bean the new bean instance 已经实例化了的bean
+	 * @param beanName the name of the bean bean名字
+	 * @return
+	 * @throws BeansException
+	 */
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		// 查找@PostConstruct和@PreDestroy注解的方法
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
             /**
@@ -150,7 +167,14 @@ public class InitDestroyAnnotationBeanPostProcessor
 		return bean;
 	}
 
+	/**
+	 * Bean销毁前调用，用来调用@PreDestroy注解的方法
+	 * @param bean the bean instance to be destroyed
+	 * @param beanName the name of the bean
+	 * @throws BeansException
+	 */
 	public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
+		// 查找@PostConstruct和@PreDestroy注解的方法
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
 			metadata.invokeDestroyMethods(bean, beanName);
@@ -181,6 +205,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 			synchronized (this.lifecycleMetadataCache) {
 				metadata = this.lifecycleMetadataCache.get(clazz);
 				if (metadata == null) {
+					// 查找@PostConstruct和@PreDestroy注解的方法
 					metadata = buildLifecycleMetadata(clazz);
 					this.lifecycleMetadataCache.put(clazz, metadata);
 				}
@@ -300,6 +325,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 					if (debug) {
 						logger.debug("Invoking init method on bean '" + beanName + "': " + element.getMethod());
 					}
+					// 使用反射调用注解了@PostConstruct的方法
 					element.invoke(target);
 				}
 			}
@@ -314,6 +340,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 					if (debug) {
 						logger.debug("Invoking destroy method on bean '" + beanName + "': " + element.getMethod());
 					}
+					// 使用反射调用注解了@PreDestroy的方法
 					element.invoke(target);
 				}
 			}
