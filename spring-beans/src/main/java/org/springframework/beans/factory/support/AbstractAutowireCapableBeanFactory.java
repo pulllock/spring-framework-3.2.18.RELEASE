@@ -1103,6 +1103,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Need to determine the constructor...
 		// 需要根据参数解析构造函数
         // 主要是检查已经注册的SmartInstantiationAwareBeanPostProcessor
+		// TODO 需要弄清楚这里是干嘛的
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		// 有参数的情况，利用参数个数、类型等确定最匹配的构造方法
 		if (ctors != null ||

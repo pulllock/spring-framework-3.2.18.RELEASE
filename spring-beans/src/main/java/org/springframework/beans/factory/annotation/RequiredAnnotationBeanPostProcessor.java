@@ -70,6 +70,8 @@ import org.springframework.util.Assert;
  * @since 2.0
  * @see #setRequiredAnnotationType
  * @see Required
+ * 用来解析@Required注解，@Required注解用在方法上，主要用在setter方法上，用来
+ * 确保属性值被设置
  */
 public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter
 		implements MergedBeanDefinitionPostProcessor, PriorityOrdered, BeanFactoryAware {
@@ -135,6 +137,18 @@ public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 	}
 
+	/**
+	 * 该方法可以对属性值进行修改，这个时候属性值还未被设置。如果postProcessAfterInstantiation返回false，则
+	 * 该方法不会被调用。
+	 *
+	 * 这里是要确定@Required注解的setter方法所需要的依赖一定存在
+	 * @param pvs
+	 * @param pds
+	 * @param bean
+	 * @param beanName
+	 * @return
+	 * @throws BeansException
+	 */
 	@Override
 	public PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
@@ -144,6 +158,7 @@ public class RequiredAnnotationBeanPostProcessor extends InstantiationAwareBeanP
 			if (!shouldSkip(this.beanFactory, beanName)) {
 				List<String> invalidProperties = new ArrayList<String>();
 				for (PropertyDescriptor pd : pds) {
+					// setter方法，被@Required注解标注并且该属性没有被设置
 					if (isRequiredProperty(pd) && !pvs.contains(pd.getName())) {
 						invalidProperties.add(pd.getName());
 					}
