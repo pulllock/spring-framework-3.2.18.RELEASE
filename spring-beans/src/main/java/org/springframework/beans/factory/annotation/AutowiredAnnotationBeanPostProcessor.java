@@ -277,17 +277,17 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 
 					// 遍历构造器
 					for (Constructor<?> candidate : rawCandidates) {
-						// 查找构造方法上有没有@Autowired等注解，需要从autowiredAnnotationTypes这个Set中进行遍历
+						// 查找构造方法上有没有@Autowired、Value、Inject等注解，需要从autowiredAnnotationTypes这个Set中进行遍历
 						// 这个Set中保存有Autowired、Value、Inject三个注解
 						Annotation ann = findAutowiredAnnotation(candidate);
 						/**
-						 * 如果构造方法上有@Autowired注解的话：
+						 * 如果构造方法上有@Autowired、Value、Inject注解的话：
 						 * 如果已经有required=true的构造方法，直接抛异常；
 						 * 如果被注解的构造方法没有参数，直接抛异常；
 						 */
 						if (ann != null) {
 
-							// 如果有一个注解的required为true，则其他的构造方法上不能有@Autowired等注解
+							// 如果有一个注解的required为true，则其他的构造方法上不能有@Autowired、Value、Inject等注解
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
 										"Invalid autowire-marked constructor: " + candidate +
@@ -331,6 +331,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 							if (defaultConstructor != null) {
 								candidates.add(defaultConstructor);
 							}
+							// 只有一个构造方法并且不是默认构造方法，打印warn日志
 							else if (candidates.size() == 1 && logger.isWarnEnabled()) {
 								logger.warn("Inconsistent constructor declaration on bean with name '" + beanName +
 										"': single autowire-marked constructor flagged as optional - this constructor " +

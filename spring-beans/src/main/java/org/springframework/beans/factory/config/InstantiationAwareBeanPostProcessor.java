@@ -113,6 +113,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor {
 	 * 该方法不会被调用。
 	 *
 	 * 在AutowiredAnnotationBeanPostProcessor中用来注入被@Autowired等注解标注的元数据
+	 *
+	 * 在RequiredAnnotationBeanPostProcessor中用来解析@Required注解
 	 */
 	PropertyValues postProcessPropertyValues(
 			PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName)
