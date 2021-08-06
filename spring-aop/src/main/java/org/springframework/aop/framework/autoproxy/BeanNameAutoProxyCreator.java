@@ -78,6 +78,33 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 	 * Identify as bean to proxy if the bean name is in the configured list of names.
 	 * 根据BeanName匹配决定是否进行代理
 	 */
+	/*
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+		<beans>
+			<!--业务处理类，也就是被代理的类-->
+			<bean id="loginService" class="me.cxis.spring.aop.LoginServiceImpl"/>
+
+			<!--通知类-->
+			<bean id="logBeforeLogin" class="me.cxis.spring.aop.LogBeforeLogin"/>
+
+			<bean id="logAfterLogin" class="me.cxis.spring.aop.LogAfterLogin"/>
+
+			<!--代理类-->
+			<bean id="loginServiceProxy" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+
+				<property name="interceptorNames">
+					<list>
+						<value>logBeforeLogin</value>
+						<value>logAfterLogin</value>
+					</list>
+				</property>
+				<property name="beanNames">
+					<value>loginService*</value>
+				</property>
+			</bean>
+		</beans>
+	 */
 	@Override
 	protected Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource targetSource) {
 		// beanNames中保存着要进行代理的Bean名字
@@ -99,6 +126,7 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 				if (isMatch(beanName, mappedName)) {
 					return PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS;
 				}
+				// 如果使用beanName匹配不到，则使用别名进行匹配
 				BeanFactory beanFactory = getBeanFactory();
 				if (beanFactory != null) {
 					String[] aliases = beanFactory.getAliases(beanName);
