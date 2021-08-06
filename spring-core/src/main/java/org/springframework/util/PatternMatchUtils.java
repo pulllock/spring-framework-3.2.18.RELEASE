@@ -38,19 +38,26 @@ public abstract class PatternMatchUtils {
 			return false;
 		}
 		int firstIndex = pattern.indexOf('*');
+		// pattern不含通配符*，则直接和str进行相等比较
 		if (firstIndex == -1) {
 			return pattern.equals(str);
 		}
+		// pattern是*开头的
 		if (firstIndex == 0) {
+			// pattern是*通配符
 			if (pattern.length() == 1) {
 				return true;
 			}
 			int nextIndex = pattern.indexOf('*', firstIndex + 1);
+			// *开头，但是后面没有*了
 			if (nextIndex == -1) {
+				// pattern=*Service，str=userService这种格式的
 				return str.endsWith(pattern.substring(1));
 			}
 			String part = pattern.substring(1, nextIndex);
+			// *User*XXXX这种格式的
 			if ("".equals(part)) {
+				// 继续第二个*后面的匹配
 				return simpleMatch(pattern.substring(nextIndex), str);
 			}
 			int partIndex = str.indexOf(part);
