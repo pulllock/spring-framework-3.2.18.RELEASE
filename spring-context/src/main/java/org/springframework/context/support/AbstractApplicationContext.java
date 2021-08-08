@@ -224,9 +224,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** MessageSource we delegate our implementation of this interface to */
 	private MessageSource messageSource;
 
-	/** Helper class used in event publishing
+	/**
+	 * Helper class used in event publishing
 	 * 应用事件广播器
-	 * */
+	 * 在initApplicationEventMulticaster中注册了一个SimpleApplicationEventMulticaster
+	 */
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
 	/** Statically specified listeners
@@ -1025,7 +1027,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initMessageSource() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		//在配置文件中，消息源bean的名字必须为messageSource
+		// 在配置文件中，消息源bean的名字必须为messageSource
 		if (beanFactory.containsLocalBean(MESSAGE_SOURCE_BEAN_NAME)) {
 			this.messageSource = beanFactory.getBean(MESSAGE_SOURCE_BEAN_NAME, MessageSource.class);
 			// Make MessageSource aware of parent MessageSource.
@@ -1041,7 +1043,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				logger.debug("Using MessageSource [" + this.messageSource + "]");
 			}
 		}
-		else {//配置文件中用户没有自定义消息源，使用默认的DelegatingMessageSource
+		else {// 配置文件中用户没有自定义消息源，使用默认的DelegatingMessageSource
 			// Use empty MessageSource to be able to accept getMessage calls.
 			DelegatingMessageSource dms = new DelegatingMessageSource();
 			dms.setParentMessageSource(getInternalParentMessageSource());
@@ -1212,15 +1214,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishRefresh() {
 		// Initialize lifecycle processor for this context.
-		//初始化生命周期处理器
+		// 初始化生命周期处理器
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
-		//启动所有实现了LifeCycle接口的bean
+		// 启动所有实现了LifeCycle接口的bean
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
-		//完成ApplicationContext初始化的时候，需要发布ContextRefreshedEvent事件
+		// 完成ApplicationContext初始化的时候，需要发布ContextRefreshedEvent事件
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.
