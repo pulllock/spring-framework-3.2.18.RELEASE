@@ -1272,7 +1272,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @throws NoSuchBeanDefinitionException if there is no bean with the given name
 	 * @throws BeanDefinitionStoreException in case of an invalid bean definition
 	 * 返回一个合并过得RootBeanDefinition
-	 * 将存储XML配置文件的GernericBeanDefinition转换为RootBeanDefinition，如果是一个子bean，会合并父类的相关属性
+	 * 将存储XML配置文件的GenericBeanDefinition转换为RootBeanDefinition，如果是一个子bean，会合并父类的相关属性
 	 */
 	protected RootBeanDefinition getMergedLocalBeanDefinition(String beanName) throws BeansException {
 		// Quick check on the concurrent map first, with minimal locking.
@@ -1656,7 +1656,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			// Caches object obtained from FactoryBean if it is a singleton.
 			// containsBeanDefinition在所有的已经加载的类中检测是否定义beanName
 			if (mbd == null && containsBeanDefinition(beanName)) {
-				// 将存储XML配置文件的GernericBeanDefinition转换为RootBeanDefinition，如果是一个子bean，会合并父类的相关属性
+				// 将存储XML配置文件的GenericBeanDefinition转换为RootBeanDefinition，如果是一个子bean，会合并父类的相关属性
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
 			// 是否是用户定义的，而不是应用程序本身定义的
