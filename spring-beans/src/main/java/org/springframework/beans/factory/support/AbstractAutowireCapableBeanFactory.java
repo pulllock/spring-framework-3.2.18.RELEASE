@@ -424,6 +424,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object result = existingBean;
 		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
+			/**
+			 * InitDestroyAnnotationBeanPostProcessor中查找@PostConstruct注解的方法并调用
+			 *
+			 * ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor
+			 *
+			 * ApplicationContextAware中调用了几个Aware接口
+			 */
 			result = beanProcessor.postProcessBeforeInitialization(result, beanName);
 			if (result == null) {
 				return result;
@@ -437,6 +444,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object result = existingBean;
 		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
+			/**
+			 * AbstractAutoProxyCreator中进行AOP代理创建
+			 *
+			 * ScheduleAnnotationBeanPostProcessor中进行@Scheduled注解的解析和任务的添加
+			 */
 			result = beanProcessor.postProcessAfterInitialization(result, beanName);
 			if (result == null) {
 				return result;
@@ -648,7 +660,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		// Register bean as disposable.
 		try {
-			// 注册disposable bean 也就是destory-method
+			// 注册disposable bean 也就是destroy-method
 			registerDisposableBeanIfNecessary(beanName, bean, mbd);
 		}
 		catch (BeanDefinitionValidationException ex) {
@@ -1228,7 +1240,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected void populateBean(String beanName, RootBeanDefinition mbd, BeanWrapper bw) {
 		// Bean实例的所有属性
-		PropertyValues pvs = mbd.getPropertyValues();
+		PropertyValues  pvs = mbd.getPropertyValues();
 
 		if (bw == null) {
 			if (!pvs.isEmpty()) {
@@ -1262,6 +1274,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					/**
 					 * 如果返回false，表示不需要进行后续的属性设值
 					 * 也不需要再经过其他的BeanPostProcessor的处理
+					 * 目前所有实现中均直接返回true
 					 */
 					if (!ibp.postProcessAfterInstantiation(bw.getWrappedInstance(), beanName)) {
 						continueWithPropertyPopulation = false;
@@ -1319,10 +1332,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
 						/**
 						 * 后处理
-						 * 有个非常有用的BeanPostProcessor：AutowiredAnnotationBeanPostProcessor
-						 * 对@Autowired，@Value注解的依赖进行设值
+						 * AutowiredAnnotationBeanPostProcessor对@Autowired，@Value、@Inject注解的依赖进行注入
+						 * RequiredAnnotationBeanPostProcessor对@Required注解的属性进行检查看有没有被设置值
+						 * CommonAnnotationBeanPostProcessor对@Resource注解的依赖进行注入
+						 *
 						 */
 						pvs = ibp.postProcessPropertyValues(pvs, filteredPds, bw.getWrappedInstance(), beanName);
+						// 如果处理完后返回null，则不再进行下面的属性设置
 						if (pvs == null) {
 							return;
 						}
