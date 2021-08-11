@@ -51,6 +51,10 @@ import org.springframework.util.StringUtils;
  * @since 2.5
  * 
  * 解析component-scan标签
+ * 会解析@Component注解，包括：@Component、@Controller、@Service、@Repository、@Configuration
+ * 另外还会解析@ManagedBean、@Named等注解
+ *
+ * 将这些注解的类解析成BeanDefinition注册到容器中去
  */
 public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -83,9 +87,11 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 
 		// Actually scan for bean definitions and register them.
-		// 获取配置扫描器，创建ClassPathBeanDefinitionScanner实例的时候会注册Component、ManagedBea、Named等注解到includeFilters中去
-		// 下一步扫描的时候会把这些注解标注的类都扫描进容器
-		// Repository、Service、Controller等注解其实都是Component注解，所以也会一起扫描
+		/**
+		 * 获取配置扫描器，创建ClassPathBeanDefinitionScanner实例的时候会注册Component、ManagedBean、Named等注解到includeFilters中去
+		 * 下一步扫描的时候会把这些注解标注的类都扫描进容器
+		 * Repository、Service、Controller、Configuration等注解其实都是Component注解，所以也会一起扫描
+		 */
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
 		// 使用ClassPathBeanDefinitionScanner进行扫描，扫描范围是base-package指定的包
 		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
@@ -139,7 +145,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 			readerContext.error(ex.getMessage(), readerContext.extractSource(element), ex.getCause());
 		}
 
-		// 解析include-filter和exclude-filter属性，根据情况添加各种TypeFilter到scaner中
+		// 解析include-filter和exclude-filter属性，根据情况添加各种TypeFilter到scanner中
 		parseTypeFilters(element, scanner, readerContext, parserContext);
 
 		return scanner;

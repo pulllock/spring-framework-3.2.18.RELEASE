@@ -89,13 +89,13 @@ abstract class ConfigurationClassUtils {
 		}
 
 		if (metadata != null) {
-		    // 标注了@Configuration注解
+		    // 标注了@Configuration注解，是一个full模式的配置类
 			if (isFullConfigurationCandidate(metadata)) {
 				// 如果是@Configuration注解的类，设置属性org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass : full
 				beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 				return true;
 			}
-			// 标注了@Component注解的类或者有@Bean注解的方法
+			// 标注了@Component注解的类或者一个类中有@Bean注解的方法，这个类是一个lite模式的配置类
 			else if (isLiteConfigurationCandidate(metadata)) {
 				// 设置属性：org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass : lite
 				beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
