@@ -240,7 +240,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
 		for (String basePackage : basePackages) {
-			// 扫描候选的Bean定义
+			// 扫描候选的Bean定义，找@Component注解的类，包括：@Component、@Controller、@Service、@Repository、@Configuration
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			// 遍历查找到的各种Bean定义
 			for (BeanDefinition candidate : candidates) {
@@ -253,7 +253,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				if (candidate instanceof AbstractBeanDefinition) {
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
-				// 注解的Bean定义，这里处理@Primary等一些直接
+				/**
+				 * 看有没有被@Primary、@DependsOn、@Lazy、@Role等注解标注，如果有的话设置相关属性
+				 */
 				if (candidate instanceof AnnotatedBeanDefinition) {
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}

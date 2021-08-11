@@ -271,9 +271,11 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		Set<BeanDefinitionHolder> configCandidates = new LinkedHashSet<BeanDefinitionHolder>();
-		// 获取所有的BeanDefinition进行遍历，
-		// 在ComponentScanBeanDefinitionParser扫描注解的Bean的时候@Configuration注解的Bean已经被扫描到容器中
-		// 这里只需要遍历所有的Bean定义名字
+		/**
+		 * 获取所有的BeanDefinition进行遍历，
+		 * 在ComponentScanBeanDefinitionParser扫描注解的Bean的时候@Configuration注解的Bean已经被扫描到容器中
+		 * 这里只需要遍历所有的Bean定义名字
+		 */
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			// 从容器中获取Bean定义
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
@@ -282,6 +284,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			 * 判断BeanDefinition是不是Configuration类型
 			 * 就是使用了@Configuration注解或者@Component注解
 			 * 或者使用@Bean注解的方法
+			 *
+			 * 如果一个类直接有@Configuration注解，则是一个full模式的配置类
+			 * 如果一个类是被@Compoonent注解，或者一个类中有@Bean注解的方法，则这个类是一个lite模式的配置类
 			 */
 			if (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, this.metadataReaderFactory)) {
 				// 是配置类，添加到配置类候选集合中
@@ -314,7 +319,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 				this.metadataReaderFactory, this.problemReporter, this.environment,
 				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
 		/**
-		 * 解析每一个@Configuration注解的类
+		 * 解析每一个配置类（full模式的和lite模式的）
 		 */
 		for (BeanDefinitionHolder holder : configCandidates) {
 			// 配置类的Bean定义

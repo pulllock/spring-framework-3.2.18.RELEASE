@@ -72,8 +72,7 @@ class ComponentScanAnnotationParser {
 	 * @return
 	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
-		//
-		//
+
 		/**
 		 * 和ComponentBeanDefinitionParser一样使用ClassPathBeanDefinitionScanner来扫描指定的包下面的类
 		 * 往下面的步骤都是根据注解中配置的信息来设置scanner，最后进行解析，步骤都和ComponentBeanDefinitionParser一样

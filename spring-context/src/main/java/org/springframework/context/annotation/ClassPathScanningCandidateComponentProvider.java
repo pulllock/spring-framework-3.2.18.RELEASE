@@ -250,6 +250,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * Scan the class path for candidate components.
 	 * @param basePackage the package to check for annotated classes
 	 * @return a corresponding Set of autodetected bean definitions
+	 * 找被@Component注解的类，包括：@Component、@Controller、@Service、@Repository、@Configuration
 	 */
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
@@ -274,6 +275,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 						// SimpleMetadataReader中包含了资源文件、类元数据、注解元数据
 						MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
 						// 先判断是否是候选的组件，就是根据配置的include-filter和exclude-filter来判断是否符合指定的规则
+						// 看是否是@Component注解的
 						if (isCandidateComponent(metadataReader)) {
 							// 如果是候选组件，生成一个ScannedGenericBeanDefinition对象并添加到集合中
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
