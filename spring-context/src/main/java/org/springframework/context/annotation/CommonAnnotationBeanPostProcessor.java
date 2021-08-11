@@ -143,7 +143,7 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.beans.factory.annotation.InitDestroyAnnotationBeanPostProcessor
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  *
- * 用来处理@Resource、@PostConstruct、@PreDestry等注解的实现
+ * 用来处理@Resource、@PostConstruct、@PreDestroy等注解的实现
  */
 @SuppressWarnings("serial")
 public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBeanPostProcessor

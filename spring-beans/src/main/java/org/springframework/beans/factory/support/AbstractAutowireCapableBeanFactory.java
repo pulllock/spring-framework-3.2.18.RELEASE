@@ -554,7 +554,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 				/**
                  * 后置处理修改BeanDefinition
 				 * 应用MergedBeanDefinitionPostProcessors
-				 * 比如@Autowired注解是通过次方法实现诸如类型的预解析
+				 * 比如：
+				 * AutowiredAnnotationBeanPostProcessor中对@Autowired、@Value、@Inject等注解进行收集
+				 * InitDestroyAnnotationBeanPostProcessor对@PostConstruct、@PreDestroy等注解进行收集
+				 * CommonAnnotationBeanPostProcessor对@Resource、@PostConstruct、@PreDestroy等注解进行收集
  				 */
 				applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
 				mbd.postProcessed = true;
@@ -1104,7 +1107,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Need to determine the constructor...
 		// 需要根据参数解析构造函数
         // 主要是检查已经注册的SmartInstantiationAwareBeanPostProcessor
-		// TODO 需要弄清楚这里是干嘛的
+		// 查找当前正在实例化的Bean中是否有@Autowired注解的构造方法
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		// 有参数的情况，利用参数个数、类型等确定最匹配的构造方法
 		if (ctors != null ||
