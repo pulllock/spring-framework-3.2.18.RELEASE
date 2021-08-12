@@ -248,6 +248,9 @@ class ConfigurationClassEnhancer {
 		 * existence of this bean object.
 		 * @throws Throwable as a catch-all for any exception that may be thrown when invoking the
 		 * super implementation of the proxied method i.e., the actual {@code @Bean} method
+		 *
+		 * enhancedConfigInstance被增强过的Configuration实例
+		 * beanMethod是Configuration中被@Bena注解的方法
 		 */
 		public Object intercept(Object enhancedConfigInstance, Method beanMethod, Object[] beanMethodArgs,
 					MethodProxy cglibMethodProxy) throws Throwable {
