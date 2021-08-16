@@ -452,13 +452,21 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
+		// 初始化文件上传用的解析器
 		initMultipartResolver(context);
+		// 初始化国际化的解析器，如果没有指定，默认使用：org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver
 		initLocaleResolver(context);
+		// 初始化主题解析器，如果没有指定，默认使用：org.springframework.web.servlet.theme.FixedThemeResolver
 		initThemeResolver(context);
+		// 初始化HandlerMapping，用来处理http请求和Controller之间的映射关系
 		initHandlerMappings(context);
+		// 初始化HandlerAdapter，用来处理具体的Controller请求
 		initHandlerAdapters(context);
+		// 初始化异常处理解析器
 		initHandlerExceptionResolvers(context);
+		// 初始化请求转换到视图名称的转换器
 		initRequestToViewNameTranslator(context);
+		// 初始化视图解析器
 		initViewResolvers(context);
 		initFlashMapManager(context);
 	}
@@ -467,6 +475,21 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Initialize the MultipartResolver used by this class.
 	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
 	 * no multipart handling is provided.
+	 */
+	/*
+		初始化文件上传解析器，一般会在springmvc的配置文件中配置如下：
+		<!-- 配置文件上传 -->
+    	<bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 默认编码 -->
+        <property name="defaultEncoding" value="utf-8"/>
+        <!-- 上传文件最大值 -->
+        <property name="maxUploadSize" value="10485760000"/>
+        <!-- 内存中的最大值 -->
+        <property name="maxInMemorySize" value="40960"/>
+        <!-- 启用是为了推迟文件解析，以便捕获文件大小异常 -->
+        <property name="resolveLazily" value="true"/>
+    </bean>
 	 */
 	private void initMultipartResolver(ApplicationContext context) {
 		try {
@@ -500,7 +523,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 		catch (NoSuchBeanDefinitionException ex) {
 			// We need to use the default.
-			// 默认策略
+			// 默认从DispatcherServlet.properties中加载，默认使用：org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver
 			this.localeResolver = getDefaultStrategy(context, LocaleResolver.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug("Unable to locate LocaleResolver with name '" + LOCALE_RESOLVER_BEAN_NAME +
@@ -513,6 +536,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Initialize the ThemeResolver used by this class.
 	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
 	 * we default to a FixedThemeResolver.
+	 * 初始化主题解析器
 	 */
 	private void initThemeResolver(ApplicationContext context) {
 		try {
@@ -523,6 +547,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 		catch (NoSuchBeanDefinitionException ex) {
 			// We need to use the default.
+			// 默认从DispatcherServlet.properties中加载，默认使用：org.springframework.web.servlet.theme.FixedThemeResolver
 			this.themeResolver = getDefaultStrategy(context, ThemeResolver.class);
 			if (logger.isDebugEnabled()) {
 				logger.debug(
@@ -536,6 +561,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Initialize the HandlerMappings used by this class.
 	 * <p>If no HandlerMapping beans are defined in the BeanFactory for this namespace,
 	 * we default to BeanNameUrlHandlerMapping.
+	 * 初始化HandlerMapping，如果没有配置的的话，默认有两个：org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping,
+	 * 	org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping
 	 */
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
@@ -574,6 +601,11 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Initialize the HandlerAdapters used by this class.
 	 * <p>If no HandlerAdapter beans are defined in the BeanFactory for this namespace,
 	 * we default to SimpleControllerHandlerAdapter.
+	 * 初始化HandlerAdapter，如果没有配置，默认是：org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter,\
+	 * 	org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter,\
+	 * 	org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter
+	 *
+	 * 	一般会在配置文件中注册一个RequestMappingHandlerAdapter
 	 */
 	private void initHandlerAdapters(ApplicationContext context) {
 		this.handlerAdapters = null;
@@ -612,6 +644,9 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Initialize the HandlerExceptionResolver used by this class.
 	 * <p>If no bean is defined with the given name in the BeanFactory for this namespace,
 	 * we default to no exception resolver.
+	 * 初始化异常处理解析器，默认是：org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver,\
+	 * 	org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver,\
+	 * 	org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver
 	 */
 	private void initHandlerExceptionResolvers(ApplicationContext context) {
 		this.handlerExceptionResolvers = null;
@@ -650,6 +685,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	/**
 	 * Initialize the RequestToViewNameTranslator used by this servlet instance.
 	 * <p>If no implementation is configured then we default to DefaultRequestToViewNameTranslator.
+	 * 初始化请求转换到视图名称的转换器，默认：org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator
 	 */
 	private void initRequestToViewNameTranslator(ApplicationContext context) {
 		try {
@@ -674,6 +710,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * Initialize the ViewResolvers used by this class.
 	 * <p>If no ViewResolver beans are defined in the BeanFactory for this
 	 * namespace, we default to InternalResourceViewResolver.
+	 * 初始化视图解析器 ，默认是：InternalResourceViewResolver
 	 */
 	private void initViewResolvers(ApplicationContext context) {
 		this.viewResolvers = null;
