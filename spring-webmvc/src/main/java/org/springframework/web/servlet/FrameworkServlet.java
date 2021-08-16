@@ -538,6 +538,7 @@ public abstract class FrameworkServlet extends HttpServletBean {
 			// Either the context is not a ConfigurableApplicationContext with refresh
 			// support or the context injected at construction time had already been
 			// refreshed -> trigger initial onRefresh manually here.
+			// springmvc容器创建并刷新后，开始初始化一些web相关组件，比如HandlerMapping
 			onRefresh(wac);
 		}
 
