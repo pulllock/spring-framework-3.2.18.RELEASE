@@ -47,6 +47,9 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMappi
  * @author Arjen Poutsma
  * @author Rossen Stoyanchev
  * @since 3.1
+ * 用来处理被@RequestMapping注解的类和方法
+ *
+ * 实现了InitializingBean接口，在afterProperties方法中解析@RequestMapping注解的方法和类，并将注解上的信息进行封装成RequestMappingInfo对象
  */
 public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMapping
 		implements EmbeddedValueResolverAware {
@@ -187,12 +190,16 @@ public class RequestMappingHandlerMapping extends RequestMappingInfoHandlerMappi
 	protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
 		RequestMappingInfo info = null;
 		RequestMapping methodAnnotation = AnnotationUtils.findAnnotation(method, RequestMapping.class);
+		// 方法上有@RequestMapping注解
 		if (methodAnnotation != null) {
 			RequestCondition<?> methodCondition = getCustomMethodCondition(method);
+			// 创建一个RequestMappingInfo对象，对象中包含了@RequestMapping中写的各种属性信息
 			info = createRequestMappingInfo(methodAnnotation, methodCondition);
 			RequestMapping typeAnnotation = AnnotationUtils.findAnnotation(handlerType, RequestMapping.class);
+			// 类上有@RequestMapping的注解
 			if (typeAnnotation != null) {
 				RequestCondition<?> typeCondition = getCustomTypeCondition(handlerType);
+				// 创建一个RequestMappingInfo对象，并和方法上的RequestMappingInfo进行合并，对象中包含了@RequestMapping中写的各种属性信息
 				info = createRequestMappingInfo(typeAnnotation, typeCondition).combine(info);
 			}
 		}

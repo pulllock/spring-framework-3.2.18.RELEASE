@@ -318,9 +318,10 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @param request current HTTP request
 	 * @return the corresponding handler instance, or the default handler
 	 * @see #getHandlerInternal
+	 * 根据url查找对应的处理方法，并添加拦截器
 	 */
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-		// 获取Handler，这个是模板方法，留给子类实现
+		// 根据url查找对应的方法
 		Object handler = getHandlerInternal(request);
 		// 没有获取到Handler使用默认的
 		if (handler == null) {
@@ -335,7 +336,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			String handlerName = (String) handler;
 			handler = getApplicationContext().getBean(handlerName);
 		}
-		// 添加拦截器
+		// 如果有拦截器，需要添加拦截器，拦截器和方法一起封装成了HandlerExecutionChain对象
 		return getHandlerExecutionChain(handler, request);
 	}
 
@@ -372,11 +373,13 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #getAdaptedInterceptors()
 	 */
 	protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+		// adaptedInterceptors中的拦截器不需要根据什么URL之类的规则进行匹配，会应用到所有请求上
 		HandlerExecutionChain chain = (handler instanceof HandlerExecutionChain ?
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
 		chain.addInterceptors(getAdaptedInterceptors());
 
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request);
+		// mappedInterceptors中的拦截器则需要根据URL匹配
 		for (MappedInterceptor mappedInterceptor : this.mappedInterceptors) {
 			if (mappedInterceptor.matches(lookupPath, this.pathMatcher)) {
 				chain.addInterceptor(mappedInterceptor.getInterceptor());

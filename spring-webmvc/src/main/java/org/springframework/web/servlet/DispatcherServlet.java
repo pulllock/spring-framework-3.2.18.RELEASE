@@ -299,10 +299,22 @@ public class DispatcherServlet extends FrameworkServlet {
 	/** ThemeResolver used by this servlet */
 	private ThemeResolver themeResolver;
 
-	/** List of HandlerMappings used by this servlet */
+	/**
+	 * List of HandlerMappings used by this servlet
+	 * HandlerMapping，
+	 * - 可以在配置文件中进行配置
+	 * - 如果没有配置的话，默认会加载两个：BeanNameUrlHandlerMapping和DefaultAnnotationHandlerMapping
+	 * - 如果是使用注解自动解析，会在AnnotationDrivenBeanDefinitionParser中创建一个RequestMappingHandlerMapping
+	 */
 	private List<HandlerMapping> handlerMappings;
 
-	/** List of HandlerAdapters used by this servlet */
+	/**
+	 * List of HandlerAdapters used by this servlet
+	 * HandlerAdapter
+	 * - 可以在配置文件中进行配置
+	 * - 如果没有配置的话，默认会加载三个：HttpRequestHandlerAdapter,SimpleControllerHandlerAdapter,AnnotationMethodHandlerAdapter
+	 * - 如果是使用注解自动解析，会在AnnotationDrivenBeanDefinitionParser中创建一个RequestMappingHandlerAdapter
+	 */
 	private List<HandlerAdapter> handlerAdapters;
 
 	/** List of HandlerExceptionResolvers used by this servlet */
@@ -963,7 +975,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Determine handler adapter for the current request.
-                // 根据Handler找到HandlerAdapter
+                // 根据一个URL对应的方法找到能够处理这个方法的handlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -1158,7 +1170,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>Tries all handler mappings in order.
 	 * @param request current HTTP request
 	 * @return the HandlerExecutionChain, or {@code null} if no handler could be found
-	 * 查找Handler是按顺序遍历所有的HandlerMapping，找到一个HandlerMappering后立即停止查找并返回
+	 * 查找Handler是按顺序遍历所有的HandlerMapping，找到一个HandlerMapping后立即停止查找并返回
 	 */
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		for (HandlerMapping hm : this.handlerMappings) {
@@ -1166,6 +1178,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				logger.trace(
 						"Testing handler map [" + hm + "] in DispatcherServlet with name '" + getServletName() + "'");
 			}
+			// 使用具体的HandlerMapping来根据url查找对应的处理方法
 			HandlerExecutionChain handler = hm.getHandler(request);
 			if (handler != null) {
 				return handler;
@@ -1198,6 +1211,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Testing handler adapter [" + ha + "]");
 			}
+			// 看那个HandlerAdapter可以处理这个url对应的方法
 			if (ha.supports(handler)) {
 				return ha;
 			}
