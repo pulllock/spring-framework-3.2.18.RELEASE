@@ -40,10 +40,19 @@ public class HandlerExecutionChain {
 
 	private static final Log logger = LogFactory.getLog(HandlerExecutionChain.class);
 
+	/**
+	 * 一个url对应的方法
+	 */
 	private final Object handler;
 
+	/**
+	 * 拦截器
+	 */
 	private HandlerInterceptor[] interceptors;
 
+	/**
+	 * 拦截器
+	 */
 	private List<HandlerInterceptor> interceptorList;
 
 	private int interceptorIndex = -1;
