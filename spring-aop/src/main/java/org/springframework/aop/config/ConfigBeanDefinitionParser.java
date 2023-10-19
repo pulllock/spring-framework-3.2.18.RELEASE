@@ -99,14 +99,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
     /**
      * 解析aop相关标签，解析成BeanDefinition注册到容器中，会默认注册一个AspectJAwareAdvisorAutoProxyCreator到容器中
      *     <!--业务实现类-->
-     *     <bean id="loginService" class="me.cxis.spring.aop.config.LoginServiceImpl"></bean>
+     *     <bean id="loginService" class="fun.pullock.spring.aop.config.LoginServiceImpl"></bean>
      *
      *     <!--增强类-->
-     *     <bean id="logBeforeLogin" class="me.cxis.spring.aop.config.LogBeforeLogin"></bean>
+     *     <bean id="logBeforeLogin" class="fun.pullock.spring.aop.config.LogBeforeLogin"></bean>
      *
      *     <aop:config>
      *         <aop:aspect id="loginAspect" ref="logBeforeLogin">
-     *             <aop:pointcut expression="execution(* me.cxis.spring.aop.config.*.*(..))" id="beforeLoginPointCut"/>
+     *             <aop:pointcut expression="execution(* fun.pullock.spring.aop.config.*.*(..))" id="beforeLoginPointCut"/>
      *             <aop:before method="beforeLogin" pointcut-ref="beforeLoginPointCut"/>
      *         </aop:aspect>
      *     </aop:config>
@@ -229,14 +229,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 
 	/**
 	 *     <!--业务实现类-->
-	 *     <bean id="loginService" class="me.cxis.spring.aop.config.LoginServiceImpl"></bean>
+	 *     <bean id="loginService" class="fun.pullock.spring.aop.config.LoginServiceImpl"></bean>
 	 *
 	 *     <!--增强类-->
-	 *     <bean id="logBeforeLogin" class="me.cxis.spring.aop.config.LogBeforeLogin"></bean>
+	 *     <bean id="logBeforeLogin" class="fun.pullock.spring.aop.config.LogBeforeLogin"></bean>
 	 *
 	 *     <aop:config>
 	 *         <aop:aspect id="loginAspect" ref="logBeforeLogin">
-	 *             <aop:pointcut expression="execution(* me.cxis.spring.aop.config.*.*(..))" id="beforeLoginPointCut"/>
+	 *             <aop:pointcut expression="execution(* fun.pullock.spring.aop.config.*.*(..))" id="beforeLoginPointCut"/>
 	 *             <aop:before method="beforeLogin" pointcut-ref="beforeLoginPointCut"/>
 	 *         </aop:aspect>
 	 *     </aop:config>

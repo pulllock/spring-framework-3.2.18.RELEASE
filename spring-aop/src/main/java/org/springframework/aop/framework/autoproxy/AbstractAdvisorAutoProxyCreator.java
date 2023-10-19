@@ -71,17 +71,17 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 		<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 		<beans>
 			<!--业务处理类，也就是被代理的类-->
-			<bean id="loginService" class="me.cxis.spring.aop.LoginServiceImpl"/>
+			<bean id="loginService" class="fun.pullock.spring.aop.LoginServiceImpl"/>
 
 			<!--通知类-->
-			<bean id="logBeforeLogin" class="me.cxis.spring.aop.LogBeforeLogin"/>
+			<bean id="logBeforeLogin" class="fun.pullock.spring.aop.LogBeforeLogin"/>
 
 			<bean id="logBeforeAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
 				<property name="advice">
 					<ref bean="logBeforeLogin"/>
 				</property>
 				<property name="pattern">
-					<value>me.cxis.spring.aop.*</value>
+					<value>fun.pullock.spring.aop.*</value>
 				</property>
 			</bean>
 

@@ -256,7 +256,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		Set<BeanDefinition> candidates = new LinkedHashSet<BeanDefinition>();
 		try {
 			// 先把包名转换成路径名，会先解析包名中的占位符，然后把'.'换成'/'
-			// 比如me.cxis.spring.* 转换为classpath*:me/cxis/spring/*/**/*.class
+			// 比如fun.pullock.spring.* 转换为classpath*:fun/pullock/spring/*/**/*.class
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + "/" + this.resourcePattern;
 			// 使用PathMatchingResourcePatternResolver从指定的路径下解析所有资源

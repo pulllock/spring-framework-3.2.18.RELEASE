@@ -83,12 +83,12 @@ public class BeanNameAutoProxyCreator extends AbstractAutoProxyCreator {
 		<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 		<beans>
 			<!--业务处理类，也就是被代理的类-->
-			<bean id="loginService" class="me.cxis.spring.aop.LoginServiceImpl"/>
+			<bean id="loginService" class="fun.pullock.spring.aop.LoginServiceImpl"/>
 
 			<!--通知类-->
-			<bean id="logBeforeLogin" class="me.cxis.spring.aop.LogBeforeLogin"/>
+			<bean id="logBeforeLogin" class="fun.pullock.spring.aop.LogBeforeLogin"/>
 
-			<bean id="logAfterLogin" class="me.cxis.spring.aop.LogAfterLogin"/>
+			<bean id="logAfterLogin" class="fun.pullock.spring.aop.LogAfterLogin"/>
 
 			<!--代理类-->
 			<bean id="loginServiceProxy" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">

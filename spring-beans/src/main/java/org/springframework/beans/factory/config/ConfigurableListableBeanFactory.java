@@ -83,8 +83,8 @@ public interface ConfigurableListableBeanFactory
 	 *        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	 * 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" default-autowire="byType">
 	 *
-	 *     <bean id="userDao" class="me.cxis.spring.autowire.xml.dao.impl.UserDaoImpl"/>
-	 *     <bean id="userService" class="me.cxis.spring.autowire.xml.service.impl.UserServiceImpl"/>
+	 *     <bean id="userDao" class="fun.pullock.spring.autowire.xml.dao.impl.UserDaoImpl"/>
+	 *     <bean id="userService" class="fun.pullock.spring.autowire.xml.service.impl.UserServiceImpl"/>
 	 *
 	 * </beans>
 	 * 配置中使用了default-autowire="byType"或者byName，可以让userDao自动注入到userService中去，这里使用的是
@@ -112,10 +112,10 @@ public interface ConfigurableListableBeanFactory
 	 *        xsi:schemaLocation="http://www.springframework.org/schema/beans
 	 * 	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" default-autowire="byType">
 	 *
-	 *     <bean id="userDao" class="me.cxis.spring.autowire.xml.dao.impl.UserDaoImpl"/>
-	 *     <bean id="userService" class="me.cxis.spring.autowire.xml.service.impl.UserServiceImpl"/>
+	 *     <bean id="userDao" class="fun.pullock.spring.autowire.xml.dao.impl.UserDaoImpl"/>
+	 *     <bean id="userService" class="fun.pullock.spring.autowire.xml.service.impl.UserServiceImpl"/>
 	 *
-	 *     <bean id="applicationContextUtilXml" class="me.cxis.spring.utils.ApplicationContextUtilXml"/>
+	 *     <bean id="applicationContextUtilXml" class="fun.pullock.spring.utils.ApplicationContextUtilXml"/>
 	 * </beans>
 	 * 这种方式中ApplicationContextUtilXml中的applicationContext并不使用上面的自动注入通过setter方法进行注入，
 	 * 为了不让Spring容器通过自动注入方式注入类似这种Aware接口的set方法中的Bean，Spring通过ignoreDependencyInterface方法
